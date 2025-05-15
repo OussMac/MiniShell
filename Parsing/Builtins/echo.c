@@ -1,6 +1,6 @@
 #include "../minishell.h"
 
-static int double_len(char **argv)
+int double_len(char **argv)
 {
     int x;
     int len;

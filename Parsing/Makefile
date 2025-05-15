@@ -5,7 +5,8 @@ NAME = minishell
 SRC = minishell.c identificators/identity_tools/identool0.c\
 		identificators/identify.c identificators/identity_tools/identool1.c tools/tool.c\
 		tools/tool2.c identificators/units.c \
-		Debbugers/Tokens_db.c Builtins/echo.c Builtins/env.c Builtins/pwd.c Signal_handlers/sig_handlers.c
+		Debbugers/Tokens_db.c Builtins/echo.c Builtins/env.c Builtins/pwd.c Signal_handlers/sig_handlers.c\
+		Builtins/exit.c tools/tool4.c
 
 OBJ = $(SRC:.c=.o)
 

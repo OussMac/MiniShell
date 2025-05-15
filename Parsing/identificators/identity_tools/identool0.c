@@ -35,3 +35,4 @@ t_token	*add_identity(char *content, enum grammar tok)
 	}
 	return (new_node);
 }
+
