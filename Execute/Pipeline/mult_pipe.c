@@ -80,7 +80,7 @@ char *bin_to_absolute(char *cmd)
     return (bin_path);
 }
 
-void execute_one_cmd(char *cmd)
+void execute_one_cmd(char *cmd) // return value to protect from failure
 {
     char **args = ft_split(cmd, ' ');
     if (!args)
@@ -127,7 +127,7 @@ int main(int argc, char **argv)
             close(fds[0]); // close read end
             close(fds[1]); // close write end
             execute_one_cmd(cmd1);
-            return (EXIT_FAILURE);
+            return (EXIT_SUCCESS);
         }
         if (fork() == 0)
         {
@@ -135,7 +135,7 @@ int main(int argc, char **argv)
             close(fds[1]); // close write end
             close(fds[0]); // close read end
             execute_one_cmd(cmd2);
-            return (EXIT_FAILURE);
+            return (EXIT_SUCCESS);
         }
         close(fds[1]); // salina bihom fparent
         close(fds[0]);
@@ -145,13 +145,13 @@ int main(int argc, char **argv)
         return (printf("Only one pipe found\n"), free(str), EXIT_SUCCESS);
     }
 
-    int *fds = malloc(sizeof(int) * (data.pipe_count) * 2);
-    if (!fds)
-        return (printf("malloc failed\n"), EXIT_FAILURE);
-    pipe(fds);
+    // int *fds = malloc(sizeof(int) * (data.pipe_count) * 2);
+    // if (!fds)
+    //     return (printf("malloc failed\n"), EXIT_FAILURE);
+    // pipe(fds);
 
-    print_int_array(fds, (data.pipe_count + 1) * 2);
-    free(fds);
+    // print_int_array(fds, (data.pipe_count + 1) * 2);
+    // free(fds);
     free(str);
     // count the number of pipes
    return (EXIT_SUCCESS);
