@@ -86,7 +86,6 @@ void execute_one_cmd(char *cmd)
     if (!args)
         return;
     execve(bin_to_absolute(args[0]), args, NULL);
-    free_argv(args, true);
 }
 
 
@@ -101,11 +100,51 @@ int main(int argc, char **argv)
         return (printf("malloc failed\n"), EXIT_FAILURE);
     printf("%s\n", str);
     count_cmd_pipes(str, &data);
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////// ome commad
     if (data.pipe_count == 0) // only one command, execute the one command.
     {
-        execute_one_cmd(str);
-        return (printf("No pipes found\n"), free(str), EXIT_FAILURE);
+        if (fork() == 0)
+        {
+            execute_one_cmd(str);
+            return (EXIT_FAILURE);
+        }
+        // parent process
+        wait(NULL);
+        return (printf("No pipes found\n"), free(str), EXIT_SUCCESS);
+    }///////////////////////////////////////////////////////////////////////////////////////////////// two commands
+    else if (data.pipe_count == 1) 
+    {
+        int fds[2];
+        if (pipe(fds) == -1)
+            return (printf("pipe failed\n"), free(str), EXIT_FAILURE);
+        char **cmds = ft_split(str, '|');
+        char *cmd1 = cmds[0];
+        char *cmd2 = cmds[1];
+        if (fork() == 0)
+        {
+            dup2(fds[1], STDOUT_FILENO); // redirect stdout to pipe write end
+            close(fds[0]); // close read end
+            close(fds[1]); // close write end
+            execute_one_cmd(cmd1);
+            return (EXIT_FAILURE);
+        }
+        if (fork() == 0)
+        {
+            dup2(fds[0], STDIN_FILENO); // redirect stdin to pipe read end
+            close(fds[1]); // close write end
+            close(fds[0]); // close read end
+            execute_one_cmd(cmd2);
+            return (EXIT_FAILURE);
+        }
+        close(fds[1]); // salina bihom fparent
+        close(fds[0]);
+        // parent process
+        while (wait(NULL) > -1)
+            ;
+        return (printf("Only one pipe found\n"), free(str), EXIT_SUCCESS);
     }
+
     int *fds = malloc(sizeof(int) * (data.pipe_count) * 2);
     if (!fds)
         return (printf("malloc failed\n"), EXIT_FAILURE);
