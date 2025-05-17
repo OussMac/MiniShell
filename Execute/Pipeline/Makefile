@@ -2,7 +2,7 @@ CC = cc
 CFLAG = -Wall -Wextra -Werror
 HEADER = pipex.h 
 NAME = pipex
-SRC = simple_pipe.c
+SRC = mult_pipe.c parse_helpers.c
 
 OBJ = $(SRC:.c=.o)
 

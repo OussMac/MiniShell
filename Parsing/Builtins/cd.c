@@ -1,32 +1,12 @@
 #include "../minishell.h"
 
-static char *get_pwd(t_data *data)
-{
-    int i;
-    int index;
-    char *oldpwd;
-
-    i = 0;
-    index = 0;
-    while(!ft_strnstr(data->o_env[index], "PWD=", 4))
-        index++;
-
-    oldpwd = malloc(get_len(data->o_env[index]) + 1);
-    while(data->o_env[index])
-    {
-        oldpwd[i] = data->o_env[index];
-        i++;
-        index++;
-    }
-    oldpwd[i] = '\0';
-    return (oldpwd);
-}
-
 void ft_cd(char *path, t_data *data)
 {
     char *oldpwd;
+    char *t_pwd_n;
+    char t_pwd[500];
 
-    get_pwd(data);
+    oldpwd = set_pointer(data, "PWD=", 4, POINT_N_GET);
     if (chdir(path))
     {
         printf("MasterMind: cd: no such file or directory: %s\n",
@@ -34,4 +14,15 @@ void ft_cd(char *path, t_data *data)
         data->exit_status = 1;
         return ;
     }
+    if (!getcwd(t_pwd, sizeof(t_pwd)))
+    {
+        printf("Getcwd Failed\n");
+        exit(EXIT_FAILURE);
+    }
+    else
+        printf("getcwd path > %s\n", t_pwd);
+    t_pwd_n = ft_strjoin(t_pwd, N_LINE);
+    change_pwd(data, t_pwd_n, "PWD=", 4); // create another OLDPWD
+    change_pwd(data, oldpwd, "OLDPWD=", 7); // overwrite the OLDPWD into PWDPWD since it has already a PWD at start
+    // resulting in no OLDPWD to exist (null) when printed
 }

@@ -14,16 +14,15 @@ t_envlist *add_variable(char *variable)
 	t_envlist *node;
 
 	node = malloc(sizeof(t_envlist));
-	cpy_variable()
+    node->variable = ft_strjoin(variable, N_LINE);
+	// cpy_variable(node->variable, variable); why ??
 	node->next = NULL;
 	return (node);
 }
 
-void *add_to_env(t_envlist **env, t_envlist *variable)
+void add_to_env(t_envlist **env, t_envlist *variable)
 {
-	if (!*env || !variable)
-		return ;
-	if (!*env)
+	if (*env)
 		get_last_node(*env)->next = variable;
 	else
 		*env = variable;

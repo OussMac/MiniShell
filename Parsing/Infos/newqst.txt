@@ -1,0 +1,31 @@
+void add_to_env(t_envlist **env, t_envlist *variable)
+{
+	if (!*env || !variable)
+		return ;
+	printf("didnt return\n");
+	if (!*env)
+	{	
+		printf("here\n");
+		get_last_node(*env)->next = variable;
+	} // issue was here, and why ?
+	else
+	{
+		printf("HERE\n");
+		*env = variable;
+	}
+}
+
+so if the env is NULL, how does the first if didnt return?
+	cuz it gets to HERE
+and since it always gets there, only the last part of the env gets
+saved in the linked list first node
+
+Answer
+	the env thats sent, isnt initialized, so its not NULL, it has some
+	garbage value, so it passes the first if and the second one since its
+	not NULL, and then it gets to the third if and re write the first node
+	always
+
+Solution
+	We can just init the env to NULL before calling the function that fills
+	the Linkedenv.

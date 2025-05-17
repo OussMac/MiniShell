@@ -1,10 +1,11 @@
 #include "../minishell.h"
 
-void ft_env(t_envlist **env)
+void linkednev_db(t_envlist **env)
 {
     t_envlist *trav;
 
     trav = *env;
+    printf("Debbugging The Linked ENV...\n");
     while(trav != NULL)
     {
         printf("%s", trav->variable);

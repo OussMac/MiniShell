@@ -29,7 +29,7 @@ t_token	*add_identity(char *content, enum grammar tok)
 	if (new_node)
 	{
 		new_node->identity = content;
-		cpy_identity(new_node->identity, content);
+		// cpy_identity(new_node->identity, content); why ??
 		new_node->tok = tok;
 		new_node->next = NULL;
 	}

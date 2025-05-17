@@ -46,7 +46,7 @@ long    ft_atol(const char *str)
     while (str[i] >= '0' && str[i] <= '9')
     {
             if (result > (LLONG_MAX - (str[i] - '0')) / 10)
-                    return (-1111);
+                    return (ANOMALY);
             result = result * 10 + (str[i] - '0');
             i++;
     }
@@ -77,4 +77,32 @@ char **double_dup(char **env)
     }
     o_env[x] = NULL;
     return(o_env);
+}
+
+char    *ft_strjoin(char *s1, char *s2)
+{
+        int             i;
+        int             j;
+        char    *join;
+
+        if (!s1 || !s2)
+                return (NULL);
+        i = 0;
+        j = 0;
+        join = malloc(get_len(s1) + get_len(s2) + 1);
+        if (join == NULL)
+                return (NULL);
+        while (s1[i])
+        {
+                join[i] = s1[i];
+                i++;
+        }
+        while (s2[j])
+        {
+                join[i] = s2[j];
+                j++;
+                i++;
+        }
+        join[i] = '\0';
+        return (join);
 }

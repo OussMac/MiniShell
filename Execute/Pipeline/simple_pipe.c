@@ -19,7 +19,7 @@ int main(int argc, char **argv)
     
     if (id == 0)
     {
-        // we are in the child
+        // we are in the first child
         printf("%s\n", argv[1]);
         printf("%s\n", argv[2]);
         dup2(fds[1], STDOUT_FILENO); //rediriect stdout of first command to write end.
@@ -33,7 +33,6 @@ int main(int argc, char **argv)
     pid_t id2 = fork();
     if (id2 == 0)
     {
-        
         // we are in second child
         dup2(fds[0], STDIN_FILENO);
 
