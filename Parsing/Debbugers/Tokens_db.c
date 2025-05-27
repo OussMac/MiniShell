@@ -17,29 +17,25 @@ void debbuger_tk(t_token *id_class)
         else if (trav->tok == 4)
             printf("ID-> HERE_DOC_ID\n");
         else if (trav->tok == 5)
-            printf("ID-> STRING_ID\n");
-        else if (trav->tok == 6)
-            printf("ID-> FILE_ID\n");
-        else if (trav->tok == 7)
-            printf("ID-> ARG_ID\n");
-        else if (trav->tok == 8)
             printf("ID-> AND_ID\n");
-        else if (trav->tok == 9)
+        else if (trav->tok == 6)
             printf("ID-> OR_ID\n");
-        else if (trav->tok == 10)
-            printf("ID-> WILD_CARD_ID\n");
-        else if (trav->tok == 11)
+        else if (trav->tok == 7)
+            printf("ID-> WILRD_CARD_ID\n");
+        else if (trav->tok == 8)
             printf("ID-> EXPANSION_ID\n");
-        else if (trav->tok == 12)
+        else if (trav->tok == 9)
             printf("ID-> S_QUOTE_ID\n");
-        else if (trav->tok == 13)
+        else if (trav->tok == 10)
             printf("ID-> D_QUOTE_ID\n");
-        else if (trav->tok == 14)
-            printf("ID-> SPACE_ID\n");
-        else if (trav->tok == 15)
+        else if (trav->tok == 11)
             printf("ID-> BRACE_O_ID\n");
-        else if (trav->tok == 16)
+        else if (trav->tok == 12)
             printf("ID-> BRACE_C_ID\n");
+        else if (trav->tok == 13)
+            printf("ID-> SPACE\n");
+        else if (trav->tok == 14)
+            printf("ID-> STRING\n");
         trav = trav->next;
         printf("****************\n");
     }

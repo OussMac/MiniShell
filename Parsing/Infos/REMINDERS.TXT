@@ -1,0 +1,28 @@
+Master@Mindv1.0> cat
+
+==181305== Invalid write of size 1
+==181305==    at 0x401713: scrap_string (in /home/ayel-bou/Desktop/MasterMindv1.0/Parsing/minishell)
+==181305==    by 0x402257: first_unit (in /home/ayel-bou/Desktop/MasterMindv1.0/Parsing/minishell)
+==181305==    by 0x401479: get_identity (in /home/ayel-bou/Desktop/MasterMindv1.0/Parsing/minishell)
+==181305==    by 0x401272: main (in /home/ayel-bou/Desktop/MasterMindv1.0/Parsing/minishell)
+==181305==  Address 0x4b74133 is 0 bytes after a block of size 3 alloc'd
+==181305==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==181305==    by 0x40166D: scrap_string (in /home/ayel-bou/Desktop/MasterMindv1.0/Parsing/minishell)
+==181305==    by 0x402257: first_unit (in /home/ayel-bou/Desktop/MasterMindv1.0/Parsing/minishell)
+==181305==    by 0x401479: get_identity (in /home/ayel-bou/Desktop/MasterMindv1.0/Parsing/minishell)
+==181305==    by 0x401272: main (in /home/ayel-bou/Desktop/MasterMindv1.0/Parsing/minishell)
+==181305== 
+==181305== Invalid read of size 1
+==181305==    at 0x484ED24: strlen (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==181305==    by 0x493AD30: __vfprintf_internal (vfprintf-internal.c:1517)
+==181305==    by 0x492479E: printf (printf.c:33)
+==181305==    by 0x402867: debbuger_tk (in /home/ayel-bou/Desktop/MasterMindv1.0/Parsing/minishell)
+==181305==    by 0x4014D8: get_identity (in /home/ayel-bou/Desktop/MasterMindv1.0/Parsing/minishell)
+==181305==    by 0x401272: main (in /home/ayel-bou/Desktop/MasterMindv1.0/Parsing/minishell)
+==181305==  Address 0x4b74133 is 0 bytes after a block of size 3 alloc'd
+==181305==    at 0x4848899: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==181305==    by 0x40166D: scrap_string (in /home/ayel-bou/Desktop/MasterMindv1.0/Parsing/minishell)
+==181305==    by 0x402257: first_unit (in /home/ayel-bou/Desktop/MasterMindv1.0/Parsing/minishell)
+==181305==    by 0x401479: get_identity (in /home/ayel-bou/Desktop/MasterMindv1.0/Parsing/minishell)
+==181305==    by 0x401272: main (in /home/ayel-bou/Desktop/MasterMindv1.0/Parsing/minishell)
+==181305== 

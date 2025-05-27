@@ -8,7 +8,7 @@ void linkednev_db(t_envlist **env)
     printf("Debbugging The Linked ENV...\n");
     while(trav != NULL)
     {
-        printf("%s", trav->variable);
+        printf("%s%s\n", trav->variable, trav->value);
         trav = trav->next;
     }
 }

@@ -9,12 +9,13 @@ t_envlist *get_last_node(t_envlist *env)
 	return (env);
 }
 
-t_envlist *add_variable(char *variable)
+t_envlist *add_variable_value(char *variable, char *value)
 {
 	t_envlist *node;
 
 	node = malloc(sizeof(t_envlist));
-    node->variable = ft_strjoin(variable, N_LINE);
+    node->variable = ft_strjoin(variable, "=");
+    node->value = value;
 	// cpy_variable(node->variable, variable); why ??
 	node->next = NULL;
 	return (node);

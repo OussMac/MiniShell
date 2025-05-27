@@ -34,7 +34,12 @@ char    *set_pointer(t_data *data, char *pointed, int len, int mode)
         else if (mode == POINT_ONLY)
         {
             if (!ft_strncmp(trav->variable, pointed, len))
+            {
                 trav->pointed = true;
+                return("FOUND\n");
+            }
+            else
+                return("NONE\n");
         }
 		trav = trav->next;
 	}

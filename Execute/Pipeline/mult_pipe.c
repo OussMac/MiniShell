@@ -1,6 +1,14 @@
 #include "pipex.h"
 
 
+
+// void pointer garbage collection
+void garbage_collector()
+{
+
+}
+
+
 char *join_argv(char **argv, char *delimiter)
 {
     int i = 0;
