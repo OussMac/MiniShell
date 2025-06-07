@@ -9,6 +9,20 @@ t_token	*ft_lstlast(t_token *lst)
 	return (lst);
 }
 
+static void init_properties(t_token *new)
+{
+	new->space_next = false;
+	new->br = 0;
+	new->brace_c = 0;
+	new->brace_o = 0;
+	new->firsts = 0;
+	new->op = 0;
+	new->op_case = 0;
+	new->space_next = 0;
+	new->was_double_quote = 0;
+	new->was_single_quote = 0;
+}
+
 void	add_back_identity(t_token **lst, t_token *new)
 {
 	if (!new || !lst)
@@ -18,6 +32,7 @@ void	add_back_identity(t_token **lst, t_token *new)
 		new->here_done = 0;
 		new->here_times = 1;
 	}
+	init_properties(new);
 	if (*lst)
 		ft_lstlast(*lst)->next = new;
 	else

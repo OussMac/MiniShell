@@ -23,7 +23,7 @@ char *scrap_string(char *input, int *index)
     char *scrap;
     
     i = 0;
-    scrap = malloc(len_of_string(input, *index));
+    scrap = malloc(len_of_string(input, *index) + 1);
     if (!scrap)
         exit(EXIT_FAILURE);
     while (input[*index])
@@ -35,7 +35,6 @@ char *scrap_string(char *input, int *index)
         i++;
     }
     scrap[i] = '\0';
-    (*index)--;
     return (scrap);
 }
 
@@ -46,7 +45,6 @@ char *scrap(int *index, char *scrapped)
     len = get_len(scrapped);
     while (len--)
         (*index)++;
-    (*index)--;
     return(scrapped);
 }
 
@@ -60,7 +58,10 @@ int len_of_quote(char *input, char quote_case, int index)
         len++;
         index++;
         if (input[index] == quote_case)
+        {
+            len++;
             break ;
+        }
     }
     return (len);
 }
@@ -71,7 +72,7 @@ char *scrap_quote(char *input, int *index, int quote_case)
     char *quote;
 
     i = 0;
-    if (!realt_quotes(input, quote_case, QUOTES_ERR))
+    if (!realt_quotes(input, quote_case, *index, QUOTES_ERR))
         return (NULL);
     quote = malloc(len_of_quote(input, quote_case, *index) + 1);
     if (!quote)
@@ -90,6 +91,5 @@ char *scrap_quote(char *input, int *index, int quote_case)
         }
     }
     quote[i] = '\0';
-    (*index)--;
     return (quote);
 }

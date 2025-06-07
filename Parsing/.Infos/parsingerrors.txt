@@ -1,0 +1,7 @@
+
+Master@Mindv1.1> ( | )
+identity> (
+ID-> BRACE_O_ID
+
+brace erros check how the braces index gets incremented while scrapping
+Master@Mindv1.1> ls && > (out) --->> it hanged here (index issues)

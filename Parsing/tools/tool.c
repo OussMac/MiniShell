@@ -4,6 +4,8 @@ int get_len(char *str)
 {
     int i;
 
+    if (!str)
+        return (0);
     i = 0;
     while(str[i])
         i++;
@@ -16,8 +18,6 @@ int check_alpha(char x, char x2)
                 || x == '<'
                 || x == '>'
                 || (x == '&' && x2 == '&')
-                || x == '$'
-                || x == '*'
                 || x == S_QUOTE
                 || x == SPACE
                 || x == D_QUOTE

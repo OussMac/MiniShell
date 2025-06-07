@@ -5,11 +5,7 @@ void    first_unit(char *input, int *i, t_token *id, t_token **id_class)
     if (!check_alpha(input[*i], input[*i + 1]))
          identity_scraping(scrap_string(input, i),
              STRING_ID, id, id_class);
-    else if (input[*i] == SPACE
-        || input[*i] == TAB)
-        identity_scraping(scrap(i, " "),
-        SPACE_ID, id, id_class);
-    else if (input[*i] == PIPE
+    if (input[*i] == PIPE
          && !check_doubles(input[*i] , input[*i + 1]))
         identity_scraping(scrap(i, "|"),
         PIPE_ID, id, id_class);
@@ -33,7 +29,6 @@ void    sec_unit(char *input, int *i, t_token *id, t_token **id_class)
 
 void    third_unit(char *input, int *i, t_token *id, t_token **id_class)
 {
-
     if (input[*i] == AND
         && check_doubles(input[*i], input[*i + 1]))
         identity_scraping(scrap(i, "&&"),
@@ -51,13 +46,7 @@ void    third_unit(char *input, int *i, t_token *id, t_token **id_class)
 
 int    forth_unit(char *input, int *i, t_token *id, t_token **id_class)
 {
-    if (input[*i] == EXPANSION)
-        identity_scraping(scrap(i, "$"),
-        EXPANSION_ID, id, id_class);
-    else if (input[*i] == WILD_CARD)
-        identity_scraping(scrap(i, "*"),
-        WILD_CARD_ID, id, id_class);
-    else if (input[*i] == S_QUOTE)
+    if (input[*i] == S_QUOTE)
     {
         if (!identity_scraping(scrap_quote(input, i, S_QUOTE),
         S_QUOTE_ID, id, id_class))

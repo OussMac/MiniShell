@@ -17,6 +17,8 @@ SRC = minishell.c Identificators/identity_tools/identool0.c\
 		Identificators/identity_tools/identool3.c\
 		Identificators/identity_tools/identool4.c\
 		tools/tools8.c Identificators/identity_tools/identool5.c\
+		Identificators/identity_tools/identool6.c\
+		tools/tools9.c\
 
 OBJ = $(SRC:.c=.o)
 

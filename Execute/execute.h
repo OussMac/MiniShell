@@ -13,6 +13,23 @@
 
 #include <signal.h> // for signal handling.
 
+typedef enum e_cmd_id
+{
+    cmd,
+    redir,
+    pipe
+} t_cmd_id;
+
+
+typedef struct s_cmd
+{
+    t_cmd_id    id; // command type (cmd, redir, pipe)
+    char        **argv; // command arguments
+
+
+}t_cmd;
+
+
 // parse helpers.
 char	**ft_split(char const *s, char c);
 void	free_argv(char **av, bool argc_2);

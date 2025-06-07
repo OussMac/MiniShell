@@ -36,7 +36,7 @@ static void in_alert(t_token *token, int *flag_in)
         if (token->tok == BRACE_C_ID)
             break ;
         if ((0 <= token->tok && token->tok <= 6)
-                || (9 <= token->tok && token->tok <= 14))
+                || (9 <= token->tok && token->tok <= 12))
             *flag_in = 1;
         token = token->next;
     }
@@ -79,4 +79,6 @@ int doubles_verify(t_token *token, t_data *data)
     it deos not return an error because the in_alert function returns flag in with one
     cuz ls is there, even if non_print returns zero cuz space is found, it does
     not return (SEF)
+
+    (ls && > out)
 */

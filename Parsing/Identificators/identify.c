@@ -38,6 +38,21 @@ int identity_scraping(char *ident, enum grammar en,
     return (1);
 }
 
+static int unification(char *input, int *i, t_token *id, t_token **id_class)
+{
+    first_unit(input, i, id, id_class);
+    sec_unit(input, i, id, id_class);
+    third_unit(input, i, id, id_class);
+    if (!forth_unit(input, i, id, id_class)
+        || !set_ops(*id_class))
+    {
+        *id_class = NULL;
+        //MindAllocator
+        return (0);
+    }
+    return (1);
+}
+
 t_token *get_identity(char *input, t_data *data)
 {
     int i;
@@ -49,25 +64,18 @@ t_token *get_identity(char *input, t_data *data)
     id_class = NULL; // why seggev??
     while (input[i])
     {
-        first_unit(input, &i, id, &id_class);
-        sec_unit(input, &i, id, &id_class);
-        third_unit(input, &i, id, &id_class);
-        if (!forth_unit(input, &i, id, &id_class)
-        || !set_ops(id_class) || (!here_doc_check(id_class, data)))
-        {
-            id_class = NULL;
-            //MindAllocator
+        if (!unification(input, &i, id, &id_class))
             break;
-        }
-        i++;
+        if (all_whitespaces(input[i]) && input[i] != '\0')
+            continue;
+        if (!unit_call_here_doc(&id_class, input, data))
+            break;
+        unit_call_space_next(id_class, input, &i);
     }
     if (!syntax_verify(id_class, data))
-    {
-        printf("Second SEF Check\n");
         id_class = NULL;
-    }
-    // debbuger_tk(id_class);
     // MindAllocator
+    debbuger_tk(id_class);
     return (id_class);
 }
 

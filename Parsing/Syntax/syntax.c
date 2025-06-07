@@ -12,26 +12,22 @@ static int first_and_null(t_token *curr)
         return (F);
     if (curr->op && !curr->firsts)
         return (F);
-    else if (curr->op && curr->firsts
-        && curr->next && curr->next->tok == SPACE_ID
-        && curr->next->next == NULL)
-        return (F);
     return (S);
 }
 
 static int hold_and_check(t_token *hold, t_token *curr)
 {
-    if ((hold->op && curr->op)
+    if ((hold->op && curr->op && !hold->op_case)
+        || (hold->op && curr->br && !hold->op_case)
+        || (curr->op_case && hold->op))
+        return (F);
+    if ((hold->tok == BRACE_O_ID && curr->op_case)
         || (hold->op && curr->br && !hold->op_case))
         return (F);
-    if ((hold->br && curr->op_case)
-        || (hold->op && curr->br))
+    if ((hold->tok == STRING_ID && curr->tok == BRACE_O_ID)
+        || hold->tok == BRACE_C_ID && curr->tok == STRING_ID)
         return (F);
-    if ((hold->tok == STRING_ID && curr->tok == BRACE_O_ID))
-        return (F);
-    if ((curr->op && !curr->next)
-        || (curr->op && curr->next && curr->next->tok == SPACE_ID
-        && !curr->next->next))
+    if (curr->op && !curr->next)
         return (F);
     return (S);
 }
@@ -59,8 +55,6 @@ int syntax_verify(t_token *token, t_data *data)
     verify = token;
     while (verify != NULL)
     {
-        if (verify->tok == SPACE_ID && verify->next)
-            verify = verify->next;
         if (hold != NULL && cmp_nodes(hold, verify, data))
             return (0);
         if (i == 0 && first_and_null(verify))

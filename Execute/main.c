@@ -1,29 +1,10 @@
 #include "execute.h"
 
-int	ft_strncmp(const char *s1, const char *s2, size_t n)
-{
-	size_t	i;
-
-	i = 0;
-	if (!s1 || !s2)
-		return (1);
-	while (i < n && s1[i] && s2[i])
-	{
-		if (s1[i] != s2[i])
-			return (s1[i] - s2[i]);
-		i++;
-	}
-	if (i < n)
-		return (s1[i] - s2[i]);
-	return (s1[i] - s2[i]);
-}
-
-
 void    sig_handler(int signum)
 {
     if (signum == SIGINT)
     {
-        rl_replace_line("", 0);    // bdl lcurrent input b empty string.
+        // rl_replace_line("", 0);    // bdl lcurrent input b empty string.
 	    printf("\n");              // print newline to jump to nl.
 	    rl_on_new_line();          // prepare readline for a new line.
 	    rl_redisplay();            // redraw prompt.

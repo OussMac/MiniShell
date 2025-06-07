@@ -11,7 +11,7 @@ static char *name_generator(void)
     n = (long)nb;
     name = ft_itoa(n);
     gename = ft_strjoin("/tmp/", name);
-    return (name);
+    return (gename);
 }
 
 static void cpy_to_file(char *in, t_data *data)
@@ -51,6 +51,7 @@ static void    open_heredoc(t_token *curr, t_data *data)
 
     gename = name_generator();
     del = scrap_del(get_delimiter(curr));
+    printf("del > %s\n", del);
     data->here_fd = open(gename, O_CREAT | O_WRONLY, 0777);
     if (!data->here_fd)
         // MindAllocator
@@ -76,12 +77,12 @@ int here_doc_check(t_token *id_class, t_data *data)
     t_token *curr;
 
     curr = id_class;
-    while (curr != NULL && curr->next != NULL)
+
+    while (curr != NULL)
     {
-        if (curr->tok == HERE_DOC_ID && !curr->here_done
-                && get_here_times(id_class) == 1)
+        if (requirements(curr, id_class, data))
         {
-            id_class->here_times = 0;
+            id_class->here_times = 0; // ?? set it on the same first node??
             if (!change_id(curr->next, data))
                 return (0);
             open_heredoc(curr, data);

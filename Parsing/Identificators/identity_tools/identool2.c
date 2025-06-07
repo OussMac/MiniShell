@@ -15,7 +15,9 @@ int brace_len(char *input)
             quote_state += 1;
         if (quote_state % 2 == 0)
             quote_state = 0;
-        if ((input[i] == '(' || input[i] == ')') && !quote_state)
+        if ((input[i] == '(' || input[i] == ')'
+                || input[i] == PIPE || input[i] == AND) 
+            && !quote_state)
             len++;
         i++;
     }
@@ -42,7 +44,8 @@ char *get_all_braces(char *input, t_brace_t *br)
             br->quote_state += 1;
         if (br->quote_state % 2 == 0)
             br->quote_state = 0;
-        if ((input[i] == '(' || input[i] == ')') && !br->quote_state)
+        if ((input[i] == '(' || input[i] == ')' || input[i] == PIPE
+            || input[i] == AND) && !br->quote_state)
         {
             braces[y] = input[i];
             y++;
@@ -66,8 +69,7 @@ int realtp_braces(char *braces, int i, t_brace_t *br)
         br->brace_op++;
     else if (braces[i] == ')')
         br->brace_cl++;
-    if (braces[i] == ')' && braces[i + 1] == '('
-        && braces[i + 2] != ')')
+    if (braces[i] == ')' && braces[i + 1] == '(')
     {
         print_error(BRACE_ERR, NULL, 0);
         return (0);
@@ -102,8 +104,8 @@ char *scrap_braces(char *input, int *index, char *brace)
     char *braces;
     t_brace_t br_tool;
 
-    if (!realt_quotes(input, '\'', QUOTES_ERR)
-        || !realt_quotes(input, '\"', QUOTES_ERR))
+    if (!realt_quotes(input, '\'', *index, QUOTES_ERR)
+        || !realt_quotes(input, '\"', *index, QUOTES_ERR))
         return (NULL);
     ft_bzero(&br_tool, sizeof(t_brace_t));
     braces = get_all_braces(input, &br_tool);
@@ -113,7 +115,7 @@ char *scrap_braces(char *input, int *index, char *brace)
         return (NULL);
     len = get_len(brace);
     while (len--)
-        (*index)--;
-    (*index)++;
+        (*index)++;
+    // (*index)++;
     return (brace);
 }

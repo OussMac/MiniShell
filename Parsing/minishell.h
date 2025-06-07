@@ -20,6 +20,10 @@
 # define ENV 0
 # define EXP 1
 # define OLDPWD 0
+# define UNIT_HEREDOC 0
+# define UNIT_SPACE_NEXT 1
+# define HEREDOC1 1
+# define HEREDOC2 2
 # define ONE_QUOTE 9
 # define DUO_QUOTE 10
 # define POINT_ONLY 0
@@ -60,13 +64,10 @@ enum grammar
     OR_ID, // ||
     BRACE_O_ID, // (
     BRACE_C_ID, // )
-    WILD_CARD_ID, // *
-    EXPANSION_ID, // $
     S_QUOTE_ID, // ''
     D_QUOTE_ID, // ""
     STRING_ID, // Commands & Arguments
     DEL_ID, // Here_doc Delimiter
-    SPACE_ID,
 };
 
 // Linked List To Store Each Entity
@@ -81,6 +82,7 @@ typedef struct s_token
     int op_case;
     int here_times;
     int here_done;
+    bool space_next;
     int was_single_quote;
     int was_double_quote;
     char *identity;
@@ -97,6 +99,7 @@ typedef struct s_envlist
     struct s_envlist *next;
 }   t_envlist;
 
+// Linked List Holding The ExportList
 typedef struct s_exportlist
 {
     char *value;
@@ -112,8 +115,9 @@ typedef struct s_data
     int to_env;
     int append;
     int is_child;
-    int exit_status;
     int here_fd;
+    int here_case;
+    int exit_status;
     t_exportlist *exp;
     t_envlist *env;
 }   t_data;
@@ -146,6 +150,8 @@ t_envlist   *add_variable_value(char *variable, char *value);
 
 // Identity Tools
 int         get_len(char *str);
+void        puterror(char *str);
+int         all_whitespaces(char x);
 t_token	    *ft_lstlast(t_token *lst);
 void        ft_bzero(void *s, size_t n);
 int         check_doubles(char x, char x2);
@@ -156,8 +162,9 @@ void	    add_back_identity(t_token **lst, t_token *new);
 t_token	    *add_identity(char *content, enum grammar tok);
 int         len_of_string(char *input, int index);
 int         ft_strnstr(char *haystack, char *needle, size_t len);
+int         unit_call_here_doc(t_token **id_class, char *input, t_data *data);
+void        unit_call_space_next(t_token *id_class, char *input, int *index);
 int         identity_scraping(char *ident, enum grammar en, t_token *id, t_token **id_class);
-void        puterror(char *str);
 
 // Identity Scrapers
 char    *scrap(int *index, char *scrapped);
@@ -216,17 +223,26 @@ void            add_to_exp(t_exportlist **env, t_exportlist *variable);
 char            *set_pointer_exp(t_data *data, char *pointed, int len, int mode);
 
 // Syntax Verification
-void puterror(char *str);
-int realt_braces(char *input, t_brace_t *br);
-int syntax_verify(t_token *token, t_data *data);
-int doubles_verify(t_token *token, t_data *data);
-void print_error(char *error, char *err, int mode);
-void syntax_error_found(t_token *curr, t_data *data);
-int realt_quotes(char *input, int doubles_case, char *err);
+void    puterror(char *str);
+int     realt_braces(char *input, t_brace_t *br);
+int     syntax_verify(t_token *token, t_data *data);
+int     doubles_verify(t_token *token, t_data *data);
+void    print_error(char *error, char *err, int mode);
+void    syntax_error_found(t_token *curr, t_data *data);
+int     realt_quotes(char *input, int doubles_case, int index, char *err);
 
 // Here_Document Tools
 char    *ft_itoa(int n);
+int     list_size(t_token *list);
+void    takeoff_quotes(t_token *tok);
+void    space_flag(t_token *id_class);
 char    *get_delimiter(t_token *token);
 int     get_here_times(t_token *id_class);
 int     change_id(t_token *next_heredoc, t_data *data);
 int     here_doc_check(t_token *id_class, t_data *data);
+int     delimiter_next(t_token *next_heredoc, t_data *data);
+int     requirements(t_token *curr, t_token *id_class, t_data *data);
+
+
+// test to be removed after
+int printer(t_token *curr);
