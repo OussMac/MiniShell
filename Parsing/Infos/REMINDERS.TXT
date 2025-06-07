@@ -26,3 +26,7 @@ Master@Mindv1.0> cat
 ==181305==    by 0x401479: get_identity (in /home/ayel-bou/Desktop/MasterMindv1.0/Parsing/minishell)
 ==181305==    by 0x401272: main (in /home/ayel-bou/Desktop/MasterMindv1.0/Parsing/minishell)
 ==181305== 
+
+in checking the syntax errors of the braces, to not check them
+everytime we find a brace open or close, we can set a flag as checked
+so we dont re check everytime next, OPTIMIZATION

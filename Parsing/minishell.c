@@ -9,15 +9,15 @@ int main(int argc, char **argv, char **env)
     init_data_struct(&data, env);
     signal(SIGINT, sig_handler);
     signal(SIGQUIT, SIG_IGN);
-    while(1)
+    while (1)
     {
-        input = readline("\033[32mMaster@Mindv1.0> \033[0m");
+        input = readline("\033[32mMaster@Mindv1.1> \033[0m");
         if (input == NULL)
-            break;
+            break ;
         if (input[0] != '\0')
             add_history(input);
-        token = get_identity(input);
-        syntax_verify(token, &data);
+        token = get_identity(input, &data);
+        // set_prompt(token);
         // debbuger_tk(token);
     }
     free(input);

@@ -5,7 +5,8 @@ void    first_unit(char *input, int *i, t_token *id, t_token **id_class)
     if (!check_alpha(input[*i], input[*i + 1]))
          identity_scraping(scrap_string(input, i),
              STRING_ID, id, id_class);
-    else if (input[*i] == SPACE)
+    else if (input[*i] == SPACE
+        || input[*i] == TAB)
         identity_scraping(scrap(i, " "),
         SPACE_ID, id, id_class);
     else if (input[*i] == PIPE
@@ -47,7 +48,8 @@ void    third_unit(char *input, int *i, t_token *id, t_token **id_class)
         HERE_DOC_ID, id, id_class);
 }
 
-void    forth_unit(char *input, int *i, t_token *id, t_token **id_class)
+
+int    forth_unit(char *input, int *i, t_token *id, t_token **id_class)
 {
     if (input[*i] == EXPANSION)
         identity_scraping(scrap(i, "$"),
@@ -56,15 +58,28 @@ void    forth_unit(char *input, int *i, t_token *id, t_token **id_class)
         identity_scraping(scrap(i, "*"),
         WILD_CARD_ID, id, id_class);
     else if (input[*i] == S_QUOTE)
-        identity_scraping(scrap_quote(input, i, S_QUOTE),
-        S_QUOTE_ID, id, id_class);
+    {
+        if (!identity_scraping(scrap_quote(input, i, S_QUOTE),
+        S_QUOTE_ID, id, id_class))
+            return (0);
+    }
     else if (input[*i] == D_QUOTE)
-        identity_scraping(scrap_quote(input, i, D_QUOTE),
-        D_QUOTE_ID, id, id_class);
+    {
+        if(!identity_scraping(scrap_quote(input, i, D_QUOTE),
+        D_QUOTE_ID, id, id_class))
+            return (0);
+    }
     else if (input[*i] == BRACE_OP)
-        identity_scraping(scrap(i, "("),
-        BRACE_O_ID, id, id_class);
+    {
+        if (!identity_scraping(scrap_braces(input, i, "("),
+        BRACE_O_ID, id, id_class))
+            return(0);
+    }
     else if (input[*i] == BRACE_CL)
-        identity_scraping(scrap(i, ")"),
-        BRACE_C_ID, id, id_class);    
+    {
+        if (!identity_scraping(scrap_braces(input, i, ")"),
+        BRACE_C_ID, id, id_class))
+            return(0);
+    }
+    return (1);  
 }

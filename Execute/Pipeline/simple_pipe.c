@@ -45,8 +45,8 @@ int main(int argc, char **argv)
         exit(EXIT_FAILURE);
     }
     
-    close(fds[1]); // salina bihom fparent
     close(fds[0]);
+    close(fds[1]); // salina bihom fparent
 
     while (wait(NULL) > -1)
     ;

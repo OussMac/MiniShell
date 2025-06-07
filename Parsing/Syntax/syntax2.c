@@ -1,120 +1,82 @@
 #include "../minishell.h"
 
-static void scan_for_doubles(t_token *token)
+static int scan_for_doubles(t_token *token)
 {
     t_token *curr;
 
     curr = token;
     while (curr != NULL)
     {
-        if (curr->tok == BRACE_O_ID || curr->tok == BRACE_C_ID)
-            curr->brace = 1;
-        else if (curr->tok == S_QUOTE_ID)
-            curr->s_quotes = 1;
-        else if (curr->tok == D_QUOTE_ID)
-            curr->d_quotes = 1;
-        curr = curr->next;
-    }
-}
-
-static int brace_verification(t_token *token, t_data *data)
-{
-    t_token *curr;
-    int op_brace;
-    int cl_brace;
-
-    op_brace = 0;
-    cl_brace = 0;
-    curr = token;
-    while (curr != NULL)
-    {
-        if (cl_brace > 0 && op_brace == 0)
-        {
-            print_error(CL_BEFORE, NULL, 0);
-            //MindAllocator
-            data->exit_status = 2;
-            return (F);
-        }
         if (curr->tok == BRACE_O_ID)
-            op_brace++;
-        else if (curr->tok == BRACE_C_ID)
-            cl_brace++;
+            return (1);
         curr = curr->next;
     }
-    if (op_brace != cl_brace)
-    {
-        print_error(BRACE_ERR, NULL, NL);
-        //MindAllocator
-        data->exit_status = 2;
-        return (F);
-    }
-    return (S);
+    return(0);
 }
 
-static int quotes_number(char *str, char qt)
+static int non_print(char *in)
 {
     int i;
-    int type_count;
 
     i = 0;
-    type_count = 0;
-    while (str[i])
+    while (in[i])
     {
-        if (str[i] == qt)
-            type_count++;
+        if ((0 <= in[i] && in[i] <= 32)
+            || in[i] == 127)
+                return (0);
         i++;
     }
-    if (type_count % 2 != 0)
-        return (F);
-    return (S);
+    return (1);
 }
 
-static int quotes_verification(t_token *token, int type, t_data *data)
+static void in_alert(t_token *token, int *flag_in)
 {
-    int type_count;
+    while (token != NULL)
+    {
+        if (token->tok == BRACE_C_ID)
+            break ;
+        if ((0 <= token->tok && token->tok <= 6)
+                || (9 <= token->tok && token->tok <= 14))
+            *flag_in = 1;
+        token = token->next;
+    }
+}
+
+int doubles_verify(t_token *token, t_data *data)
+{
+    int flag_in;
     t_token *curr;
 
+    flag_in = 0;
     curr = token;
-    type_count = 0;
-    while (curr != NULL)
+    if (!scan_for_doubles(token))
+        return (1);
+    while (curr != NULL
+            && curr->next != NULL)
     {
-        if(curr->tok == type)
+        if (curr->tok == BRACE_O_ID)
         {
-            if ((type == S_QUOTE_ID
-                && quotes_number(curr->identity, S_QUOTE))
-                || (type == D_QUOTE_ID
-                && quotes_number(curr->identity, D_QUOTE)))
+            in_alert(curr->next, &flag_in);
+            if (!non_print(curr->next->identity) && !flag_in
+                || (curr->tok == BRACE_O_ID
+                        && curr->next->tok == BRACE_C_ID))
             {
-                print_error(QUOTES_ERR, NULL, 0);
-                data->exit_status = 2;
-                return(F);
+                syntax_error_found(curr->next, data);
+                return (0);
             }
         }
         curr = curr->next;
     }
-    return (S);
-}
-
-void doubles_verify(t_token *token, t_data *data)
-{
-    t_token *curr;
-
-    curr = token;
-    scan_for_doubles(token);
-    while (curr != NULL)
-    {
-        if (curr->s_quotes
-            && quotes_verification(token, ONE_QUOTE, data))
-            return ;
-        if (curr->d_quotes
-            && quotes_verification(token, DUO_QUOTE, data))
-            return ;
-        if (curr->brace 
-            && brace_verification(token, data))
-            return ;
-        curr = curr->next;
-    }
+    return (1);
 }
 
 /* ("ls && ls)" check this case and try to know why its was best to not scrap braces
     as we scrapped quotes*/
+
+/*
+    in the case of ( (ls))
+
+    it deos not return an error because the in_alert function returns flag in with one
+    cuz ls is there, even if non_print returns zero cuz space is found, it does
+    not return (SEF)
+*/

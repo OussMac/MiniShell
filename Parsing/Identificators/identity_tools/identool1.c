@@ -71,6 +71,8 @@ char *scrap_quote(char *input, int *index, int quote_case)
     char *quote;
 
     i = 0;
+    if (!realt_quotes(input, quote_case, QUOTES_ERR))
+        return (NULL);
     quote = malloc(len_of_quote(input, quote_case, *index) + 1);
     if (!quote)
         exit(EXIT_FAILURE);

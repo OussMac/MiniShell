@@ -12,7 +12,11 @@ SRC = minishell.c Identificators/identity_tools/identool0.c\
 		Builtins/Builtins_t/B_tools4.c tools/tools7.c \
 		Builtins/Builtins_t/B_tools5.c\
 		\
-		Syntax/syntax.c Syntax/syntax2.c
+		Syntax/syntax.c Syntax/syntax2.c\
+		Identificators/identity_tools/identool2.c\
+		Identificators/identity_tools/identool3.c\
+		Identificators/identity_tools/identool4.c\
+		tools/tools8.c Identificators/identity_tools/identool5.c\
 
 OBJ = $(SRC:.c=.o)
 

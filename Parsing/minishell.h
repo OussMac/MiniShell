@@ -6,6 +6,7 @@
 # include <limits.h>
 # include <signal.h>
 # include <stdbool.h>
+# include <fcntl.h>
 
 // Macros
 # define NL 0
@@ -45,6 +46,7 @@
 # define BRACE_OP '('
 # define BRACE_CL ')'
 # define N_LINE "\n"
+# define TAB '\t'
 
 // Enum Of IDs
 enum grammar
@@ -56,14 +58,15 @@ enum grammar
     HERE_DOC_ID, // <<
     AND_ID, // &&
     OR_ID, // ||
+    BRACE_O_ID, // (
+    BRACE_C_ID, // )
     WILD_CARD_ID, // *
     EXPANSION_ID, // $
     S_QUOTE_ID, // ''
     D_QUOTE_ID, // ""
-    BRACE_O_ID, // (
-    BRACE_C_ID, // )
+    STRING_ID, // Commands & Arguments
+    DEL_ID, // Here_doc Delimiter
     SPACE_ID,
-    STRING_ID,
 };
 
 // Linked List To Store Each Entity
@@ -71,11 +74,15 @@ enum grammar
 typedef struct s_token
 {
     int op;
-    int brace;
-    int concat;
+    int br;
+    int brace_c;
+    int brace_o;
     int firsts;
-    int s_quotes;
-    int d_quotes;
+    int op_case;
+    int here_times;
+    int here_done;
+    int was_single_quote;
+    int was_double_quote;
     char *identity;
     enum grammar tok;
     struct s_token *next;
@@ -106,9 +113,17 @@ typedef struct s_data
     int append;
     int is_child;
     int exit_status;
+    int here_fd;
     t_exportlist *exp;
     t_envlist *env;
 }   t_data;
+
+typedef struct s_brace_t
+{
+    int brace_op;
+    int brace_cl;
+    int quote_state;
+}   t_brace_t;
 
 // Signal Tools
 void    sig_handler(int signum);
@@ -135,25 +150,27 @@ t_token	    *ft_lstlast(t_token *lst);
 void        ft_bzero(void *s, size_t n);
 int         check_doubles(char x, char x2);
 void        cpy_identity(char *dst, char *src);
-t_token     *get_identity(char *input);
+t_token     *get_identity(char *input, t_data *data);
 int         check_alpha(char x, char x2);
 void	    add_back_identity(t_token **lst, t_token *new);
 t_token	    *add_identity(char *content, enum grammar tok);
 int         len_of_string(char *input, int index);
 int         ft_strnstr(char *haystack, char *needle, size_t len);
-void        identity_scraping(char *ident, enum grammar en, t_token *id, t_token **id_class);
+int         identity_scraping(char *ident, enum grammar en, t_token *id, t_token **id_class);
+void        puterror(char *str);
 
 // Identity Scrapers
 char    *scrap(int *index, char *scrapped);
 char    *scrap_string(char *input, int *index);
 int     len_of_quote(char *input, char quote_case, int index);
 char    *scrap_quote(char *input, int *index, int quote_case);
+char    *scrap_braces(char *input, int *index, char *brace);
 
 // Units of Tokening
 void    first_unit(char *input, int *i, t_token *id, t_token **id_class);
 void    sec_unit(char *input, int *index, t_token *id, t_token **id_class);
 void    third_unit(char *input, int *index, t_token *id, t_token **id_class);
-void    forth_unit(char *input, int *i, t_token *id, t_token **id_class);
+int     forth_unit(char *input, int *i, t_token *id, t_token **id_class);
 
 // Builtins
 void    pwd(char **env);
@@ -200,9 +217,16 @@ char            *set_pointer_exp(t_data *data, char *pointed, int len, int mode)
 
 // Syntax Verification
 void puterror(char *str);
-void syntax_verify(t_token *token, t_data *data);
+int realt_braces(char *input, t_brace_t *br);
+int syntax_verify(t_token *token, t_data *data);
+int doubles_verify(t_token *token, t_data *data);
 void print_error(char *error, char *err, int mode);
-void doubles_verify(t_token *token, t_data *data);
+void syntax_error_found(t_token *curr, t_data *data);
+int realt_quotes(char *input, int doubles_case, char *err);
 
-
-
+// Here_Document Tools
+char    *ft_itoa(int n);
+char    *get_delimiter(t_token *token);
+int     get_here_times(t_token *id_class);
+int     change_id(t_token *next_heredoc, t_data *data);
+int     here_doc_check(t_token *id_class, t_data *data);

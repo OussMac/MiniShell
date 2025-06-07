@@ -1,6 +1,6 @@
 #include "../minishell.h"
 
-static void syntax_error_found(t_token *curr, t_data *data)
+void syntax_error_found(t_token *curr, t_data *data)
 {
     print_error(SYNTAX, curr->identity, SYN);
     data->exit_status = 1;
@@ -21,10 +21,16 @@ static int first_and_null(t_token *curr)
 
 static int hold_and_check(t_token *hold, t_token *curr)
 {
-    if ((hold->op && curr->op))
-    return (F);
+    if ((hold->op && curr->op)
+        || (hold->op && curr->br && !hold->op_case))
+        return (F);
+    if ((hold->br && curr->op_case)
+        || (hold->op && curr->br))
+        return (F);
+    if ((hold->tok == STRING_ID && curr->tok == BRACE_O_ID))
+        return (F);
     if ((curr->op && !curr->next)
-    || (curr->op && curr->next && curr->next->tok == SPACE_ID
+        || (curr->op && curr->next && curr->next->tok == SPACE_ID
         && !curr->next->next))
         return (F);
     return (S);
@@ -37,39 +43,46 @@ static int cmp_nodes(t_token *hold, t_token *verify, t_data *data)
             syntax_error_found(verify, data);
             //MindAllocator
             data->exit_status = 2;
-            return(F);
+            return (F);
     }
-    return(S);
+    return (S);
 }
 
-void syntax_verify(t_token *token, t_data *data)
+int syntax_verify(t_token *token, t_data *data)
 {
     int i;
     t_token *hold;
     t_token *verify;
-    t_token *first;
 
     i = 0;
     hold = NULL;
     verify = token;
-    first = token;
     while (verify != NULL)
     {
         if (verify->tok == SPACE_ID && verify->next)
             verify = verify->next;
-        if (hold != NULL
-            && cmp_nodes(hold, verify, data))
-            return ;
+        if (hold != NULL && cmp_nodes(hold, verify, data))
+            return (0);
         if (i == 0 && first_and_null(verify))
         {
                 syntax_error_found(verify, data);
                 //MindAllocator
                 data->exit_status = 2;
-                return ;
+                return(0);
         }
         hold = verify;
         verify = verify->next;
         i++;
     }
-    doubles_verify(token, data);
+    if (!doubles_verify(token, data))
+        return (0);
+    return (1);
 }
+
+/*
+    Master@Mindv1.0> (   &&   )  we need to check for and, 
+                            or operators arguments
+    Master@Mindv1.0> < a (ls) ??
+    ayel-bou@e2r10p13:~$ (ls && > out) same here as the first
+    Master@Mindv1.0> (( ))
+*/

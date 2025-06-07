@@ -13,10 +13,15 @@ void	add_back_identity(t_token **lst, t_token *new)
 {
 	if (!new || !lst)
 		return ;
+	if (!ft_strcmp(new->identity, "<<"))
+	{
+		new->here_done = 0;
+		new->here_times = 1;
+	}
 	if (*lst)
 		ft_lstlast(*lst)->next = new;
 	else
-		*lst = new;
+		*lst = new;	
 }
 
 t_token	*add_identity(char *content, enum grammar tok)
