@@ -53,11 +53,12 @@ void zero_point(t_data *data)
 
 void init_data_struct(t_data *data, char **env)
 {
+    data->append = 0;
     data->to_env = 0;
     data->to_exp = 0;
     data->is_child = 0;
+    data->here_minus = 0;
     data->exit_status = 0;
-    data->append = 0;
     data->env = NULL;
     data->exp = NULL;
     list_exp(&data->exp, env);

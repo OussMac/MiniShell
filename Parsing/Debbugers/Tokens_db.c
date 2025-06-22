@@ -5,7 +5,7 @@ void debbuger_tk(t_token *id_class)
     t_token *trav = id_class;
     while (trav != NULL)
     {
-        printf("identity> %s\n", trav->identity);
+        printf("RE_identity> %s\n", trav->identity);
         if (trav->tok == 0)
         {
             printf("ID-> PIPE\n");
@@ -83,6 +83,40 @@ void debbuger_tk(t_token *id_class)
             printf("ID-> DEL_ID\n");
             if (trav->space_next == true)
                 printf("Space next True\n");
+        }
+        else if (trav->tok == 13)
+        {
+            printf("ID-> INPUT_FILE_ID\n");
+            if (trav->space_next == true)
+                printf("Space next True\n");
+        }
+        else if (trav->tok == 14)
+        {
+            printf("ID-> OUTPUT_FILE_ID\n");
+            if (trav->space_next == true)
+                printf("Space next True\n");
+        }
+        else if (trav->tok == 15)
+        {
+            printf("ID-> INPUT_APP_FILE_ID\n");
+            if (trav->space_next == true)
+                printf("Space next True\n");
+        }
+        else if (trav->tok == 16)
+        {
+            printf("ID-> COMMAND_ID\n");
+            if (trav->space_next == true)
+                printf("Space next True\n");
+            if (trav->end == true)
+                printf("End Marked\n");
+        }
+        else if (trav->tok == 17)
+        {
+            printf("ID-> ARG_ID\n");
+            if (trav->space_next == true)
+                printf("Space next True\n");
+            if (trav->end == true)
+                printf("End Marked\n");
         }
         trav = trav->next;
         printf("****************\n");

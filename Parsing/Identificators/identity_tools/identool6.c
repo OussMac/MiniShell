@@ -1,36 +1,36 @@
 #include "../../minishell.h"
 
-// int delimiter_next(t_token *next_heredoc, t_data *data)
-// {
-//     char *del_join;
+void set_free(t_token *curr)
+{
+    t_token *temp;
 
-//     if (next_heredoc->next && next_heredoc->space_next == false)
-//     {
-//         takeoff_quotes(next_heredoc);
-//         takeoff_quotes(next_heredoc->next);
-//         printf("del %s, del next %s\n", next_heredoc->identity, next_heredoc->next->identity);
-//         del_join = ft_strjoin(next_heredoc->identity,
-//         next_heredoc->next->identity);
-//         free(next_heredoc->identity);
-//         next_heredoc->identity = del_join;
-//         free(next_heredoc->next->identity);
-//         next_heredoc->tok = DEL_ID;
-//         next_heredoc->next = NULL;
-//         return(1);
-//     }
-//     return(0);
-// }
+    temp = NULL;
+    while (curr)
+    {
+        free(curr->identity);
+        free(temp);
+        temp = curr;
+        if (!curr->next)
+        {
+            free(temp);
+            temp = NULL;
+            break ;
+        }
+        curr = curr->next;
+    }
+}
 
-// static void set_free(t_token *curr)
-// {
-//     int i;
+static void free_nodes_del(t_token *delimiter, char *del_join)
+{
+    t_token *after_delimiter;
 
-//     i = list_size(curr);
-//     while(i > 0)
-//     {
-        
-//     }
-// }
+    free(delimiter->identity);
+    delimiter->identity = del_join;
+    delimiter->tok = DEL_ID;
+    after_delimiter = delimiter->next;
+    set_free(after_delimiter);
+    delimiter->next = NULL;
+}
 
 static char *join_delimiter(char *del_join, t_token *delimiter)
 {
@@ -62,16 +62,17 @@ int delimiter_next(t_token *next_heredoc, t_data *data)
     delimiter = next_heredoc;
     if (next_heredoc->next == NULL
             || next_heredoc->space_next == true)
-        return(0);
+        return (0);
     while (next_heredoc)
     {
         takeoff_quotes(next_heredoc);
         del_join = join_delimiter(del_join, next_heredoc);
-        if (next_heredoc->space_next == false)
-            break;
+        if (next_heredoc->space_next == true)
+            break ;
         next_heredoc = next_heredoc->next;
     }
-    return(1);
+    free_nodes_del(delimiter, del_join);
+    return (1);
 }
 /*
     seems good, next to do, is to free all nodes that has beeng extracted

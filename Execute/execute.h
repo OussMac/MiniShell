@@ -1,6 +1,15 @@
 #ifndef EXECUTE_H
 # define EXECUTE_H
 
+// text colors
+# define RED "\e[31m"
+# define GRN "\e[32m"
+# define BLU "\e[34m"
+# define YLW "\e[33m"
+# define MGN "\e[35m"
+# define CYN "\e[36m"
+# define RST "\e[97m"
+
 # include <stdlib.h> // for constants
 # include <stdbool.h> // for booleans
 
@@ -12,26 +21,99 @@
 #include <unistd.h> // for write
 
 #include <signal.h> // for signal handling.
+void    sig_handler(int signum); // signal handlers
+
+
+// Struct Holding MasterMind Data
+typedef struct s_data
+{
+    // int to_exp;
+    // int to_env;
+    // int append;
+    // int here_fd;
+    // int is_child;
+    // int here_case;
+    // int here_minus;
+    // int exit_status;
+    // t_exportlist *exp;
+    // t_envlist *env;
+}   t_data;
+
+typedef struct s_osdata
+{
+    char    **env;
+}   t_osdata;
+
+
+# define NODE_COMMAND 0
+# define NODE_REDIR 1
+# define NODE_PIPE 2
+# define NODE_OR 3
+# define NODE_AND 4
+# define NODE_GROUP 5
+
 
 typedef enum e_cmd_id
 {
-    cmd,
-    redir,
-    pipe
-} t_cmd_id;
+    O_CMD, // simple command
+    O_REDIR, // redirect to file, either in or out
+    O_PIPE, // piping, redirect input of cmd1 to cmd2 output
+    O_OR, // or operator, only run B if A fails
+    O_AND, // and operator, only run B if A succeds
+    GROUP // subshell () with its own tree
+}   t_cmd_id;
 
 
 typedef struct s_cmd
 {
     t_cmd_id    id; // command type (cmd, redir, pipe)
-    char        **argv; // command arguments
+    char        **argv; // command arguments, null if anything else
+    struct s_cmd *right; // right cmd
+    struct s_cmd *left; // left cmd
+    t_osdata    *osdata; // pointer to my data struct in main.
+}   t_cmd;
+
+// function to execute tree node
+void    execute_tree(t_cmd *root, t_osdata *osdata);
+int pipe_node(t_cmd *node, t_osdata *osdata);
 
 
-}t_cmd;
 
+
+
+//--------------------- [  Helpers  ] -----------------------------------------------
+// t_cmd *execute_tree(t_cmd *cmd);
+t_cmd   *create_tree(char *input); // create the command tree from input
+t_cmd   *create_leaf(char *input, t_cmd_id id, t_osdata *osdata); // create a single node, usually root
+t_cmd   *add_right(t_cmd **root, char *input, t_cmd_id id);
+t_cmd   *add_left(t_cmd **root, char *input, t_cmd_id id);
 
 // parse helpers.
 char	**ft_split(char const *s, char c);
 void	free_argv(char **av, bool argc_2);
+void	print_argv(char *name, char **argv);
+
+// simple tokenizer wrapper built on ft_split, to insure building the tree and returns the head
+t_cmd   *o_tokenizer(char *line, t_osdata *osdata);
+char **better_split(const char *s);
+
+// better split helpers
+int	ft_strncmp(const char *s1, const char *s2, size_t n);
+int	ft_strcmp(char *s1, char *s2);
+void	*lst_free(char **lst, size_t j);
+char	*ft_substr(char const *s, unsigned int start, size_t len);
+char	*ft_strdup(const char *s1);
+size_t	ft_strlen(const char *s);
+char	*ft_strcat(char *dest, char *src);
+
+// tree builder 
+t_cmd *build_tree(t_osdata *osdata, char **tokens);
+void print_tree(t_cmd *root);
+const char *cmd_id_to_str(t_cmd_id id);
+//execve helpers.
+char    *get_absolute_path(char *cmd);
+//--------------------- [^^^ Helpers ^^^] ---------------------------------------------
+
+char	*ft_strjoin(char const *s1, char const *s2);
 
 # endif // EXECUTE_H

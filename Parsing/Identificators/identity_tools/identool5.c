@@ -21,9 +21,10 @@ void takeoff_quotes(t_token *tok)
 
 int change_id(t_token *next_heredoc, t_data *data)
 {
+    // printer(next_heredoc);
     if (delimiter_next(next_heredoc, data))
         return(1);
-    if (next_heredoc->op)
+    if (next_heredoc->op || next_heredoc->br)
     {
         syntax_error_found(next_heredoc, data);
         return(0);
@@ -67,12 +68,12 @@ int get_here_times(t_token *id_class)
 
 int printer(t_token *curr)
 {
-    while(curr)
+    while (curr)
     {
-        printf("printer > %s\n", curr->identity);
+        printf("\e[0;36;1mprinter > %s\n\e[0m", curr->identity);
         curr = curr->next;
     }
-    return(1);
+    return (1);
 }
 
 int requirements(t_token *curr, t_token *id_class, t_data *data)

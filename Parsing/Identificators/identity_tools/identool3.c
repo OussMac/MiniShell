@@ -21,7 +21,6 @@ int realt_quotes(char *input, int doubles_case, int index, char *err)
     }
     if (doubles % 2 != 0)
     {
-        // exit status
         print_error(err, NULL, 0);
         return (0);
     }
@@ -39,14 +38,28 @@ void space_flag(t_token *id_class)
 
 int all_whitespaces(char x)
 {
+    if ((9 <= x && x <= 13) || x == 32 || x == PIPE
+        || x == RED_IN || x == RED_OUT || x == AND 
+        || x == BRACE_CL || x == BRACE_OP)
+            return (0);
+    return (1);
+}
+
+/*
+    if some of the operators passes this check and go to the herdoc
+    it result on an invalid free, need to check later.
+*/
+
+static int whitespaces(char x)
+{
     if ((9 <= x && x <= 13) || x == 32)
             return (0);
     return (1);
 }
 
-int unit_call_here_doc(t_token **id_class, char *input, t_data *data)
+int unit_call_here_doc(t_token **id_class, char *input, t_data *data, t_brace_t *br)
 {
-    if (!here_doc_check(*id_class, data))
+    if (!here_doc_check(*id_class, data, br))
     {
         *id_class = NULL;
         return (0);
@@ -56,7 +69,7 @@ int unit_call_here_doc(t_token **id_class, char *input, t_data *data)
 
 void unit_call_space_next(t_token *id_class, char *input, int *index)
 {
-    if (!all_whitespaces(input[*index]))
+    if (!whitespaces(input[*index]))
     {
         space_flag(id_class);
         (*index)++;

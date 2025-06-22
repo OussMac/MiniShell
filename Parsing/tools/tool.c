@@ -7,9 +7,9 @@ int get_len(char *str)
     if (!str)
         return (0);
     i = 0;
-    while(str[i])
+    while (str[i])
         i++;
-    return(i);
+    return (i);
 }
 
 int check_alpha(char x, char x2)

@@ -1,24 +1,30 @@
 CC = cc 
-CFLAG = #
+CFLAG = #-fsanitize=address -g3
 H = minishell.h 
 NAME = minishell
 SRC = minishell.c Identificators/identity_tools/identool0.c\
-		Identificators/identify.c Identificators/identity_tools/identool1.c tools/tool.c\
+		Identificators/identify.c Identificators/identity_tools/identool1.c \
+		tools/tool.c\
 		tools/tool2.c Identificators/units.c \
-		Debbugers/Tokens_db.c Debbugers/Linkedenv.c Builtins/echo.c Builtins/env.c Builtins/pwd.c Signal_handlers/sig_handlers.c\
-		Builtins/exit.c Builtins/export.c tools/tools3.c tools/tools4.c tools/tools5.c\
+		Debbugers/Tokens_db.c Debbugers/Linkedenv.c \
+		Builtins/echo.c Builtins/env.c Builtins/pwd.c \
+		Signal_handlers/sig_handlers.c\
+		Builtins/exit.c Builtins/export.c \
+		tools/tools3.c tools/tools4.c tools/tools5.c\
 		Builtins/Builtins_t/B_tools.c Builtins/Builtins_t/B_tools2.c\
 		Builtins/Builtins_t/B_tools3.c tools/tools6.c \
 		Builtins/Builtins_t/B_tools4.c tools/tools7.c \
 		Builtins/Builtins_t/B_tools5.c\
-		\
-		Syntax/syntax.c Syntax/syntax2.c\
+		Syntax/syntax.c Syntax/syntax2.c Syntax/syntax3.c\
 		Identificators/identity_tools/identool2.c\
 		Identificators/identity_tools/identool3.c\
 		Identificators/identity_tools/identool4.c\
 		tools/tools8.c Identificators/identity_tools/identool5.c\
 		Identificators/identity_tools/identool6.c\
-		tools/tools9.c\
+		tools/tools9.c Identificators/identity_tools/identool7.c\
+		Re_Identificators/re_identity.c Re_Identificators/re_identity_tools/re_identool0.c\
+		Re_Identificators/re_identity_tools/re_identool1.c\
+		MasterMind/system_mind0.c MasterMind/system_mind1.c\
 
 OBJ = $(SRC:.c=.o)
 

@@ -1,5 +1,7 @@
 #include "../../minishell.h"
 
+extern int g_flag;
+
 static char *name_generator(void)
 {
     long n;
@@ -43,21 +45,23 @@ static char *scrap_del(char *delimiter)
     return (del);
 }
 
-static void    open_heredoc(t_token *curr, t_data *data)
+static int  open_heredoc(t_token *id_class, t_token *curr, t_data *data, t_brace_t *br)
 {
     char *in;
     char *del;
     char *gename;
 
+    if (!sef_doc(id_class, data, br))
+        return(0);
     gename = name_generator();
     del = scrap_del(get_delimiter(curr));
-    printf("del > %s\n", del);
     data->here_fd = open(gename, O_CREAT | O_WRONLY, 0777);
     if (!data->here_fd)
         // MindAllocator
         exit(F);
+    // int fd = dup(STDOUT_FILENO);
     in = readline("Here_doc> ");
-    while(ft_strcmp(del, in))
+    while (ft_strcmp(del, in))
     {
         if (!in)
         {
@@ -69,23 +73,23 @@ static void    open_heredoc(t_token *curr, t_data *data)
         cpy_to_file(in, data);
         in = readline("Here_doc> ");
     }
-    unlink(gename);
+    // dup2(fd, STDOUT_FILENO);
+    return(unlink(gename), 1);
 }
 
-int here_doc_check(t_token *id_class, t_data *data)
+int here_doc_check(t_token *id_class, t_data *data, t_brace_t *br)
 {
     t_token *curr;
 
     curr = id_class;
-
     while (curr != NULL)
     {
         if (requirements(curr, id_class, data))
         {
             id_class->here_times = 0; // ?? set it on the same first node??
-            if (!change_id(curr->next, data))
+            if (!change_id(curr->next, data)
+                || !open_heredoc(id_class, curr, data, br))
                 return (0);
-            open_heredoc(curr, data);
         }
         curr = curr->next;
     }

@@ -1,0 +1,57 @@
+#include "../execute.h"
+
+int exec_pipe_node(t_cmd *cmd1, t_cmd *cmd2, int *fds, t_osdata *osdata)
+{
+    pid_t id1;
+    pid_t id2;
+
+    id1 = fork();
+    if (id1 == -1)
+        return (perror("fork failed."), EXIT_FAILURE);
+    
+    // handle child 1 logic
+    if (id1 == 0)
+    {
+        dup2(fds[1], STDOUT_FILENO);
+        close(fds[1]);
+        close(fds[0]);
+        execve(get_absolute_path(cmd1->argv[0]), cmd1->argv, osdata->env);
+        perror("[MP] execve failed"); // Print error if execve fails
+        exit(EXIT_FAILURE); // Exit child process if execve fails
+    }
+    id2 = fork();
+    if (id2 == -1)
+        return (perror("fork failed."), EXIT_FAILURE);
+    
+    // handle child 1 logic
+    if (id2 == 0)
+    {
+        dup2(fds[0], STDIN_FILENO);
+        close(fds[1]);
+        close(fds[0]);
+        execve(get_absolute_path(cmd2->argv[0]), cmd2->argv, osdata->env);
+        perror("[MP] execve failed"); // Print error if execve fails
+        exit(EXIT_FAILURE); // Exit child process if execve fails
+    }
+    close(fds[1]);
+    close(fds[0]);
+    while (wait(NULL) > -1);
+
+    return (EXIT_SUCCESS);
+}
+
+int pipe_node(t_cmd *node, t_osdata *osdata)
+{
+    int fds[2];
+
+    // create a pipe
+    if (pipe(fds) == -1)
+        return (perror("pipe failure"), EXIT_FAILURE);
+    exec_pipe_node(node->left, node->right, fds, osdata);
+
+    // printf("%s output ==> | input <== %s\n", node->left->argv[0], node->right->argv[0]);
+    return (EXIT_SUCCESS);
+}
+
+
+// 9ad lpipeline algo 

@@ -10,5 +10,5 @@ int list_size(t_token *list)
         size++;
         list = list->next;
     }
-    return(size);
+    return (size);
 }

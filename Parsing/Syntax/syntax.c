@@ -3,7 +3,7 @@
 void syntax_error_found(t_token *curr, t_data *data)
 {
     print_error(SYNTAX, curr->identity, SYN);
-    data->exit_status = 1;
+    data->exit_status = 2;
 }
 
 static int first_and_null(t_token *curr)
@@ -14,12 +14,12 @@ static int first_and_null(t_token *curr)
         return (F);
     return (S);
 }
-
-static int hold_and_check(t_token *hold, t_token *curr)
+int hold_and_check(t_token *hold, t_token *curr)
 {
     if ((hold->op && curr->op && !hold->op_case)
         || (hold->op && curr->br && !hold->op_case)
-        || (curr->op_case && hold->op))
+        || (curr->op_case && hold->op)
+        || (hold->op_case && curr->tok == BRACE_C_ID))
         return (F);
     if ((hold->tok == BRACE_O_ID && curr->op_case)
         || (hold->op && curr->br && !hold->op_case))
@@ -38,13 +38,12 @@ static int cmp_nodes(t_token *hold, t_token *verify, t_data *data)
     {
             syntax_error_found(verify, data);
             //MindAllocator
-            data->exit_status = 2;
             return (F);
     }
     return (S);
 }
 
-int syntax_verify(t_token *token, t_data *data)
+int syntax_verify(t_token *token, t_data *data, t_brace_t *br)
 {
     int i;
     t_token *hold;
@@ -68,7 +67,7 @@ int syntax_verify(t_token *token, t_data *data)
         verify = verify->next;
         i++;
     }
-    if (!doubles_verify(token, data))
+    if (scan_for_doubles(token) && !doubles_verify(token, data, br))
         return (0);
     return (1);
 }

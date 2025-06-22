@@ -1,17 +1,18 @@
 #include "../minishell.h"
 
-static int scan_for_doubles(t_token *token)
+int scan_for_doubles(t_token *token)
 {
     t_token *curr;
 
     curr = token;
     while (curr != NULL)
     {
-        if (curr->tok == BRACE_O_ID)
+        if (curr->tok == BRACE_O_ID
+                || curr->tok == BRACE_C_ID)
             return (1);
         curr = curr->next;
     }
-    return(0);
+    return (0);
 }
 
 static int non_print(char *in)
@@ -21,9 +22,8 @@ static int non_print(char *in)
     i = 0;
     while (in[i])
     {
-        if ((0 <= in[i] && in[i] <= 32)
-            || in[i] == 127)
-                return (0);
+        if ((0 <= in[i] && in[i] <= 32) || in[i] == 127)
+            return (0);
         i++;
     }
     return (1);
@@ -36,36 +36,57 @@ static void in_alert(t_token *token, int *flag_in)
         if (token->tok == BRACE_C_ID)
             break ;
         if ((0 <= token->tok && token->tok <= 6)
-                || (9 <= token->tok && token->tok <= 12))
+            || (9 <= token->tok && token->tok <= 12))
             *flag_in = 1;
         token = token->next;
     }
 }
 
-int doubles_verify(t_token *token, t_data *data)
+static int closing_evaluation(t_token *token, t_data *data, t_brace_t *br)
+{
+    int i = 0;
+    t_token *braces;
+    t_token *stack_br;
+
+    stack_br = NULL;
+    braces = get_all_braces(token);
+    while (braces != NULL)
+    {
+        if (!push_br(&stack_br, braces))
+            return (0);
+        i++;
+        braces = braces->next;
+    }
+    if (stack_br != NULL)
+        return (0);
+    return (1);
+}
+
+int doubles_verify(t_token *token, t_data *data, t_brace_t *br)
 {
     int flag_in;
     t_token *curr;
 
     flag_in = 0;
     curr = token;
-    if (!scan_for_doubles(token))
-        return (1);
-    while (curr != NULL
-            && curr->next != NULL)
+    while (curr != NULL && curr->next != NULL)
     {
         if (curr->tok == BRACE_O_ID)
         {
             in_alert(curr->next, &flag_in);
             if (!non_print(curr->next->identity) && !flag_in
-                || (curr->tok == BRACE_O_ID
-                        && curr->next->tok == BRACE_C_ID))
+                || (curr->tok == BRACE_O_ID && curr->next->tok == BRACE_C_ID))
             {
                 syntax_error_found(curr->next, data);
                 return (0);
             }
         }
         curr = curr->next;
+    }
+    if (!closing_evaluation(token, data, br))
+    {
+        print_error(BRACE_ERR, NULL, 0);
+        return (0);
     }
     return (1);
 }

@@ -79,7 +79,6 @@ int valide_exp(char *arg, t_data *data)
 void    export(t_data *data, char **args, int len)
 {
     int i;
-    char *arg;
 
     i = 1;
     if (len == 1) // to simulate no argument were found

@@ -56,7 +56,7 @@ void print_error(char *error, char *err, int mode)
         puterror(error);
         if (mode == SYN)
         {
-                write(2, "\'", 1);
+                write(2, "`", 1);
                 puterror(err);
                 write(2, "\'", 1);
                 write(2, "\n", 2);
