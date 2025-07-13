@@ -1,7 +1,5 @@
 #include "../../minishell.h"
 
-extern int g_flag;
-
 static char *name_generator(void)
 {
     long n;
@@ -56,7 +54,7 @@ static int  open_heredoc(t_token *id_class, t_token *curr, t_data *data, t_brace
     gename = name_generator();
     del = scrap_del(get_delimiter(curr));
     data->here_fd = open(gename, O_CREAT | O_WRONLY, 0777);
-    if (!data->here_fd)
+    if (data->here_fd == -1)
         // MindAllocator
         exit(F);
     // int fd = dup(STDOUT_FILENO);
@@ -73,6 +71,7 @@ static int  open_heredoc(t_token *id_class, t_token *curr, t_data *data, t_brace
         cpy_to_file(in, data);
         in = readline("Here_doc> ");
     }
+    store_fd(id_class, data);
     // dup2(fd, STDOUT_FILENO);
     return(unlink(gename), 1);
 }

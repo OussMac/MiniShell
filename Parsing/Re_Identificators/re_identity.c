@@ -44,15 +44,15 @@ t_token    *re_identity(t_token *id_class)
     string = 0;
     curr = id_class;
     quotes_removal(id_class);
+    joining_system(id_class);
     while (curr != NULL)
     {
         if (curr->tok == PIPE_ID || curr->tok == OR_ID
-                || curr->tok == AND_ID)
+            || curr->tok == AND_ID)
             string = 0;
         re_identifications(curr, &string);
         cmd_arg(&curr, &string);
         curr = curr->next;
     }
-    // debbuger_tk(id_class);
     return (re_builder(id_class));
 }

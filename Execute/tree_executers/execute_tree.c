@@ -23,47 +23,47 @@ char    *get_absolute_path(char *cmd)
     }
     return (NULL); // Not found
 }
+//----------------------------------------------------------------------------------
 
-void    exec_node(t_cmd *node, t_osdata *osdata)
+int     exec_node(t_cmd *node, t_osdata *osdata)
 {
-    pid_t id = fork();
+    int     ex_status;
+    pid_t   id = fork();
 
     if (id == 0)
-    {
-        execve(get_absolute_path(node->argv[0]), node->argv, osdata->env);
-        perror("execve failed"); // Print error if execve fails
-        exit(EXIT_FAILURE); // Exit child process if execve fails
-    }
+        exit(exec_colored(node->argv, osdata->env)); // exit child process if execve fails
 
-    wait(NULL);
+    waitpid(id, &ex_status, 0);
+    return (ex_status);
 }
 
-void    recursive_execution(t_cmd *node, t_osdata *osdata)
+int recursive_execution(t_cmd *node, t_osdata *osdata)
 {
     if (!node)
-        return ;
-    // printf("[ ====== ] 7na f had node ==> %s\n", cmd_id_to_str(node->id));
+        return (EXIT_FAILURE);
+    if (node->id == O_CMD) // base case exec cmd
+    {
+        expand_env_variables(node, osdata->env);
+        if (validate_builtin(node->argv[0]) == true)
+            return (exec_builtin(node, osdata));
+        return (exec_node(node, osdata));
+    }
     if (node->id == O_PIPE)
-    {
-        // handle pipeline
-        pipe_node(node, osdata);
-        return;
-    }
-    else if (node->id == O_CMD)
-    {
-        // we are in a command we send it to be executed here.
-        // print_argv("[ ====== ] with this content ==> ", node->argv);
-        exec_node(node, osdata);
-    }
+        return (execute_pipeline(node, osdata, STDIN_FILENO, false)); // handles only to commands rn.
+    if (node->id == O_GROUP)
+        return (recursive_execution(node->left, osdata)); // handle subshells.
+    if (node->id == O_AND || node->id == O_OR)
+        return (short_circuit_operand(node, node->id, osdata)); // short circuit algo for and and or.
     if (node->left)
-        recursive_execution(node->left, osdata);
+        return (recursive_execution(node->left, osdata)); // go deeper left (dfs algo)
     if (node->right)
-        recursive_execution(node->right, osdata);
+        return (recursive_execution(node->right, osdata)); // when done going left go deeper right.
+    return (EXIT_SUCCESS); // return 0 assume no cmd to execute is success!
 }
 
-void    execute_tree(t_cmd *root, t_osdata *osdata)
+int   execute_tree(t_cmd *root, t_osdata *osdata)
 {
     if (!root)
-        return ;
-    recursive_execution(root, osdata);
+        return (EXIT_FAILURE);
+    return (recursive_execution(root, osdata));
 }

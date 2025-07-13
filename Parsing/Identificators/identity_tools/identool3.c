@@ -38,9 +38,7 @@ void space_flag(t_token *id_class)
 
 int all_whitespaces(char x)
 {
-    if ((9 <= x && x <= 13) || x == 32 || x == PIPE
-        || x == RED_IN || x == RED_OUT || x == AND 
-        || x == BRACE_CL || x == BRACE_OP)
+    if ((9 <= x && x <= 13) || x == 32)
             return (0);
     return (1);
 }
@@ -50,7 +48,7 @@ int all_whitespaces(char x)
     it result on an invalid free, need to check later.
 */
 
-static int whitespaces(char x)
+int whitespaces(char x)
 {
     if ((9 <= x && x <= 13) || x == 32)
             return (0);

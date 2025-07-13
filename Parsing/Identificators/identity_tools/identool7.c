@@ -1,5 +1,13 @@
 #include "../../minishell.h"
 
+void    add_front_identity(t_token **lst, t_token *new)
+{
+        if (!new || !lst)
+                return ;
+        new->next = *lst;
+        *lst = new;
+}
+
 t_token *get_all_braces(t_token *token)
 {
     t_token *in;
@@ -51,4 +59,20 @@ int push_br(t_token **stack_br, t_token *to_push)
     else
         add_back_identity(stack_br, new, D_INIT);
     return (1);
+}
+
+void    store_fd(t_token *id_class, t_data *data)
+{
+    t_token *curr;
+
+    curr = id_class;
+    while (curr != NULL)
+    {
+        if (curr->tok == DEL_ID)
+        {
+            curr->here_doc_fd = dup(data->here_fd);
+            break ;
+        }
+        curr = curr->next;
+    }
 }

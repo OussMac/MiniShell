@@ -1,5 +1,15 @@
 #include "../../minishell.h"
 
+static int check_con(t_token *curr)
+{
+    if (curr->tok == PIPE_ID
+        || curr->tok == OR_ID || curr->tok == AND_ID || curr->tok == RED_APP_ID
+        || curr->tok == RED_IN_ID || curr->tok == RED_OUT_ID || curr->tok == HERE_DOC_ID
+        || curr->tok == BRACE_C_ID || curr->tok == BRACE_O_ID)
+            return (0);
+    return (1);
+}
+
 void set_free(t_token *curr)
 {
     t_token *temp;
@@ -28,8 +38,11 @@ static void free_nodes_del(t_token *delimiter, char *del_join)
     delimiter->identity = del_join;
     delimiter->tok = DEL_ID;
     after_delimiter = delimiter->next;
-    set_free(after_delimiter);
-    delimiter->next = NULL;
+    if (check_con(after_delimiter))
+    {
+        set_free(after_delimiter);
+        delimiter->next = NULL;
+    }
 }
 
 static char *join_delimiter(char *del_join, t_token *delimiter)
@@ -67,7 +80,8 @@ int delimiter_next(t_token *next_heredoc, t_data *data)
     {
         takeoff_quotes(next_heredoc);
         del_join = join_delimiter(del_join, next_heredoc);
-        if (next_heredoc->space_next == true)
+        if (next_heredoc->space_next == true
+            || (next_heredoc->next && !check_con(next_heredoc->next)))
             break ;
         next_heredoc = next_heredoc->next;
     }

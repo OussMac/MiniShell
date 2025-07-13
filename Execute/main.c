@@ -13,14 +13,16 @@ int main(int argc, char **argv, char **env)
     signal(SIGQUIT, SIG_IGN);
     while (1334)
     {
-        input = readline(RED"Master@Mind> "RST);
+        input = readline(BLU"Master@Mind> "RST);
 
         if (!input)
+        {
             return (printf("exit\n"), free(input), EXIT_SUCCESS); // handling ctrl-D
+        }
         if (input[0])
             add_history(input); // add non-empty strings to history.
         root = o_tokenizer(input, &osdata);
-        print_tree(root); // printer debugger (remove later)
+        // print_tree(root); // printer debugger (remove later)
         execute_tree(root, &osdata);
         free(input);
     }

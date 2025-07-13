@@ -6,14 +6,14 @@
  */
 static const char *seps[] = {
     "||", "&&", "<<", ">>",
-    "|",  "<",  ">",
+    "|",  "<",  ">", "(", ")", 
     NULL
 };
 
 /*
  * return the length of the matching separator at s[i], or 0 if none.
  */
-static size_t match_sep(const char *s)
+size_t match_sep(const char *s)
 {
 	int	i = 0;
 	while (seps[i])

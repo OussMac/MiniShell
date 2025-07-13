@@ -53,6 +53,7 @@ typedef struct s_osdata
 # define NODE_GROUP 5
 
 
+
 typedef enum e_cmd_id
 {
     O_CMD, // simple command
@@ -60,7 +61,7 @@ typedef enum e_cmd_id
     O_PIPE, // piping, redirect input of cmd1 to cmd2 output
     O_OR, // or operator, only run B if A fails
     O_AND, // and operator, only run B if A succeds
-    GROUP // subshell () with its own tree
+    O_GROUP // subshell () with its own tree
 }   t_cmd_id;
 
 
@@ -73,11 +74,36 @@ typedef struct s_cmd
     t_osdata    *osdata; // pointer to my data struct in main.
 }   t_cmd;
 
+// struct for flattened pipes, linear pipeline
+typedef struct s_pipe_list
+{
+    t_cmd               *cmd;
+    struct s_pipe_list  *next;
+}   t_pipe_list;
+
 // function to execute tree node
-void    execute_tree(t_cmd *root, t_osdata *osdata);
-int pipe_node(t_cmd *node, t_osdata *osdata);
+int   execute_tree(t_cmd *root, t_osdata *osdata);
+int execute_pipeline(t_cmd *node, t_osdata *osdata, int input_fd, bool is_last);
+int exec_colored(char **argv, char **envp);
+
+// recursive executer.
+int recursive_execution(t_cmd *node, t_osdata *osdata);
+
+// short - circuit - operand.
+int short_circuit_operand(t_cmd *node, t_cmd_id operand_id, t_osdata *osdata);
+
+// subshell and grouping logic for parenthesis.
+int subshell_group(t_cmd *node, t_osdata *osdata);
 
 
+// builtins
+bool    validate_builtin(char *str);
+int exec_builtin(t_cmd *node, t_osdata *osdata);
+void expand_env_variables(t_cmd *node, char **env);
+char *get_env_value(char *variable, char **env);
+
+// builtins. (just for testing)
+int o_echo(t_cmd *node, t_osdata *osdata);
 
 
 
@@ -96,9 +122,10 @@ void	print_argv(char *name, char **argv);
 // simple tokenizer wrapper built on ft_split, to insure building the tree and returns the head
 t_cmd   *o_tokenizer(char *line, t_osdata *osdata);
 char **better_split(const char *s);
+size_t match_sep(const char *s);
 
 // better split helpers
-int	ft_strncmp(const char *s1, const char *s2, size_t n);
+int	ft_strncmp(const char *s1, const char *s2, size_t n); // my ft_strcmp is flawed fix later.
 int	ft_strcmp(char *s1, char *s2);
 void	*lst_free(char **lst, size_t j);
 char	*ft_substr(char const *s, unsigned int start, size_t len);

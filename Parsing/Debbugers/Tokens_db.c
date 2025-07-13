@@ -83,6 +83,8 @@ void debbuger_tk(t_token *id_class)
             printf("ID-> DEL_ID\n");
             if (trav->space_next == true)
                 printf("Space next True\n");
+            if (trav->here_doc_fd != -1)
+                printf("File Descriptor Stored\n");
         }
         else if (trav->tok == 13)
         {

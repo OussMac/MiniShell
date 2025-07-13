@@ -13,7 +13,7 @@ const char *cmd_id_to_str(t_cmd_id id)
         return ("OR");
     else if (id == O_AND)    
         return ("AND");
-    else if (id == GROUP)    
+    else if (id == O_GROUP)    
         return ("GROUP");
     return ("UNKNOWN");
 }

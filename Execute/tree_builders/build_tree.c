@@ -5,6 +5,106 @@
 static char **g_tokv; // the token vector (double array) i get from tokenization.
 static int    g_pos; // the current index position we are reading from in the array.
 
+
+
+
+static char *last_strdup(char *str)
+{
+    char *ptr;
+    int i = 0;
+    int last_space = -1;
+
+    while (str[i])
+    {
+        if (str[i] == ' ')
+            last_space = i;
+        i++;
+    }
+
+    if (last_space == -1)
+        last_space = i; // No spaces found, take the whole string
+
+    ptr = malloc(i - last_space);
+    if (!ptr)
+        return (perror("malloc"), NULL);
+
+    int j = 0;
+    while (last_space < i)
+    {
+        ptr[j++] = str[++last_space];
+    }
+    ptr[j] = '\0';
+    return (ptr);
+}
+
+
+
+static char *uspace_strdup(char *str)
+{
+    char *ptr;
+
+    int i = 0;
+
+    while (str[i])
+    {
+        if(str[i] == ' ' || str[i] == '\0')
+            break;
+        i++;
+    }
+    
+    ptr = malloc (i + 1);
+    if (!ptr)
+        return (perror ("malloc"),NULL);
+    int j = 0;
+    while (j < i)
+    {
+        ptr[j++] = str[i++];
+    }
+    ptr[j] = '\0';
+    return (ptr);
+}
+
+
+// split and take the first arg
+static char *trimmer_br(char *str)
+{
+    char **trimmed;
+
+    if (strchr(str,  '('))
+    {
+        
+        trimmed = ft_split(str, '(');
+        return (uspace_strdup(str + 1));
+    }
+    else if (strchr(str,  ')'))
+    {
+        trimmed = ft_split(str, ')');
+        return (last_strdup(str)); // last word allocated string minus the bracket essentially like substr but in one function for this purpose
+    }
+    else
+        return (ft_strdup(str));
+    return (NULL);
+}
+
+
+
+static t_cmd *brace_trim(t_cmd *node)
+{
+    char *temp;
+    int i, j;
+
+    i = 0;
+    while (node->argv[i])
+    {
+        temp = node->argv[i]; //ptr to old string
+        node->argv[i] = trimmer_br(node->argv[i]); // new allocated str
+        printf("trimmed =>> %s\n", node->argv[i]);
+        free(temp); // free old one
+        i++;
+    }
+    return (node);
+}
+
 static char *peek(void) 
 {
     return (g_tokv[g_pos]);
@@ -78,7 +178,7 @@ static t_cmd *parse_simple(t_osdata *osdata)
             perror("GROUP malloc"); 
             return (NULL); 
         }
-        node->id    = GROUP;
+        node->id    = O_GROUP;
         node->argv  = NULL;
         node->left  = sub;
         node->right = NULL;
@@ -97,7 +197,7 @@ static t_cmd *parse_simple(t_osdata *osdata)
     }
     if (g_pos == start) 
     {
-        perror("ouss_ouss_parser: expected command");
+        perror("ouss_parser: expected command");
         return (NULL);
     }
 

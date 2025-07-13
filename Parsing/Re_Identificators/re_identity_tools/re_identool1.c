@@ -11,13 +11,14 @@ t_token *re_builder(t_token *id_class)
     while (curr != NULL)
     {
         if (!(1 <= curr->tok
-                && curr->tok <= 3))
+                && curr->tok <= 4))
         {
             in = add_identity(curr->identity, curr->tok, INIT, curr);
             add_back_identity(&re_built, in, D_INIT);
         }
         curr = curr->next;
     }
+    debbuger_tk(re_built);
     return (re_built);
 }
 

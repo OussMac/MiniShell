@@ -22,11 +22,11 @@
 # define PWD 1
 # define SQ 0
 # define DQ 1
-# define MARK 0
-# define DEMARK 1
 # define ENV 0
 # define EXP 1
 # define INIT 0
+# define MARK 0
+# define DEMARK 1
 # define D_INIT 1
 # define OLDPWD 0
 # define SEF_DOC 1
@@ -104,16 +104,17 @@ typedef struct s_token
 {
     int op;
     int br;
+    bool end;
+    int firsts;
     int brace_c;
     int brace_o;
-    int firsts;
     int op_case;
-    int here_times;
     int here_done;
+    int here_times;
     bool space_next;
+    int here_doc_fd;
     int was_single_quote;
     int was_double_quote;
-    bool end;
     char *identity;
     enum grammar tok;
     struct s_token *next;
@@ -185,6 +186,7 @@ t_envlist           *add_variable_value(char *variable, char *value);
 // Identity Tools
 int                 get_len(char *str);
 void                puterror(char *str);
+int                 whitespaces(char x);
 int                 all_whitespaces(char x);
 t_token	            *ft_lstlast(t_token *lst);
 int                 set_ops(t_token *id_class);
@@ -276,6 +278,7 @@ void                takeoff_quotes(t_token *tok);
 void                space_flag(t_token *id_class);
 char                *get_delimiter(t_token *token);
 int                 get_here_times(t_token *id_class);
+void                store_fd(t_token *id_class, t_data *data);
 int                 hold_and_check(t_token *hold, t_token *curr);
 int                 change_id(t_token *next_heredoc, t_data *data);
 int                 delimiter_next(t_token *next_heredoc, t_data *data);
@@ -292,9 +295,13 @@ void                identify_argument(t_token **id_class);
 void                re_identifications(t_token *curr, int *string);
 
 // MasterMind System
+int                 conditions(t_token *curr);
 void                build_tree(t_token *id_class);
 void                joining_system(t_token *id_class);
+void                add_front_identity(t_token **lst, t_token *new);
 
+// Shunting Yard Algorithm
+t_token             *shunting_yard_algorithm(t_token *id_class);
 
 // test to be removed after
 int                 printer(t_token *curr);

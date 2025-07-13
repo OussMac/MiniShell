@@ -25,6 +25,8 @@ SRC = minishell.c Identificators/identity_tools/identool0.c\
 		Re_Identificators/re_identity.c Re_Identificators/re_identity_tools/re_identool0.c\
 		Re_Identificators/re_identity_tools/re_identool1.c\
 		MasterMind/system_mind0.c MasterMind/system_mind1.c\
+		MasterMind/Mind_tools/mind_tools0.c MasterMind/Mind_tools/mind_tools1.c\
+
 
 OBJ = $(SRC:.c=.o)
 

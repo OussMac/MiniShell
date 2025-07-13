@@ -50,6 +50,7 @@ static int unification(char *input, int *i, t_token *id, t_token **id_class)
         //MindAllocator
         return (0);
     }
+    set_ops(*id_class);
     return (1);
 }
 

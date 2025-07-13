@@ -22,13 +22,13 @@ void takeoff_quotes(t_token *tok)
 int change_id(t_token *next_heredoc, t_data *data)
 {
     // printer(next_heredoc);
-    if (delimiter_next(next_heredoc, data))
-        return(1);
     if (next_heredoc->op || next_heredoc->br)
     {
         syntax_error_found(next_heredoc, data);
-        return(0);
+        return (0);
     }
+    if (delimiter_next(next_heredoc, data))
+        return (1);
     takeoff_quotes(next_heredoc);
     next_heredoc->tok = DEL_ID;
     return (1);

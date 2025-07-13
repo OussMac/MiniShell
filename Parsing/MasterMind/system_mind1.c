@@ -1,95 +1,46 @@
 #include "../minishell.h"
 
-static t_token *free_till_end(t_token *curr)
+static void add_token(t_token *curr, t_token **yard)
 {
-    t_token *temp;
-    t_token *reserve;
+    t_token *in;
 
-    temp = NULL;
-    reserve = NULL;
-    while (curr != NULL)
-    {
-        free(curr->identity);
-        free(temp);
-        temp = curr;
-        if (!curr->next)
-        {
-            curr->end = false;
-            free(temp);
-            break;
-        }
-        else if (curr->end == true)
-        {
-            reserve = temp->next;
-            curr->end = false;
-            free(temp);
-            break;
-        }
-        curr = curr->next;
-    }
-    return (reserve);
+    in = add_identity(curr->identity, curr->tok, D_INIT, NULL);
+    add_back_identity(yard, in, D_INIT);
 }
 
-static void    join_till_end(t_token *curr, t_token *id_class)
+static void operations_field(t_token *curr, t_token **op_field, t_token **yard)
 {
-    char *joined;
+    int brace;
+    t_token *in;
+    t_token *brace_op;
 
-    joined = NULL;
-    while (id_class != NULL
-            && id_class->tok == ARG_ID)
+    brace = 0;
+    in = NULL;
+    if (curr->tok == BRACE_O_ID)
     {
-        joined = ft_strjoin(curr->identity, id_class->identity);
-        free(curr->identity); // Might delete later (MindAllocator)
-        curr->identity = joined;
-        if (id_class->next == NULL
-                || id_class->space_next == true || id_class->tok == PIPE_ID
-                || id_class->tok == AND_ID || id_class->tok == OR_ID
-                || id_class->tok == ARG_ID)
-        {
-            id_class->end = true;
-            break ;
-        }
-        id_class = id_class->next;
+        in = add_identity(curr->identity, curr->tok, D_INIT, NULL);
+        add_front_identity(op_field, in);
+        brace = 1;
     }
+    else if (curr->tok == BRACE_C_ID && brace == 1)
+        send_take_out(curr, op_field, yard); // function to pop out braces and operative to the yard (TODO)
 }
 
-void    joining_system(t_token *id_class)
+t_token *shunting_yard_algorithm(t_token *id_class)
 {
-    char *joined;
     t_token *curr;
+    t_token *yard;
+    t_token *op_field;
 
+    yard = NULL;
+    op_field = NULL;
     curr = id_class;
-    joined = NULL;
     while (curr != NULL)
     {
-        if (curr->tok == COMMAND_ID
-            && curr->space_next == false && curr->next)
-        {
-            join_till_end(curr, curr->next);
-            curr->next = free_till_end(curr->next);
-        }
+        if (curr->tok == COMMAND_ID || curr->tok == ARG_ID)
+            add_token(curr, &yard);
+        else if (curr->op_case || curr->br)
+            operations_field(curr, &op_field, &yard);
         curr = curr->next;
     }
-    debbuger_tk(id_class);
 }
-
-// Master@Mindv1.1> cat'ls'nadi
-// temp > ls
-// reserve> nadi
-// RE_identity> catls
-// ID-> COMMAND_ID
-// ****************
-// RE_identity> nadi
-// ID-> ARG_ID
-// ****************
-/*
-    u can change the conditions in the join till the end into , 
-        if (id_class->next == NULL
-                || id_class->space_next == true)
-        {
-            if (id_class->net)
-                id_class->end = true;
-            break ;
-        }
-    and debbug this, cuz there is another behavior i cannot figure out, just run the same command
-*/

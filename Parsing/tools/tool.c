@@ -23,9 +23,10 @@ int check_alpha(char x, char x2)
                 || x == D_QUOTE
                 || x == BRACE_CL
                 || x == BRACE_OP
-                || x == TAB)
-                return(T);
-        return(N);
+                || x == TAB
+                || !whitespaces(x))
+                return (T);
+        return (N);
 }
 
 void  cpy_identity(char *dst, char *src)
