@@ -1,6 +1,6 @@
 #include "../execute.h"
 
-void expand_env_variables(t_cmd *node, char **env)
+void expand_env_variables(t_tree *node, char **env)
 {
     int i = 0;
     char *new_arg;

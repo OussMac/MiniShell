@@ -39,24 +39,22 @@ int     exec_node(t_cmd *node, t_osdata *osdata)
 
 int recursive_execution(t_tree *node, t_data *data)
 {
-    if (!node)
-        return (EXIT_FAILURE);
     if (node->tok == COMMAND_ID) // base case exec cmd
     {
-        expand_env_variables(node, data->env);
+        expand_env_variables(node, data->env_vec);
         // print_tree(node);
-        if (validate_builtin(node->argv[0]) == true)
-            return (exec_builtin(node, data));
+        // if (validate_builtin(node->argv[0]) == true)
+        //     return (exec_builtin(node, data));
         return (exec_node(node, data));
     }
-    if (node->tok == O_PIPE)
+    if (node->tok == PIPE_ID)
         return (pipe_node(node, data)); // handles only to commands rn.
-    if (node->tok == O_GROUP)
+    if (node->tok == PIPE_ID)
     {
         // handle groups
         return (recursive_execution(node->left, data));
     }
-    if (node->tok == O_AND || node->tok == O_OR)
+    if (node->tok == AND_ID || node->tok == OR_ID)
         return (short_circuit_operand(node, node->tok, data));
 
     if (node->left)
@@ -70,6 +68,11 @@ int recursive_execution(t_tree *node, t_data *data)
 void    execute_tree(t_tree *root, t_data *data)
 {
     if (!root)
+    {
+        // if (re_built != NULL)
+            // Exec list
         return ;
+    }
+    value_to_argv();
     recursive_execution(root, data);
 }

@@ -25,22 +25,6 @@
 #include <signal.h> // for signal handling.
 void    sig_handler(int signum); // signal handlers
 
-
-// Struct Holding MasterMind Data
-typedef struct s_data
-{
-    // int to_exp;
-    // int to_env;
-    // int append;
-    // int here_fd;
-    // int is_child;
-    // int here_case;
-    // int here_minus;
-    // int exit_status;
-    // t_exportlist *exp;
-    // t_envlist *env;
-}   t_data;
-
 typedef struct s_osdata
 {
     char    **env;
@@ -57,7 +41,6 @@ typedef struct s_osdata
 
 typedef struct s_cmd
 {
-    t_cmd_id    id; // command type (cmd, redir, pipe)
     char        **argv; // command arguments, null if anything else
     struct s_cmd *right; // right cmd
     struct s_cmd *left; // left cmd
