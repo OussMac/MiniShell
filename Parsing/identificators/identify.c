@@ -34,6 +34,8 @@ int identity_scraping(char *ident, enum grammar en,
     if (!ident)
         return (0);
     id = add_identity(ident, en, D_INIT, NULL);
+    if (!id)
+        list_cleaner(id_class);
     add_back_identity(id_class, id, INIT);
     return (1);
 }
@@ -46,8 +48,8 @@ static int unification(char *input, int *i, t_token *id, t_token **id_class)
     if (!forth_unit(input, i, id, id_class)
         || !set_ops(*id_class))
     {
+        list_cleaner(id_class);
         *id_class = NULL;
-        //MindAllocator
         return (0);
     }
     set_ops(*id_class);
@@ -62,7 +64,7 @@ t_token *get_identity(char *input, t_data *data, t_brace_t *br)
 
     i = 0;
     id = NULL;
-    id_class = NULL; // why seggev??
+    id_class = NULL;
     while (input[i])
     {
         if (!unification(input, &i, id, &id_class))
@@ -74,8 +76,10 @@ t_token *get_identity(char *input, t_data *data, t_brace_t *br)
         unit_call_space_next(id_class, input, &i);
     }
     if (!syntax_verify(id_class, data, br))
-        // MindAllocator
+    {
+        list_cleaner(&id_class);
         id_class = NULL;
-    // debbuger_tk(id_class);
+    }
+    free(input);
     return (id_class);
 }

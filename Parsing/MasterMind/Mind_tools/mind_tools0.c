@@ -4,7 +4,6 @@ static int free_conditions(t_token *curr, t_token *temp, t_token **reserve)
 {
     if (!curr->next)
     {
-        printf("token free >> %s\n", curr->identity);
         curr->end = false;
         free(temp);
         return (0);
@@ -28,7 +27,7 @@ static t_token *free_till_end(t_token *curr)
     reserve = NULL;
     while (curr != NULL)
     {
-        // free(curr->identity);
+        free(curr->identity);
         free(temp);
         temp = curr;
         if (!free_conditions(curr, temp, &reserve))
@@ -42,25 +41,23 @@ int    conditions(t_token *curr)
 {
     if (curr->tok == PIPE_ID
         || curr->tok == OR_ID || curr->tok == AND_ID || curr->tok == RED_APP_ID
-        || curr->tok == RED_IN_ID || curr->tok == RED_OUT_ID || curr->tok == HERE_DOC_ID)
+        || curr->tok == RED_IN_ID || curr->tok == RED_OUT_ID || curr->tok == HERE_DOC_ID
+        || curr->br)
             return (0);
     return (1);
 }
 
-static void    join_till_end(t_token *curr, t_token *id_class)
+static int    join_till_end(t_token *curr, t_token *id_class)
 {
     char *joined;
 
     joined = NULL;
     while (id_class != NULL)
     {
-        // if (!conditions(id_class)) // u can send here the next id class, and check for the bug using this case cat'ls'nadi | pwd
-        // {
-        //     id_class->end = true;
-        //     break ;
-        // }
         joined = ft_strjoin(curr->identity, id_class->identity);
-        free(curr->identity); // Might delete later (MindAllocator)
+        if (!joined)
+            return (S);
+        free(curr->identity);
         curr->identity = joined;
         if (id_class->next && id_class->next->tok != STRING_ID
             || id_class->space_next == true)
@@ -70,9 +67,10 @@ static void    join_till_end(t_token *curr, t_token *id_class)
         }
         id_class = id_class->next;
     }
+    return (F);
 }
 
-void    joining_system(t_token *id_class)
+int    joining_system(t_token *id_class)
 {
     char *joined;
     t_token *curr;
@@ -85,10 +83,11 @@ void    joining_system(t_token *id_class)
             && curr->space_next == false && curr->next
             && conditions(curr->next))
         {
-            join_till_end(curr, curr->next);
+            if (!join_till_end(curr, curr->next))
+                return (S);
             curr->next = free_till_end(curr->next);
         }
         curr = curr->next;
     }
-    // debbuger_tk(id_class);
+    return (F);
 }

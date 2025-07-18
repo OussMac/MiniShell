@@ -19,6 +19,8 @@
 # define N 0
 # define NL 0
 # define SYN 1
+# define START 0
+# define END 1
 # define PWD 1
 # define SQ 0
 # define DQ 1
@@ -29,6 +31,9 @@
 # define DEMARK 1
 # define D_INIT 1
 # define OLDPWD 0
+# define L_POW 1
+# define M_POW 2
+# define H_POW 3
 # define SEF_DOC 1
 # define ALL_SEF 0
 # define HEREDOC1 1
@@ -89,11 +94,27 @@ enum grammar
     ARG_ID, // Argument
 };
 
+// Redirections Files List
+typedef struct s_red
+{
+    char *value;
+    enum grammar tok;
+    int fd_here_doc;
+    int was_s_quote;
+    int was_d_quote;
+    struct s_red *next;
+}   t_red;
+
 // MasterMindTree
 typedef struct s_tree
 {
     char *value;
     enum grammar tok;
+    int op_case;
+    int here_doc_fd;
+    int was_s_quote;
+    int was_d_quote;
+    struct s_red *red;
     struct s_tree *left;
     struct s_tree *right;
 } t_tree;
@@ -105,19 +126,27 @@ typedef struct s_token
     int op;
     int br;
     bool end;
+    int power;
+    bool used;
     int firsts;
     int brace_c;
     int brace_o;
     int op_case;
+    bool marked;
+    bool in_acc;
     int here_done;
     int here_times;
     bool space_next;
     int here_doc_fd;
     int was_single_quote;
     int was_double_quote;
-    char *identity;
-    enum grammar tok;
+    bool here_document_act;
+    bool del_fd;
+    bool cmd_up_next;
     struct s_token *next;
+    enum grammar tok;
+    char *identity;
+    t_red *red;
 }   t_token;
 
 // Linked List Holding The Enviroment
@@ -149,6 +178,7 @@ typedef struct s_data
     int here_case;
     int here_minus;
     int exit_status;
+    int fail;
     t_exportlist *exp;
     t_envlist *env;
 }   t_data;
@@ -195,11 +225,11 @@ int                 check_alpha(char x, char x2);
 int                 check_doubles(char x, char x2);
 void                cpy_identity(char *dst, char *src);
 int                 len_of_string(char *input, int index);
-void	            add_back_identity(t_token **lst, t_token *new, int mode);
-t_token	            *add_identity(char *content, enum grammar tok, int mode, t_token *infos);
 int                 ft_strnstr(char *haystack, char *needle, size_t len);
 t_token             *get_identity(char *input, t_data *data, t_brace_t *br);
+void	            add_back_identity(t_token **lst, t_token *new, int mode);
 void                unit_call_space_next(t_token *id_class, char *input, int *index);
+t_token	            *add_identity(char *content, enum grammar tok, int mode, t_token *infos);
 int                 unit_call_here_doc(t_token **id_class, char *input, t_data *data, t_brace_t *br);
 int                 identity_scraping(char *ident, enum grammar en, t_token *id, t_token **id_class);
 
@@ -266,18 +296,20 @@ int                 scan_for_doubles(t_token *token);
 int                 push_br(t_token **stack_br, t_token *to_push);
 void                print_error(char *error, char *err, int mode);
 void                syntax_error_found(t_token *curr, t_data *data);
+void                clean_stacks(t_token **stackone, t_token **stacktwo);
 int                 syntax_verify(t_token *token, t_data *data, t_brace_t *br);
 int                 doubles_verify(t_token *token, t_data *data, t_brace_t *br);
 int                 realt_quotes(char *input, int doubles_case, int index, char *err);
 
 // Here_Document Tools
 char                *ft_itoa(int n);
-int                 list_size(t_token *list);
 void                set_free(t_token *curr);
+int                 list_size(t_token *list);
 void                takeoff_quotes(t_token *tok);
 void                space_flag(t_token *id_class);
 char                *get_delimiter(t_token *token);
 int                 get_here_times(t_token *id_class);
+void                get_quotes_state(t_token *delimiter);
 void                store_fd(t_token *id_class, t_data *data);
 int                 hold_and_check(t_token *hold, t_token *curr);
 int                 change_id(t_token *next_heredoc, t_data *data);
@@ -286,24 +318,50 @@ int                 sef_doc(t_token *token, t_data *data, t_brace_t *br);
 int                 requirements(t_token *curr, t_token *id_class, t_data *data);
 int                 here_doc_check(t_token *id_class, t_data *data, t_brace_t *br);
 
-
 // Re_Identification Of Tokens
 t_token             *re_builder(t_token *id_class);
 t_token             *re_identity(t_token *id_class);
+int                 joining_system(t_token *id_class);
 void                cmd_arg(t_token **curr, int *string);
 void                identify_argument(t_token **id_class);
 void                re_identifications(t_token *curr, int *string);
 
 // MasterMind System
 int                 conditions(t_token *curr);
-void                build_tree(t_token *id_class);
-void                joining_system(t_token *id_class);
-void                add_front_identity(t_token **lst, t_token *new);
-
-// Shunting Yard Algorithm
+int                 red_checks(t_token *curr);
+void                set_end(t_token **op_field);
+t_token             *get_file(t_token *id_class);
+void                set_power(t_token *id_class);
+t_token             *return_op(t_token *op_field);
+void                arg_system(t_token *id_class);
+void                red_system(t_token **id_class);
+void                command_ahead(t_token *id_class);
+t_tree              *build_tree(t_token *id_class);
+t_token             *delete_red(t_token **id_class);
+void                set_last_cmd(t_token *id_class);
+void                mark_unmarked(t_token *id_class);
+t_red               *redirection_cop(t_token *id_class);
+void                add_back_red(t_red **cmd, t_red *in);
+int                 add_token(t_token *curr, t_token **yard);
 t_token             *shunting_yard_algorithm(t_token *id_class);
+void                recursive_build(t_token *yard, t_tree **tree);
+int                 mark_ending(t_token *op_field, t_token **yard);
+void                add_front_identity(t_token **lst, t_token *new);
+int                 add_all_to_yard(t_token **yard, t_token **op_field);
+void                last_cmd(t_token *curr, int *x, int *y, t_token **cmd);
+int                 remove_op(t_token **yard, t_token **op_field, t_token *op);
+int                 algo(t_token *curr, t_token **op_field, t_token *in, t_token **yard);
+int                 add_op(t_token *curr, t_token **op_field, t_token **yard, t_token *in);
+int                 add_n_remove(t_token *curr, t_token **op_field, t_token **yard, t_token *in);
+int                 algorithm_options(t_token *curr, t_token **op_field, t_token **yard, t_token *in);
+
+// Cleaner Functions
+void                cleaner_red(t_token *list);
+void                list_cleaner(t_token **list);
 
 // test to be removed after
-int                 printer(t_token *curr);
+void                print_tree(t_tree *root);
+int                 printer(t_token *curr, char *name);
+int                 printer_red(t_red *curr, char *name);
 
 # endif

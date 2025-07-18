@@ -18,7 +18,9 @@ t_token *get_all_braces(t_token *token)
     {
         if (token->tok == BRACE_O_ID || token->tok == BRACE_C_ID)
         {
-            in = add_identity(token->identity, token->tok, D_INIT, NULL);
+            in = add_identity(ft_strdup(token->identity), token->tok, D_INIT, NULL);
+            if (!in)
+                return (NULL);
             add_back_identity(&braces, in, D_INIT);
         }
         token = token->next;
@@ -50,12 +52,21 @@ int push_br(t_token **stack_br, t_token *to_push)
 {
     t_token *new;
 
-    new = add_identity(to_push->identity, to_push->tok, D_INIT, NULL);
-    // new to be freed each time and not to be included in MindAllocator :)
-    if (new->tok == BRACE_C_ID && !*stack_br)
+    new = add_identity(ft_strdup(to_push->identity), to_push->tok, D_INIT, NULL);
+    if (!new)
         return (0);
+    if (new->tok == BRACE_C_ID && !*stack_br)
+    {
+        free(new->identity);
+        free(new);
+        return (0);
+    }
     else if (new->tok == BRACE_C_ID && (*stack_br)->tok == BRACE_O_ID)
+    {
+        free(new->identity);
+        free(new);
         pop_out_brace(stack_br);
+    }
     else
         add_back_identity(stack_br, new, D_INIT);
     return (1);
@@ -68,9 +79,10 @@ void    store_fd(t_token *id_class, t_data *data)
     curr = id_class;
     while (curr != NULL)
     {
-        if (curr->tok == DEL_ID)
+        if (curr->tok == DEL_ID && curr->del_fd == false)
         {
             curr->here_doc_fd = dup(data->here_fd);
+            curr->del_fd = true;
             break ;
         }
         curr = curr->next;

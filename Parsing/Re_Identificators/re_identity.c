@@ -1,12 +1,14 @@
 #include "../minishell.h"
 
-static void remove_q(t_token *curr, int mode)
+static int remove_q(t_token *curr, int mode)
 {
     char *removed;
 
     if (mode == SQ)
     {
         removed = ft_strtrim(curr->identity, "\'");
+        if (!removed)
+            return(S);
         free(curr->identity);
         curr->identity = removed;
         curr->was_single_quote = 1;
@@ -14,14 +16,17 @@ static void remove_q(t_token *curr, int mode)
     else if (mode == DQ)
     {
         removed = ft_strtrim(curr->identity, "\"");
+        if (!removed)
+            return (S);
         free(curr->identity);
         curr->identity = removed;
         curr->was_double_quote = 1;
     }
     curr->tok = STRING_ID;
+    return (F);
 }
 
-static void quotes_removal(t_token *id_class)
+static int quotes_removal(t_token *id_class)
 {
     t_token *curr;
 
@@ -29,11 +34,18 @@ static void quotes_removal(t_token *id_class)
     while (curr != NULL)
     {
         if (curr->tok == S_QUOTE_ID)
-            remove_q(curr, SQ);
+        {
+            if (!remove_q(curr, SQ))
+                return (S);
+        }
         else if (curr->tok == D_QUOTE_ID)
-            remove_q(curr, DQ);
+        {
+            if (!remove_q(curr, DQ))
+                return (S);
+        }
         curr = curr->next;
     }
+    return (F);
 }
 
 t_token    *re_identity(t_token *id_class)
@@ -41,10 +53,12 @@ t_token    *re_identity(t_token *id_class)
     int string;
     t_token *curr;
 
+    if (id_class == NULL)
+        return (NULL);
     string = 0;
     curr = id_class;
-    quotes_removal(id_class);
-    joining_system(id_class);
+    if (!quotes_removal(id_class) || !joining_system(id_class))
+        return (list_cleaner(&id_class), NULL);
     while (curr != NULL)
     {
         if (curr->tok == PIPE_ID || curr->tok == OR_ID
@@ -54,5 +68,6 @@ t_token    *re_identity(t_token *id_class)
         cmd_arg(&curr, &string);
         curr = curr->next;
     }
+    arg_system(id_class);
     return (re_builder(id_class));
 }

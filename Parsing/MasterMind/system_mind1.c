@@ -1,46 +1,71 @@
 #include "../minishell.h"
 
-static void add_token(t_token *curr, t_token **yard)
+int add_token(t_token *curr, t_token **list)
 {
     t_token *in;
 
-    in = add_identity(curr->identity, curr->tok, D_INIT, NULL);
-    add_back_identity(yard, in, D_INIT);
+    in = add_identity(ft_strdup(curr->identity), curr->tok, INIT, curr);
+    if (!in)
+        return (S);
+    add_back_identity(list, in, D_INIT);
+    return (F);
 }
 
-static void operations_field(t_token *curr, t_token **op_field, t_token **yard)
+int remove_op(t_token **yard, t_token **op_field, t_token *op)
 {
-    int brace;
+    if (!mark_ending(*op_field, yard))
+        return (S);
+    set_end(op_field);
+    return (F);
+}
+
+static int operations_field(t_token *curr, t_token **op_field, t_token **yard)
+{
     t_token *in;
     t_token *brace_op;
 
-    brace = 0;
     in = NULL;
     if (curr->tok == BRACE_O_ID)
     {
-        in = add_identity(curr->identity, curr->tok, D_INIT, NULL);
-        add_front_identity(op_field, in);
-        brace = 1;
+        if (!add_op(curr, op_field, yard, in))
+            return (S);
     }
-    else if (curr->tok == BRACE_C_ID && brace == 1)
-        send_take_out(curr, op_field, yard); // function to pop out braces and operative to the yard (TODO)
+    else if (curr->op_case)
+    {
+        if (!algo(curr, op_field, in, yard))
+            return (S);
+    }
+    else if (curr->tok == BRACE_C_ID)
+    {
+        if (!add_n_remove(curr, op_field, yard, in))
+            return (S);
+    }
+    return (F);
 }
 
 t_token *shunting_yard_algorithm(t_token *id_class)
 {
+    int brace;
     t_token *curr;
     t_token *yard;
     t_token *op_field;
 
+    brace = 0;
     yard = NULL;
     op_field = NULL;
+    set_power(id_class);
     curr = id_class;
     while (curr != NULL)
     {
-        if (curr->tok == COMMAND_ID || curr->tok == ARG_ID)
-            add_token(curr, &yard);
-        else if (curr->op_case || curr->br)
-            operations_field(curr, &op_field, &yard);
+        if (!curr->op_case && !curr->br
+            && !add_token(curr, &yard))
+            return (list_cleaner(&yard), NULL);
+        else if ((curr->op_case || curr->br)
+            && !operations_field(curr, &op_field, &yard))
+            return (list_cleaner(&yard), NULL);
         curr = curr->next;
     }
+    if (!add_all_to_yard(&yard, &op_field))
+        return (list_cleaner(&yard), NULL);
+    return (yard);
 }

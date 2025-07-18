@@ -21,14 +21,18 @@ void takeoff_quotes(t_token *tok)
 
 int change_id(t_token *next_heredoc, t_data *data)
 {
-    // printer(next_heredoc);
     if (next_heredoc->op || next_heredoc->br)
     {
         syntax_error_found(next_heredoc, data);
         return (0);
     }
-    if (delimiter_next(next_heredoc, data))
-        return (1);
+    if (!delimiter_next(next_heredoc, data))
+    {
+        if (data->fail == 1)
+            return (data->fail = false, 0);
+    }
+    else
+        return(1);
     takeoff_quotes(next_heredoc);
     next_heredoc->tok = DEL_ID;
     return (1);
@@ -66,16 +70,6 @@ int get_here_times(t_token *id_class)
     return (0);
 }
 
-int printer(t_token *curr)
-{
-    while (curr)
-    {
-        printf("\e[0;36;1mprinter > %s\n\e[0m", curr->identity);
-        curr = curr->next;
-    }
-    return (1);
-}
-
 int requirements(t_token *curr, t_token *id_class, t_data *data)
 {
     if (curr->next == NULL)
@@ -83,8 +77,8 @@ int requirements(t_token *curr, t_token *id_class, t_data *data)
     else if (curr->tok == HERE_DOC_ID
         && !curr->here_done && get_here_times(id_class) == 1)
     {
-            data->here_case = 2;
-            return (1);
+        data->here_case = 2;
+        return (1);
     }
     return (0);
 }

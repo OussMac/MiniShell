@@ -44,26 +44,32 @@ int recursive_execution(t_cmd *node, t_osdata *osdata)
     if (node->id == O_CMD) // base case exec cmd
     {
         expand_env_variables(node, osdata->env);
+        // print_tree(node);
         if (validate_builtin(node->argv[0]) == true)
             return (exec_builtin(node, osdata));
         return (exec_node(node, osdata));
     }
     if (node->id == O_PIPE)
-        return (execute_pipeline(node, osdata, STDIN_FILENO, false)); // handles only to commands rn.
+        return (pipe_node(node, osdata)); // handles only to commands rn.
     if (node->id == O_GROUP)
-        return (recursive_execution(node->left, osdata)); // handle subshells.
+    {
+        // handle groups
+        return (recursive_execution(node->left, osdata));
+    }
     if (node->id == O_AND || node->id == O_OR)
-        return (short_circuit_operand(node, node->id, osdata)); // short circuit algo for and and or.
+        return (short_circuit_operand(node, node->id, osdata));
+
     if (node->left)
         return (recursive_execution(node->left, osdata)); // go deeper left (dfs algo)
     if (node->right)
         return (recursive_execution(node->right, osdata)); // when done going left go deeper right.
+    
     return (EXIT_SUCCESS); // return 0 assume no cmd to execute is success!
 }
 
-int   execute_tree(t_cmd *root, t_osdata *osdata)
+void    execute_tree(t_cmd *root, t_osdata *osdata)
 {
     if (!root)
-        return (EXIT_FAILURE);
-    return (recursive_execution(root, osdata));
+        return ;
+    recursive_execution(root, osdata);
 }

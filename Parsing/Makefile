@@ -1,5 +1,7 @@
 CC = cc 
-CFLAG = #-fsanitize=address -g3
+CFLAG = -I$(READLINE_DIR)/include # zdt readline library (MAC) -Wall -Wextra -Werror
+READLINE_DIR := ../lib/readline/install
+LDFLAGS += -L$(READLINE_DIR)/lib -lreadline -lhistory -lncurses
 H = minishell.h 
 NAME = minishell
 SRC = minishell.c Identificators/identity_tools/identool0.c\
@@ -22,18 +24,24 @@ SRC = minishell.c Identificators/identity_tools/identool0.c\
 		tools/tools8.c Identificators/identity_tools/identool5.c\
 		Identificators/identity_tools/identool6.c\
 		tools/tools9.c Identificators/identity_tools/identool7.c\
+		Identificators/identity_tools/identool8.c\
 		Re_Identificators/re_identity.c Re_Identificators/re_identity_tools/re_identool0.c\
 		Re_Identificators/re_identity_tools/re_identool1.c\
+		Re_Identificators/re_identity_tools/re_identool2.c\
+		Re_Identificators/re_identity_tools/re_identool3.c\
+		Re_Identificators/re_identity_tools/re_identool4.c\
+		Re_Identificators/re_identity_tools/re_identool5.c\
 		MasterMind/system_mind0.c MasterMind/system_mind1.c\
 		MasterMind/Mind_tools/mind_tools0.c MasterMind/Mind_tools/mind_tools1.c\
-
+		MasterMind/Mind_tools/mind_tools2.c MasterMind/Mind_tools/mind_tools3.c \
+		Debbugers/dbg_tree.c tools/tools10.c\
 
 OBJ = $(SRC:.c=.o)
 
 all: $(NAME)
 
 $(NAME): $(OBJ)
-	@$(CC) $(OBJ) $(CFLAG) -lreadline -o $(NAME)
+	@$(CC) $(OBJ) $(CFLAG) $(LDFLAGS) -lreadline -o $(NAME)
 
 %.o: %.c $(H)
 	@$(CC) $(CFLAG) -c $< -o $@

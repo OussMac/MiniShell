@@ -7,11 +7,7 @@ void    sig_handler(int signum)
     if (signum == SIGINT)
     {
         g_flag = 1;
-        if (g_flag == 1)
-        {
-            printf("drna ctrl c");
-        }
-        rl_replace_line("", 0);    // bdl lcurrent input b empty string.
+        // rl_replace_line("", 0);    // bdl lcurrent input b empty string.
 	    printf("\n");              // print newline to jump to nl.
 	    rl_on_new_line();          // prepare readline for a new line.
 	    rl_redisplay();            // redraw prompt.

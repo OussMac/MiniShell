@@ -85,8 +85,10 @@ char    *ft_strjoin(char *s1, char *s2)
         int             j;
         char    *join;
 
-        if(!s1)
+        if (!s1)
                 return (ft_strdup(s2));
+        if (!s2)
+                return (NULL);
         i = 0;
         j = 0;
         join = malloc(get_len(s1) + get_len(s2) + 1);

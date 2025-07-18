@@ -82,8 +82,8 @@ typedef struct s_pipe_list
 }   t_pipe_list;
 
 // function to execute tree node
-int   execute_tree(t_cmd *root, t_osdata *osdata);
-int execute_pipeline(t_cmd *node, t_osdata *osdata, int input_fd, bool is_last);
+void    execute_tree(t_cmd *root, t_osdata *osdata);
+int pipe_node(t_cmd *node, t_osdata *osdata);
 int exec_colored(char **argv, char **envp);
 
 // recursive executer.

@@ -59,12 +59,13 @@ void init_data_struct(t_data *data, char **env)
     data->is_child = 0;
     data->here_minus = 0;
     data->exit_status = 0;
+    data->fail = 0;
     data->env = NULL;
     data->exp = NULL;
-    list_exp(&data->exp, env);
-    list_env(&data->env, env);
-    zero_point(data);
-    scan_ops(&data->exp);
+    // list_exp(&data->exp, env);
+    // list_env(&data->env, env);
+    // zero_point(data);
+    // scan_ops(&data->exp);
     // linkednev_db(&data->env);
     // printf("**************************************************\n");
     // linkednexp_db(&data->exp);

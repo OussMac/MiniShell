@@ -1,32 +1,5 @@
 #include "../../minishell.h"
 
-int realt_quotes(char *input, int doubles_case, int index, char *err)
-{
-    int doubles;
-
-    doubles = 0;
-    if (!ft_strchr(input, doubles_case))
-        return (1);
-    while (input[index])
-    {
-        if (input[index] == doubles_case
-            && doubles == 1)
-        {
-            doubles++;
-            break;
-        }
-        if (input[index] == doubles_case)
-            doubles++;
-        index++;
-    }
-    if (doubles % 2 != 0)
-    {
-        print_error(err, NULL, 0);
-        return (0);
-    }
-    return (1);
-}
-
 void space_flag(t_token *id_class)
 {
     t_token *last_token;
@@ -43,11 +16,6 @@ int all_whitespaces(char x)
     return (1);
 }
 
-/*
-    if some of the operators passes this check and go to the herdoc
-    it result on an invalid free, need to check later.
-*/
-
 int whitespaces(char x)
 {
     if ((9 <= x && x <= 13) || x == 32)
@@ -59,6 +27,7 @@ int unit_call_here_doc(t_token **id_class, char *input, t_data *data, t_brace_t 
 {
     if (!here_doc_check(*id_class, data, br))
     {
+        list_cleaner(id_class);
         *id_class = NULL;
         return (0);
     }

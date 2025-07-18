@@ -38,6 +38,7 @@ static int cmp_nodes(t_token *hold, t_token *verify, t_data *data)
     {
             syntax_error_found(verify, data);
             //MindAllocator
+            data->exit_status = 2;
             return (F);
     }
     return (S);
@@ -59,7 +60,6 @@ int syntax_verify(t_token *token, t_data *data, t_brace_t *br)
         if (i == 0 && first_and_null(verify))
         {
                 syntax_error_found(verify, data);
-                //MindAllocator
                 data->exit_status = 2;
                 return(0);
         }
@@ -68,14 +68,6 @@ int syntax_verify(t_token *token, t_data *data, t_brace_t *br)
         i++;
     }
     if (scan_for_doubles(token) && !doubles_verify(token, data, br))
-        return (0);
+        return (data->exit_status = 2, 0);
     return (1);
 }
-
-/*
-    Master@Mindv1.0> (   &&   )  we need to check for and, 
-                            or operators arguments
-    Master@Mindv1.0> < a (ls) ??
-    ayel-bou@e2r10p13:~$ (ls && > out) same here as the first
-    Master@Mindv1.0> (( ))
-*/

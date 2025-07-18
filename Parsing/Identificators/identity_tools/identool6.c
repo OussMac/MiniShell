@@ -38,6 +38,7 @@ static void free_nodes_del(t_token *delimiter, char *del_join)
     delimiter->identity = del_join;
     delimiter->tok = DEL_ID;
     after_delimiter = delimiter->next;
+    get_quotes_state(delimiter);
     if (check_con(after_delimiter))
     {
         set_free(after_delimiter);
@@ -45,7 +46,7 @@ static void free_nodes_del(t_token *delimiter, char *del_join)
     }
 }
 
-static char *join_delimiter(char *del_join, t_token *delimiter)
+static char *join_delimiter(char *del_join, t_token *delimiter, int index)
 {
     int i;
     char *del;
@@ -53,6 +54,8 @@ static char *join_delimiter(char *del_join, t_token *delimiter)
 
     i = 0;
     del = malloc(get_len(delimiter->identity) + 1);
+    if (!del)
+        return (NULL);
     while (delimiter->identity[i])
     {
         del[i] = delimiter->identity[i];
@@ -60,17 +63,24 @@ static char *join_delimiter(char *del_join, t_token *delimiter)
     }
     del[i] = '\0';
     tmp = ft_strdup(del_join);
+    if (!tmp && index > 0)
+        return (free(del), NULL);
     free(del_join);
     del_join = ft_strjoin(tmp, del);
+    if (!del_join)
+        return(free(tmp), free(del), NULL);
     free(del);
+    free(tmp);
     return (del_join);
 }
 
 int delimiter_next(t_token *next_heredoc, t_data *data)
 {
+    int index;
     char *del_join;
     t_token *delimiter;
 
+    index = 0;
     del_join = NULL;
     delimiter = next_heredoc;
     if (next_heredoc->next == NULL
@@ -79,20 +89,15 @@ int delimiter_next(t_token *next_heredoc, t_data *data)
     while (next_heredoc)
     {
         takeoff_quotes(next_heredoc);
-        del_join = join_delimiter(del_join, next_heredoc);
+        del_join = join_delimiter(del_join, next_heredoc, index);
+        if (!del_join)
+            return (data->fail = true, 0);
         if (next_heredoc->space_next == true
             || (next_heredoc->next && !check_con(next_heredoc->next)))
             break ;
         next_heredoc = next_heredoc->next;
+        index++;
     }
     free_nodes_del(delimiter, del_join);
     return (1);
 }
-/*
-    seems good, next to do, is to free all nodes that has beeng extracted
-    as delimiters for heredoc, and joined on the first delimiter node, 
-    free them from the first point to the null or to the space next true node, 
-    in the case of null its fine, in the case of space next true, we need to link
-    the first delimiter node, with the next space true node, inchallah, do that
-    at home, Good luck inchallah
-*/

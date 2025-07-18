@@ -111,6 +111,10 @@ void debbuger_tk(t_token *id_class)
                 printf("Space next True\n");
             if (trav->end == true)
                 printf("End Marked\n");
+            if (trav->here_document_act == true)
+                printf("HERE_DOC_INPUT\n");
+            if (trav->red)
+                printer_red(trav->red, "Red ");
         }
         else if (trav->tok == 17)
         {
