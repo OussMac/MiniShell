@@ -37,39 +37,39 @@ int     exec_node(t_cmd *node, t_osdata *osdata)
     return (ex_status);
 }
 
-int recursive_execution(t_cmd *node, t_osdata *osdata)
+int recursive_execution(t_tree *node, t_data *data)
 {
     if (!node)
         return (EXIT_FAILURE);
-    if (node->id == O_CMD) // base case exec cmd
+    if (node->tok == COMMAND_ID) // base case exec cmd
     {
-        expand_env_variables(node, osdata->env);
+        expand_env_variables(node, data->env);
         // print_tree(node);
         if (validate_builtin(node->argv[0]) == true)
-            return (exec_builtin(node, osdata));
-        return (exec_node(node, osdata));
+            return (exec_builtin(node, data));
+        return (exec_node(node, data));
     }
-    if (node->id == O_PIPE)
-        return (pipe_node(node, osdata)); // handles only to commands rn.
-    if (node->id == O_GROUP)
+    if (node->tok == O_PIPE)
+        return (pipe_node(node, data)); // handles only to commands rn.
+    if (node->tok == O_GROUP)
     {
         // handle groups
-        return (recursive_execution(node->left, osdata));
+        return (recursive_execution(node->left, data));
     }
-    if (node->id == O_AND || node->id == O_OR)
-        return (short_circuit_operand(node, node->id, osdata));
+    if (node->tok == O_AND || node->tok == O_OR)
+        return (short_circuit_operand(node, node->tok, data));
 
     if (node->left)
-        return (recursive_execution(node->left, osdata)); // go deeper left (dfs algo)
+        return (recursive_execution(node->left, data)); // go deeper left (dfs algo)
     if (node->right)
-        return (recursive_execution(node->right, osdata)); // when done going left go deeper right.
+        return (recursive_execution(node->right, data)); // when done going left go deeper right.
     
     return (EXIT_SUCCESS); // return 0 assume no cmd to execute is success!
 }
 
-void    execute_tree(t_cmd *root, t_osdata *osdata)
+void    execute_tree(t_tree *root, t_data *data)
 {
     if (!root)
         return ;
-    recursive_execution(root, osdata);
+    recursive_execution(root, data);
 }

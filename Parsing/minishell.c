@@ -32,7 +32,8 @@ int main(int argc, char **argv, char **env)
         token = get_identity(input, &data, &br);
         prompts = re_identity(token);
         tree = build_tree(prompts);
-        
+        execute_tree2(tree, &data);
+
     }
     free(input);
 }

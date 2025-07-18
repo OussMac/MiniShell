@@ -1,6 +1,8 @@
 #ifndef EXECUTE_H
 # define EXECUTE_H
 
+# include "../Parsing/minishell.h"
+
 // text colors
 # define RED "\e[31m"
 # define GRN "\e[32m"
@@ -51,18 +53,6 @@ typedef struct s_osdata
 # define NODE_OR 3
 # define NODE_AND 4
 # define NODE_GROUP 5
-
-
-
-typedef enum e_cmd_id
-{
-    O_CMD, // simple command
-    O_REDIR, // redirect to file, either in or out
-    O_PIPE, // piping, redirect input of cmd1 to cmd2 output
-    O_OR, // or operator, only run B if A fails
-    O_AND, // and operator, only run B if A succeds
-    O_GROUP // subshell () with its own tree
-}   t_cmd_id;
 
 
 typedef struct s_cmd
