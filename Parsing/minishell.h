@@ -109,6 +109,8 @@ typedef struct s_red
 typedef struct s_tree
 {
     char *value;
+    char **argv;
+    char **env;
     enum grammar tok;
     int op_case;
     int here_doc_fd;
@@ -181,6 +183,7 @@ typedef struct s_data
     int fail;
     t_exportlist *exp;
     t_envlist *env;
+    char **env_vec;
 }   t_data;
 
 // MiniStruct For Braces Handling
@@ -363,5 +366,12 @@ void                list_cleaner(t_token **list);
 void                print_tree(t_tree *root);
 int                 printer(t_token *curr, char *name);
 int                 printer_red(t_red *curr, char *name);
+
+// ouss functions
+int execute_tree(t_tree *root, t_data *data, char **env, void *re_built);
+int merger(t_tree *root, t_data *data, char **env);
+int execute_pipeline(t_tree *node, t_data *data, int input_fd, bool is_last);
+int recursive_execution(t_tree *node, t_data *data);
+
 
 # endif

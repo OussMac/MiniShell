@@ -15,11 +15,9 @@ t_tree *build_tree(t_token *id_class)
         cleaner_red(id_class);
         list_cleaner(&id_class);
     }
-    printf("TREE >>>\n");
     list_cleaner(&id_class);
     recursive_build(yard, &tree);
     list_cleaner(&yard);
-    print_tree(tree);
     return (tree);
 }
 
@@ -32,6 +30,7 @@ static void init_tree(t_tree **node)
     (*node)->left = NULL;
     (*node)->right = NULL;
     (*node)->red = NULL;
+    (*node)->argv = NULL;
     (*node)->op_case = 0;
 }
 

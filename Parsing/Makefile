@@ -35,6 +35,11 @@ SRC = minishell.c Identificators/identity_tools/identool0.c\
 		MasterMind/Mind_tools/mind_tools0.c MasterMind/Mind_tools/mind_tools1.c\
 		MasterMind/Mind_tools/mind_tools2.c MasterMind/Mind_tools/mind_tools3.c \
 		Debbugers/dbg_tree.c tools/tools10.c\
+		\
+		\
+		\
+		../Execute/tree_executers/execute_tree.c ../Execute/tree_executers/merge_utils.c \
+		../Execute/tree_pipeline/tree_pipeline.c
 
 OBJ = $(SRC:.c=.o)
 

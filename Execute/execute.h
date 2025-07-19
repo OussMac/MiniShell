@@ -2,6 +2,17 @@
 # define EXECUTE_H
 
 # include "../Parsing/minishell.h"
+# define RECURS_LIMIT (size_t)1000
+
+
+
+
+
+
+
+/*
+
+
 
 // text colors
 # define RED "\e[31m"
@@ -115,5 +126,6 @@ char    *get_absolute_path(char *cmd);
 //--------------------- [^^^ Helpers ^^^] ---------------------------------------------
 
 char	*ft_strjoin(char const *s1, char const *s2);
+*/
 
 # endif // EXECUTE_H

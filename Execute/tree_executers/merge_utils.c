@@ -1,0 +1,32 @@
+#include "../execute.h"
+
+static int tree_traverser(t_tree *root, char **og_env, size_t *recurs_count)
+{
+
+    (*recurs_count)++;
+    if (!root || *recurs_count == RECURS_LIMIT)
+        return (EXIT_FAILURE);
+    if (root->tok == COMMAND_ID)
+    {
+        root->argv = ft_split(root->value, ' ');
+        root->env = og_env;
+        return (EXIT_SUCCESS);
+    }
+    if (root->left)
+        return (tree_traverser(root->left, og_env, recurs_count));
+    if (root->right)
+        return (tree_traverser(root->right, og_env, recurs_count));
+    return (EXIT_SUCCESS);
+}
+// entry point.
+int merger(t_tree *root, t_data *data, char **env)
+{
+    static size_t   r_c;
+    if (tree_traverser(root, env, &r_c) != EXIT_SUCCESS)
+    {
+        r_c = 0;
+        return (perror("Recursion Limit"), EXIT_FAILURE);
+    }
+    r_c = 0;
+    return (EXIT_SUCCESS);
+}

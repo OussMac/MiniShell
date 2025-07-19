@@ -24,7 +24,7 @@ int main(int argc, char **argv, char **env)
     {
         // Pre parsing Braces case of (ls << eof)
         ft_bzero(&br, sizeof(t_brace_t));
-        input = readline("\033[32mMaster@Mindv1.1> \033[0m");
+        input = readline("\033[32mMaster@Mindv2.0> \033[0m");
         if (input == NULL)
             break ;
         if (input[0] != '\0')
@@ -32,8 +32,7 @@ int main(int argc, char **argv, char **env)
         token = get_identity(input, &data, &br);
         prompts = re_identity(token);
         tree = build_tree(prompts);
-        execute_tree2(tree, &data);
-
+        execute_tree(tree, &data, env, NULL);
     }
     free(input);
 }
