@@ -39,7 +39,8 @@ SRC = minishell.c Identificators/identity_tools/identool0.c\
 		\
 		\
 		../Execute/tree_executers/execute_tree.c ../Execute/tree_executers/merge_utils.c \
-		../Execute/tree_pipeline/tree_pipeline.c
+		../Execute/tree_pipeline/tree_pipeline.c ../Execute/tree_executers/free_tree.c \
+		
 
 OBJ = $(SRC:.c=.o)
 
