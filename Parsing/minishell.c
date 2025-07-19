@@ -1,5 +1,10 @@
 #include "minishell.h"
 
+void f()
+{
+    system("leaks minishell");
+}
+
 void voiders(int argc, char **argv, char **env)
 {
     (void)argc;
@@ -9,6 +14,7 @@ void voiders(int argc, char **argv, char **env)
 
 int main(int argc, char **argv, char **env)
 {
+    // atexit(f);
     t_tree *tree;
     t_data data;
     t_brace_t br;
@@ -32,7 +38,8 @@ int main(int argc, char **argv, char **env)
         token = get_identity(input, &data, &br);
         prompts = re_identity(token);
         tree = build_tree(prompts);
-        execute_tree(tree, &data, env, NULL);
+        free_tree(tree);
+        // execute_tree(tree, &data, env, NULL);
     }
     free(input);
 }

@@ -111,7 +111,7 @@ typedef struct s_tree
     char *value;
     char **argv;
     char **env;
-    enum grammar tok;
+    t_grammar tok;
     int op_case;
     int here_doc_fd;
     int was_s_quote;
@@ -367,11 +367,13 @@ void                print_tree(t_tree *root);
 int                 printer(t_token *curr, char *name);
 int                 printer_red(t_red *curr, char *name);
 
-// ouss functions
+// ouss functions  -------------------------
 int execute_tree(t_tree *root, t_data *data, char **env, void *re_built);
 int merger(t_tree *root, t_data *data, char **env);
 int execute_pipeline(t_tree *node, t_data *data, int input_fd, bool is_last);
 int recursive_execution(t_tree *node, t_data *data);
+// free_tree (error handling)
+void    free_tree(t_tree *node);
 
 
 # endif
