@@ -41,11 +41,13 @@ char *scrap_string(char *input, int *index)
 char *scrap(int *index, char *scrapped)
 {
     int len;
+    char *token;
 
     len = get_len(scrapped);
+    token = ft_strdup(scrapped);
     while (len--)
         (*index)++;
-    return(scrapped);
+    return(token);
 }
 
 int len_of_quote(char *input, char quote_case, int index)

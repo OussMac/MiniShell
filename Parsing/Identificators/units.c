@@ -5,7 +5,7 @@ void    first_unit(char *input, int *i, t_token *id, t_token **id_class)
     if (!check_alpha(input[*i], input[*i + 1]))
          identity_scraping(scrap_string(input, i),
              STRING_ID, id, id_class);
-    if (input[*i] == PIPE
+    else if (input[*i] == PIPE
          && !check_doubles(input[*i] , input[*i + 1]))
         identity_scraping(scrap(i, "|"),
         PIPE_ID, id, id_class);
@@ -54,7 +54,7 @@ int    forth_unit(char *input, int *i, t_token *id, t_token **id_class)
     }
     else if (input[*i] == D_QUOTE)
     {
-        if(!identity_scraping(scrap_quote(input, i, D_QUOTE),
+        if (!identity_scraping(scrap_quote(input, i, D_QUOTE),
         D_QUOTE_ID, id, id_class))
             return (0);
     }
