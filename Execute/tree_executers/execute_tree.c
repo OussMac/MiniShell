@@ -62,16 +62,28 @@ int recursive_execution(t_tree *node, t_data *data) // not static cuz used in pi
     
     return (EXIT_SUCCESS); // return 0 assume no cmd to execute is success!
 }
+
 // entry point.
 int execute_tree(t_tree *root, t_data *data, char **env, void *re_built)
 {
+    int rec_exit_status;
     if (!root)
     {
         // if (re_built != NULL)
-        //     return (exec_list(NULL)); // passing Null for now.
-        return (perror("Null root"), EXIT_FAILURE); // free tree
+        {
+            // free_tree(root);
+            // free_rebuilt(re_built);
+            // return (exec_list(NULL)); // passing Null for now.
+        }
+        // free_tree(root);
+        return (perror("Null root"), EXIT_FAILURE);
     }
     if (merger(root, data, env) != EXIT_SUCCESS)
-        return (perror("Merge Failed"), EXIT_FAILURE); // free tree
-    return (recursive_execution(root, data));
+    {
+        // free_tree(root);
+        return (perror("Merge Failed"), EXIT_FAILURE);
+    }
+    rec_exit_status = recursive_execution(root, data);
+    // free_tree(root);
+    return (rec_exit_status);
 }

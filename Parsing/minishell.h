@@ -71,7 +71,7 @@
 # define TAB '\t'
 
 // Enum Of IDs
-enum grammar
+typedef enum grammar
 {
     PIPE_ID, // |
     RED_IN_ID, // <
@@ -92,13 +92,13 @@ enum grammar
     INPUT_APP_FILE_ID, // Input Append File
     COMMAND_ID, // Command
     ARG_ID, // Argument
-};
+} t_grammar;
 
 // Redirections Files List
 typedef struct s_red
 {
     char *value;
-    enum grammar tok;
+    t_grammar tok;
     int fd_here_doc;
     int was_s_quote;
     int was_d_quote;
