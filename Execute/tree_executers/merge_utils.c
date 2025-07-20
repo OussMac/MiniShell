@@ -13,9 +13,15 @@ static int tree_traverser(t_tree *root, char **og_env, size_t *recurs_count)
         return (EXIT_SUCCESS);
     }
     if (root->left)
-        return (tree_traverser(root->left, og_env, recurs_count));
+    {
+        if (tree_traverser(root->left, og_env, recurs_count) != EXIT_SUCCESS)
+            return (EXIT_FAILURE);
+    }
     if (root->right)
-        return (tree_traverser(root->right, og_env, recurs_count));
+    {
+        if (tree_traverser(root->right, og_env, recurs_count) != EXIT_SUCCESS)
+            return (EXIT_FAILURE);
+    }
     return (EXIT_SUCCESS);
 }
 // entry point.

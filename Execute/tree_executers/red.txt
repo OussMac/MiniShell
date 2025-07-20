@@ -1,0 +1,88 @@
+#include <fcntl.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
+
+static int red_in(t_tree *red_node)
+{
+    int fd = open(red_node->filename, O_RDONLY);
+    if (fd < 0)
+    {
+        perror(red_node->filename);
+        return (EXIT_FAILURE);
+    }
+    if (dup2(fd, STDIN_FILENO) < 0)
+    {
+        perror("dup2 failed");
+        close(fd);
+        return (EXIT_FAILURE);
+    }
+    close(fd);
+    return (EXIT_SUCCESS);
+}
+
+static int red_out(t_tree *red_node)
+{
+    int flags = O_WRONLY | O_CREAT | O_TRUNC;
+    int fd = open(red_node->filename, flags, 0644);
+    if (fd < 0)
+    {
+        perror(red_node->filename);
+        return (EXIT_FAILURE);
+    }
+    if (dup2(fd, STDOUT_FILENO) < 0)
+    {
+        perror("dup2 failed");
+        close(fd);
+        return (EXIT_FAILURE);
+    }
+    close(fd);
+    return (EXIT_SUCCESS);
+}
+
+static int red_append(t_tree *red_node)
+{
+    int flags = O_WRONLY | O_CREAT | O_APPEND;
+    int fd = open(red_node->filename, flags, 0644);
+    if (fd < 0)
+    {
+        perror(red_node->filename);
+        return (EXIT_FAILURE);
+    }
+    if (dup2(fd, STDOUT_FILENO) < 0)
+    {
+        perror("dup2 failed");
+        close(fd);
+        return (EXIT_FAILURE);
+    }
+    close(fd);
+    return (EXIT_SUCCESS);
+}
+
+int handle_red(t_tree *node, t_data *data)
+{
+    t_tree *red = node->red;
+
+    while (red)
+    {
+        if (red->tok == INPUT_FILE_ID)
+        {
+            if (red_in(red) != EXIT_SUCCESS)
+                return (EXIT_FAILURE);
+        }
+        else if (red->tok == OUTPUT_FILE_ID)
+        {
+            if (red_out(red) != EXIT_SUCCESS)
+                return (EXIT_FAILURE);
+        }
+        else if (red->tok == APPEND_FILE_ID)
+        {
+            if (red_append(red) != EXIT_SUCCESS)
+                return (EXIT_FAILURE);
+        }
+        // TODO: HEREDOC here if needed.
+        red = red->red; // follow the redirection chain
+    }
+    return (exec_node(node, data));
+}
