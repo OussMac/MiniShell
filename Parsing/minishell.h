@@ -370,10 +370,20 @@ int                 printer_red(t_red *curr, char *name);
 // ouss functions  -------------------------
 int execute_tree(t_tree *root, t_data *data, char **env, void *re_built);
 int merger(t_tree *root, t_data *data, char **env);
-int execute_pipeline(t_tree *node, t_data *data, int input_fd, bool is_last);
+int execute_pipeline(t_tree *node, t_data *data, int input_fd);
 int recursive_execution(t_tree *node, t_data *data);
 // free_tree (error handling)
 void    free_tree(t_tree *node);
+char    *get_absolute_path(char *cmd);
+int     exec_node(t_tree *node, t_data *data);
+int short_circuit_operand(t_tree *node, t_grammar operand_id, t_data *data);
+
+
+typedef struct s_plist
+{
+    t_tree *cmd_node;
+    struct s_plist *next;
+}   t_plist;
 
 
 # endif
