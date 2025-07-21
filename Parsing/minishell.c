@@ -5,6 +5,19 @@ void f()
     system("leaks minishell");
 }
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+void check_fd_leaks(void)
+{
+    char cmd[64];
+    snprintf(cmd, sizeof(cmd), "lsof -p %d", getpid());
+    printf("=== FD Leak Check ===\n");
+    system(cmd);
+}
+
+
 void voiders(int argc, char **argv, char **env)
 {
     (void)argc;
@@ -15,6 +28,8 @@ void voiders(int argc, char **argv, char **env)
 int main(int argc, char **argv, char **env)
 {
     // atexit(f);
+    // atexit(check_fd_leaks);
+
     t_tree *tree;
     t_data data;
     t_brace_t br;
@@ -38,6 +53,7 @@ int main(int argc, char **argv, char **env)
         token = get_identity(input, &data, &br);
         prompts = re_identity(token);
         tree = build_tree(prompts);
+        print_tree(tree);
         execute_tree(tree, &data, env, NULL);
     }
     free(input);
