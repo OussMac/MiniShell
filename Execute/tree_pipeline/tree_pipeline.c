@@ -72,10 +72,7 @@ int execute_pipeline(t_tree *root, t_data *data, int input_fd)
             if (is_pipe)
                 dup2(fd[1], STDOUT_FILENO), close(fd[0]), close(fd[1]);
 
-            execve(get_absolute_path(curr->cmd_node->argv[0]), curr->cmd_node->argv, data->env_vec);
-
-            dprintf(STDERR_FILENO, "Migrane: command not found: %s\n", curr->cmd_node->argv[0]);
-            exit(EXIT_FAILURE);
+            exit(recursive_execution(curr->cmd_node, data));
         }
         if (prev != STDIN_FILENO)
             close(prev);

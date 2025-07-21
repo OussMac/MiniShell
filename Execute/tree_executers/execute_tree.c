@@ -67,7 +67,6 @@ int recursive_execution(t_tree *node, t_data *data) // not static cuz used in pi
 // entry point.
 int execute_tree(t_tree *root, t_data *data, char **env, void *re_built)
 {
-    print_tree(root);
     int rec_exit_status;
     if (!root)
     {
