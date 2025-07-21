@@ -1,69 +1,43 @@
+#include "../execute.h"
 #include <fcntl.h>
 #include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
 
 static int red_in(t_tree *red_node)
 {
-    int fd = open(red_node->filename, O_RDONLY);
-    if (fd < 0)
-    {
-        perror(red_node->filename);
-        return (EXIT_FAILURE);
-    }
-    if (dup2(fd, STDIN_FILENO) < 0)
-    {
-        perror("dup2 failed");
-        close(fd);
-        return (EXIT_FAILURE);
-    }
+    int fd = open(red_node->str, O_RDONLY);
+    if (fd == -1)
+        return (perror("minishell: input"), EXIT_FAILURE);
+    if (dup2(fd, STDIN_FILENO) == -1)
+        return (perror("minishell: dup2"), close(fd), EXIT_FAILURE);
     close(fd);
     return (EXIT_SUCCESS);
 }
 
 static int red_out(t_tree *red_node)
 {
-    int flags = O_WRONLY | O_CREAT | O_TRUNC;
-    int fd = open(red_node->filename, flags, 0644);
-    if (fd < 0)
-    {
-        perror(red_node->filename);
-        return (EXIT_FAILURE);
-    }
-    if (dup2(fd, STDOUT_FILENO) < 0)
-    {
-        perror("dup2 failed");
-        close(fd);
-        return (EXIT_FAILURE);
-    }
+    int fd = open(red_node->str, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (fd == -1)
+        return (perror("minishell: output"), EXIT_FAILURE);
+    if (dup2(fd, STDOUT_FILENO) == -1)
+        return (perror("minishell: dup2"), close(fd), EXIT_FAILURE);
     close(fd);
     return (EXIT_SUCCESS);
 }
 
 static int red_append(t_tree *red_node)
 {
-    int flags = O_WRONLY | O_CREAT | O_APPEND;
-    int fd = open(red_node->filename, flags, 0644);
-    if (fd < 0)
-    {
-        perror(red_node->filename);
-        return (EXIT_FAILURE);
-    }
-    if (dup2(fd, STDOUT_FILENO) < 0)
-    {
-        perror("dup2 failed");
-        close(fd);
-        return (EXIT_FAILURE);
-    }
+    int fd = open(red_node->str, O_WRONLY | O_CREAT | O_APPEND, 0644);
+    if (fd == -1)
+        return (perror("minishell: append"), EXIT_FAILURE);
+    if (dup2(fd, STDOUT_FILENO) == -1)
+        return (perror("minishell: dup2"), close(fd), EXIT_FAILURE);
     close(fd);
     return (EXIT_SUCCESS);
 }
 
-int handle_red(t_tree *node, t_data *data)
+int handle_red(t_tree *cmd_node, t_data *data)
 {
-    t_tree *red = node->red;
-
+    t_tree *red = cmd_node->red;
     while (red)
     {
         if (red->tok == INPUT_FILE_ID)
@@ -76,13 +50,12 @@ int handle_red(t_tree *node, t_data *data)
             if (red_out(red) != EXIT_SUCCESS)
                 return (EXIT_FAILURE);
         }
-        else if (red->tok == APPEND_FILE_ID)
+        else if (red->tok == INPUT_APP_FILE_ID)
         {
             if (red_append(red) != EXIT_SUCCESS)
                 return (EXIT_FAILURE);
         }
-        // TODO: HEREDOC here if needed.
-        red = red->red; // follow the redirection chain
+        red = red->red; // move to next redirection
     }
-    return (exec_node(node, data));
+    return (EXIT_SUCCESS);
 }

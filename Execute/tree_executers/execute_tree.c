@@ -67,6 +67,7 @@ int recursive_execution(t_tree *node, t_data *data) // not static cuz used in pi
 // entry point.
 int execute_tree(t_tree *root, t_data *data, char **env, void *re_built)
 {
+    print_tree(root);
     int rec_exit_status;
     if (!root)
     {
@@ -77,11 +78,13 @@ int execute_tree(t_tree *root, t_data *data, char **env, void *re_built)
             // return (exec_list(NULL)); // passing Null for now.
         }
         free_tree(root);
+        printf("Exit Status --> %d\n", data->exit_status);
         return (perror("Null root"), EXIT_FAILURE);
     }
     if (merger(root, data, env) != EXIT_SUCCESS)
     {
         free_tree(root);
+        printf("Exit Status --> %d\n", data->exit_status);
         return (perror("Merge Failed"), EXIT_FAILURE);
     }
     rec_exit_status = recursive_execution(root, data);

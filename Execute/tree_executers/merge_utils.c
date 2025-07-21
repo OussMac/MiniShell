@@ -3,12 +3,17 @@
 static int tree_traverser(t_tree *root, char **og_env, size_t *recurs_count)
 {
 
-    (*recurs_count)++;
-    if (!root || *recurs_count == RECURS_LIMIT)
+    if (*recurs_count == RECURS_LIMIT)
         return (EXIT_FAILURE);
+    (*recurs_count)++;
     if (root->tok == COMMAND_ID)
     {
         root->argv = ft_split(root->value, ' ');
+        if (!root->argv)
+        {
+            // clean_up();
+            // EXIT_FAILURE;
+        }
         root->env = og_env;
         return (EXIT_SUCCESS);
     }
@@ -24,6 +29,7 @@ static int tree_traverser(t_tree *root, char **og_env, size_t *recurs_count)
     }
     return (EXIT_SUCCESS);
 }
+
 // entry point.
 int merger(t_tree *root, t_data *data, char **env)
 {
