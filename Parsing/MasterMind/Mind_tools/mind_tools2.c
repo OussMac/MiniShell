@@ -17,9 +17,8 @@ void    set_power(t_token *id_class)
     {
         if (id_class->tok == PIPE_ID)
             id_class->power = H_POW;
-        else if (id_class->tok == AND_ID)
-            id_class->power = M_POW;
-        else if (id_class->tok == OR_ID)
+        else if (id_class->tok == AND_ID
+            || id_class->tok == OR_ID)
             id_class->power = L_POW;
         id_class = id_class->next;
     }
