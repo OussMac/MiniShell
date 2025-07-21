@@ -24,7 +24,7 @@ t_tree *build_tree(t_token *id_class)
 static void init_tree(t_tree **node)
 {
     *node = malloc(sizeof(t_tree));
-    if (!node)
+    if (!*node)
         exit(F);
     (*node)->value = NULL;
     (*node)->left = NULL;
