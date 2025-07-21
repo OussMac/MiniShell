@@ -2,7 +2,7 @@
 # define EXECUTE_H
 
 # include "../Parsing/minishell.h"
-# define RECURS_LIMIT (size_t)1000
+# define RECURS_LIMIT (size_t)250
 
 
 

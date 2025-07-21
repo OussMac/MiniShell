@@ -46,15 +46,16 @@ int recursive_execution(t_tree *node, t_data *data) // not static cuz used in pi
     if (node->tok == COMMAND_ID) // base case exec cmd
     {
         // expand_env_variables(node, data->env_vec);
-        // print_tree(node);
         // if (validate_builtin(node->argv[0]) == true)
         //     return (exec_builtin(node, data));
+        if (node->red)
+            return (handle_red(node, data));
         return (exec_node(node, data));
     }
     if (node->tok == PIPE_ID)
-        return (puts("dkhl"), execute_pipeline(node, data, STDIN_FILENO, false)); // pipeline recurses back to this func
-    // if (node->tok == AND_ID || node->tok == OR_ID)
-    //     return (short_circuit_operand(node, node->tok, data));
+        return (execute_pipeline(node, data, STDIN_FILENO)); // pipeline recurses back to this func
+    if (node->tok == AND_ID || node->tok == OR_ID)
+        return (short_circuit_operand(node, node->tok, data));
     if (node->left)
         return (recursive_execution(node->left, data)); // go deeper left (dfs algo)
     if (node->right)
@@ -66,6 +67,7 @@ int recursive_execution(t_tree *node, t_data *data) // not static cuz used in pi
 // entry point.
 int execute_tree(t_tree *root, t_data *data, char **env, void *re_built)
 {
+    print_tree(root);
     int rec_exit_status;
     if (!root)
     {
@@ -75,15 +77,16 @@ int execute_tree(t_tree *root, t_data *data, char **env, void *re_built)
             // free_rebuilt(re_built);
             // return (exec_list(NULL)); // passing Null for now.
         }
-        // free_tree(root);
+        free_tree(root);
+        printf("Exit Status --> %d\n", data->exit_status);
         return (perror("Null root"), EXIT_FAILURE);
     }
     if (merger(root, data, env) != EXIT_SUCCESS)
     {
-        // free_tree(root);
+        free_tree(root);
+        printf("Exit Status --> %d\n", data->exit_status);
         return (perror("Merge Failed"), EXIT_FAILURE);
     }
     rec_exit_status = recursive_execution(root, data);
-    // free_tree(root);
-    return (rec_exit_status);
+    return (free_tree(root), rec_exit_status);
 }

@@ -1,0 +1,9 @@
+ls -la || echo hi && echo test
+
+had test katbuilda tree ghalat
+khas tbda mn &&
+
+((ls -la || echo hi) && echo test)
+
+
+a9was kayforsiwha tkon hkak
