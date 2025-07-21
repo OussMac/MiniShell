@@ -17,6 +17,8 @@ static void free_redir(t_red *red)
 static void free_argv(char **argv)
 {
     int i;
+
+    i = 0;
     if (!argv)
         return ;
     while (argv[i])
