@@ -1,38 +1,75 @@
 #include "../execute.h"
 
-int o_echo(t_cmd *node, t_osdata *osdata)
+static void ft_putchar(char c)
 {
-    int i = 1;
-    int newline = 1;
+    write(STDOUT_FILENO, &c, 1);
+}
 
-    // Step 1: Handle multiple -n options
-    while (node->argv[i] && ft_strncmp(node->argv[i], "-n", 2) == 0)
+static bool validate_echo_option(char *str, int *i)
+{
+    int j;
+
+    j = 0;
+    if (str[j++] != '-')
+        return (false);
+    while (str[j])
     {
-        int j = 2;
-        while (node->argv[i][j] == 'n')
-            j++;
+        if (str[j] != 'n')
+            return (false);
+        j++;
+    }
+    (*i)++;
+    return (true);
+}
 
-        if (node->argv[i][j] != '\0') // not like -nnn
-            break;
 
-        newline = 0;
+static bool echo_printer(char *str, bool first_arg)
+{
+    int     i;
+    bool    newline;
+
+    i = 0;
+    newline = false;
+    while (str[i])
+    {
+        if (first_arg)
+        {
+            newline = validate_echo_option(str, &i);
+            if (!newline)
+            {
+                first_arg = false;
+                continue;
+            }
+        }
+        else
+            ft_putchar(str[i]);
         i++;
     }
+    return (newline);
+}
 
-    // Step 2: Print the rest of the arguments
+
+// function entry
+int o_echo(t_tree *node)
+{
+    int     i;
+    bool    newline;
+
+    newline = false;
+    i = 1; // start from 1 : [0) echo] [1)hello]<-- (here)  [2)world] [NULL]; 
+    // echo has already been validated in teh strcmp.
     while (node->argv[i])
     {
-        printf(YLW"%s", node->argv[i]);
+        if (i == 1)
+            newline = echo_printer(node->argv[i], true);
+        else
+            echo_printer(node->argv[i], false);
         if (node->argv[i + 1])
-            printf(" ");
+            ft_putchar(' ');
         i++;
     }
-
-    // Step 3: Newline if not suppressed
-    if (newline)
-        printf("\n");
-    printf(RST);
-    fflush(stdout); // fllush buffer in case of no newline
+    if (!newline)
+        ft_putchar('\n');
 
     return (EXIT_SUCCESS);
 }

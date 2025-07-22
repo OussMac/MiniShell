@@ -46,8 +46,8 @@ int recursive_execution(t_tree *node, t_data *data) // not static cuz used in pi
     if (node->tok == COMMAND_ID) // base case exec cmd
     {
         // expand_env_variables(node, data->env_vec);
-        // if (validate_builtin(node->argv[0]) == true)
-        //     return (exec_builtin(node, data));
+        if (validate_builtin(node->argv[0]) == true)
+            return (exec_builtin(node, data));
         if (node->red)
             return (handle_red(node, data));
         return (exec_node(node, data));
@@ -55,11 +55,7 @@ int recursive_execution(t_tree *node, t_data *data) // not static cuz used in pi
     if (node->tok == PIPE_ID)
         return (execute_pipeline(node, data, STDIN_FILENO)); // pipeline recurses back to this func
     if (node->tok == AND_ID || node->tok == OR_ID)
-    {
-        if (node->red)
-            return (handle_red(node, data));
         return (short_circuit_operand(node, node->tok, data));
-    }
     if (node->left)
         return (recursive_execution(node->left, data)); // go deeper left (dfs algo)
     if (node->right)

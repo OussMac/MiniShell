@@ -372,6 +372,8 @@ int                 printer_red(t_red *curr, char *name);
 // ouss functions  -----------------------------------------------------------------
 // ---------------------------------------------------------------------------------
 
+#include <dirent.h>
+
 int     execute_tree(t_tree *root, t_data *data, char **env, void *re_built);
 int     merger(t_tree *root, t_data *data, char **env);
 int     recursive_execution(t_tree *node, t_data *data);
@@ -379,6 +381,21 @@ int     exec_node(t_tree *node, t_data *data);
 int     execute_pipeline(t_tree *node, t_data *data, int input_fd);
 int     short_circuit_operand(t_tree *node, t_grammar operand_id, t_data *data);
 int     handle_red(t_tree *node, t_data *data);
+
+// builtins
+bool    validate_builtin(char *str);
+int     exec_builtin(t_tree *node, t_data *data);
+int     o_echo(t_tree *node);
+int     o_cd(t_tree *node, t_data *data);
+int     o_pwd(t_tree *node, t_data *data);
+int     o_export(t_tree *node, t_data *data);
+int     o_unset(t_tree *node, t_data *data);
+int     o_env(t_tree *node, t_data *data);
+int     o_exit(t_tree *node, t_data *data);
+
+// wild_card
+int     expand_wild_cards(t_tree *node);
+
 
 // utils in pipleine cuz i didnt recurs it back to rec exec.
 char    *get_absolute_path(char *cmd);
@@ -392,6 +409,8 @@ typedef struct s_plist
     t_tree *cmd_node;
     struct s_plist *next;
 }   t_plist;
+
+// ----------------------------------------------------------------------------
 
 
 # endif
