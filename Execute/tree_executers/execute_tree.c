@@ -55,7 +55,11 @@ int recursive_execution(t_tree *node, t_data *data) // not static cuz used in pi
     if (node->tok == PIPE_ID)
         return (execute_pipeline(node, data, STDIN_FILENO)); // pipeline recurses back to this func
     if (node->tok == AND_ID || node->tok == OR_ID)
+    {
+        if (node->red)
+            return (handle_red(node, data));
         return (short_circuit_operand(node, node->tok, data));
+    }
     if (node->left)
         return (recursive_execution(node->left, data)); // go deeper left (dfs algo)
     if (node->right)

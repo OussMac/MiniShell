@@ -1,4 +1,4 @@
-#include "execute.h"
+#include "../execute.h"
 
 
 
@@ -20,7 +20,7 @@ static bool has_star(char *str)
 
 static int  link_patterns_to_argv(t_tree *node, char *pattern)
 {
-    
+    return (EXIT_SUCCESS);
 }
 
 

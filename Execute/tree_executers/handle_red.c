@@ -85,5 +85,5 @@ int handle_red(t_tree *node, t_data *data)
     close(saved_in);
     close(saved_out);
 
-    return status;
+    return (status);
 }
