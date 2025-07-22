@@ -50,16 +50,21 @@ static void free_pipe_list(t_plist *head)
 
 int execute_pipeline(t_tree *root, t_data *data, int input_fd)
 {
-    t_plist *plist = NULL;
+    t_plist *plist;
     t_plist *curr;
-    int prev = input_fd, fd[2], status;
+    int prev;
+    int fds[2];
+    int status;
     
+    prev = input_fd;
+
+    plist = NULL;
     flatten_pipeline(root, &plist);
     curr = plist;
     while (curr)
     {
         int is_pipe = curr->next != NULL;
-        if (is_pipe && pipe(fd) < 0)
+        if (is_pipe && pipe(fds) < 0)
             return (perror("pipe"), EXIT_FAILURE);
         pid_t pid = fork();
         if (pid < 0)
@@ -70,14 +75,14 @@ int execute_pipeline(t_tree *root, t_data *data, int input_fd)
                 dup2(prev, STDIN_FILENO), close(prev);
 
             if (is_pipe)
-                dup2(fd[1], STDOUT_FILENO), close(fd[0]), close(fd[1]);
+                dup2(fds[1], STDOUT_FILENO), close(fds[0]), close(fds[1]);
 
             exit(recursive_execution(curr->cmd_node, data));
         }
         if (prev != STDIN_FILENO)
             close(prev);
         if (is_pipe)
-            close(fd[1]), prev = fd[0];
+            close(fds[1]), prev = fds[0];
         curr = curr->next;
     }
     if (prev != STDIN_FILENO)
