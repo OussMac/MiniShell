@@ -75,12 +75,10 @@ int handle_red(t_tree *node, t_data *data)
         }
         curr_red = curr_red->next;
     }
-
     int status = EXIT_FAILURE;
 
     if (redirection_success)
         status = exec_node(node, data);
-
     // Always restore STDIN/STDOUT
     dup2(saved_in, STDIN_FILENO);
     dup2(saved_out, STDOUT_FILENO);
