@@ -1,9 +1,5 @@
 #include "../execute.h"
 
-static int  red_wrraper(t_tree *node, t_data *data, t_grammar red_id)
-{
-    return (EXIT_SUCCESS);
-}
 
 static int red_in(t_red *red, t_data *data)
 {
@@ -20,42 +16,74 @@ static int red_in(t_red *red, t_data *data)
 
 static int red_out(t_red *red, t_data *data)
 {
+    int out_fd;
+
+    out_fd = open(red->value, O_CREAT | O_WRONLY | O_TRUNC, 0644);
+    if (out_fd == -1)
+        return (dprintf(2 , "Migrane: %s", red->value), perror(" "), EXIT_FAILURE);
+    if (dup2(out_fd, STDOUT_FILENO) == -1)
+        return (dprintf(2 , "Migrane: %s", red->value), perror(" "), close(out_fd), EXIT_FAILURE);
+    close(out_fd);
     return (EXIT_SUCCESS);
 }
 
 static int  red_append(t_red *red, t_data *data)
 {
+    int out_fd;
+
+    out_fd = open(red->value, O_CREAT | O_WRONLY | O_APPEND, 0644);
+    if (out_fd == -1)
+        return (dprintf(2 , "Migrane: %s", red->value), perror(" "), EXIT_FAILURE);
+    if (dup2(out_fd, STDOUT_FILENO) == -1)
+        return (dprintf(2 , "Migrane: %s", red->value), perror(" "), close(out_fd), EXIT_FAILURE);
+    close(out_fd);
     return (EXIT_SUCCESS);
 }
 
 int handle_red(t_tree *node, t_data *data)
 {
-    t_red   *curr_red;
+    t_red *curr_red = node->red;
+    int saved_in = dup(STDIN_FILENO);
+    int saved_out = dup(STDOUT_FILENO);
+    int redirection_success = 1;
 
-    curr_red = node->red;
     while (curr_red)
     {
         if (curr_red->tok == INPUT_FILE_ID)
         {
-            int saved_in;
-            saved_in = dup(STDIN_FILENO);
             if (red_in(curr_red, data) != EXIT_SUCCESS)
-                return (EXIT_FAILURE);
-            exec_node(node, data);
-            dup2(saved_in, STDIN_FILENO);
-            close(saved_in);
+            {
+                redirection_success = 0;
+                break;
+            }
         }
         else if (curr_red->tok == OUTPUT_FILE_ID)
         {
             if (red_out(curr_red, data) != EXIT_SUCCESS)
-                return (EXIT_FAILURE);
+            {
+                redirection_success = 0;
+                break;
+            }
         }
         else if (curr_red->tok == INPUT_APP_FILE_ID)
         {
             if (red_append(curr_red, data) != EXIT_SUCCESS)
-                return (EXIT_FAILURE);
+            {
+                redirection_success = 0;
+                break;
+            }
         }
         curr_red = curr_red->next;
     }
-    return (EXIT_SUCCESS);
+    int status = EXIT_FAILURE;
+
+    if (redirection_success)
+        status = exec_node(node, data);
+    // Always restore STDIN/STDOUT
+    dup2(saved_in, STDIN_FILENO);
+    dup2(saved_out, STDOUT_FILENO);
+    close(saved_in);
+    close(saved_out);
+
+    return status;
 }
