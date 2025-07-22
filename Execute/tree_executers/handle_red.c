@@ -42,6 +42,8 @@ static int  red_append(t_red *red, t_data *data)
 
 int handle_red(t_tree *node, t_data *data)
 {
+    printf("command --> %s\n", node->argv[0]);
+    printf("red --> %s\n", node->red->value);
     t_red *curr_red = node->red;
     int saved_in = dup(STDIN_FILENO);
     int saved_out = dup(STDOUT_FILENO);
