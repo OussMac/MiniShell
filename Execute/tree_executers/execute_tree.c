@@ -1,6 +1,17 @@
 #include "../execute.h"
 
 
+static void print_arg_vector(char **arg_vector)
+{
+    if (arg_vector == NULL)
+        return;
+
+    for (int i = 0; arg_vector[i] != NULL; i++)
+    {
+        printf("%s\n", arg_vector[i]);
+    }
+}
+
 // help function with forbidden functions
 // will code our own.
 char    *get_absolute_path(char *cmd)
@@ -28,11 +39,14 @@ char    *get_absolute_path(char *cmd)
 int     exec_node(t_tree *node, t_data *data)
 {
     int     ex_status;
+
+    print_arg_vector(data->env_vec);
     pid_t   id = fork();
 
     if (id == 0)
     {
         execve(get_absolute_path(node->argv[0]), node->argv, data->env_vec);
+        perror("");
         dprintf(STDERR_FILENO, "Migrane: command not found: %s \n", node->argv[0]);
         exit(EXIT_FAILURE); // exit child process if execve fails
     }

@@ -111,7 +111,6 @@ typedef struct s_tree
 {
     char *value;
     char **argv;
-    char **env;
     t_grammar tok;
     int op_case;
     int here_doc_fd;
@@ -400,7 +399,10 @@ int     o_exit(t_tree *node, t_data *data);
 int     expand_wild_cards(t_tree *node);
 
 // linked env
-void    add_to_envlist(t_envlist **envlist, char *str);
+int add_to_envlist(t_envlist **envlist, char *str);
+char    **convert_list_to_envp(t_envlist *envlist);
+size_t  envlist_size(t_envlist *env);
+char    *convert_node_to_str(t_envlist *env_node);
 
 
 // utils in pipleine cuz i didnt recurs it back to rec exec.

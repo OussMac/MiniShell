@@ -44,20 +44,29 @@ static char *get_key(char *str)
     return (key);
 }
 
-void    add_to_envlist(t_envlist **envlist, char *str)
+int add_to_envlist(t_envlist **envlist, char *str)
 {
     t_envlist   *new_env;
     t_envlist   *curr;
 
     new_env = malloc (sizeof(t_envlist));
     if (!new_env)
-        return ;
+    {
+        // clean_up
+        return (EXIT_FAILURE);
+    }
     new_env->variable = get_key(str);
-    // if (!new_env->variable)
-        // malloc fail or null string clean up.
+    if (!new_env->variable)
+    {
+        // clean up
+        return (EXIT_FAILURE);
+    }
     new_env->value = get_value(str);
-    // if (!new_env->value)
-        // malloc fail or null string clean up.
+    if (!new_env->value)
+    {
+        // clean_ up
+        return (EXIT_FAILURE);
+    }
     new_env->pointed = false;
     new_env->next = NULL;
     if (!*envlist)
@@ -69,4 +78,28 @@ void    add_to_envlist(t_envlist **envlist, char *str)
             curr = curr->next;
         curr->next = new_env;
     }
+    return (EXIT_SUCCESS);
+}
+
+char **convert_list_to_envp(t_envlist *envlist)
+{
+    t_envlist   *cur;
+    char        **envp;
+    size_t      env_size;
+    int         i;
+
+    env_size = envlist_size(envlist);
+    envp = malloc (env_size * sizeof(char *));
+    if (!envp)
+    {
+        // cleanup exit;
+        return (NULL);
+    }
+    cur = envlist;
+    while(cur)
+    {
+        envp[i] = convert_node_to_str(cur);
+        cur = cur->next;
+    }
+    return (envp);
 }

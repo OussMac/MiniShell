@@ -64,4 +64,5 @@ void    clean_up(t_tree *tree, t_data *data)
 {
     free_tree(tree);
     free_envlist(data->env);
+    free_argv(data->env_vec);
 }
