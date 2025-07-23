@@ -1,10 +1,27 @@
 #include "../execute.h"
 
+static void free_envlist(t_envlist *env)
+{
+    t_envlist   *tmp;
+
+    if (!env)
+        return ;
+    while (env)
+    {
+        tmp = env->next;
+        free(env->value);
+        free(env->variable);
+        free(env);
+        env = tmp;
+    }
+}
+
 static void free_redir(t_red *red)
 {
+    t_red *tmp;
+
     if (!red)
         return ;
-    t_red *tmp;
     while (red)
     {
         tmp = red->next;
@@ -41,4 +58,10 @@ void    free_tree(t_tree *node)
     free_argv(node->argv);
     free_redir(node->red);
     free(node);
+}
+
+void    clean_up(t_tree *tree, t_data *data)
+{
+    free_tree(tree);
+    free_envlist(data->env);
 }

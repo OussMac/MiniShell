@@ -10,6 +10,7 @@
 # include <signal.h>
 # include <stdbool.h>
 # include <fcntl.h>
+# include <sys/wait.h>
 
 // Macros
 # define F 1
@@ -406,7 +407,7 @@ void    add_to_envlist(t_envlist **envlist, char *str);
 char    *get_absolute_path(char *cmd);
 
 // free_tree (error handling)
-void    free_tree(t_tree *node);
+void    clean_up(t_tree *tree, t_data *data);
 
 
 typedef struct s_plist

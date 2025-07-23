@@ -76,20 +76,20 @@ int execute_tree(t_tree *root, t_data *data, char **env, void *re_built)
     {
         // if (re_built != NULL)
         {
-            // free_tree(root);
+            // clean_up(root, data);
             // free_rebuilt(re_built);
             // return (exec_list(NULL)); // passing Null for now.
         }
-        free_tree(root);
+        clean_up(root, data);
         printf("Exit Status --> %d\n", data->exit_status);
         return (perror("Null root"), EXIT_FAILURE);
     }
     if (merger(root, data, env) != EXIT_SUCCESS)
     {
-        free_tree(root);
+        clean_up(root, data);
         printf("Exit Status --> %d\n", data->exit_status);
         return (perror("Merge Failed"), EXIT_FAILURE);
     }
     rec_exit_status = recursive_execution(root, data);
-    return (free_tree(root), rec_exit_status);
+    return (clean_up(root, data), rec_exit_status);
 }
