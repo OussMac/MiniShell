@@ -44,9 +44,10 @@ SRC = minishell.c Identificators/identity_tools/identool0.c\
 		../Execute/tree_executers/shortcircuit.c ../Execute/tree_executers/handle_red.c \
 		../Execute/o_builtins/o_bultins.c ../Execute/o_builtins/o_echo.c \
 		../Execute/o_builtins/o_cd.c ../Execute/o_builtins/o_env.c \
-		../Execute/o_builtins/o_exit.c ../Execute/o_builtins/o_expand.c \
-		../Execute/o_builtins/o_export.c ../Execute/o_builtins/o_pwd.c \
-		../Execute/o_builtins/o_unset.c ../Execute/o_builtins/wild_card.c
+		../Execute/o_builtins/o_exit.c ../Execute/o_builtins/o_export.c \
+		../Execute/o_builtins/o_pwd.c ../Execute/o_builtins/o_unset.c \
+		../Execute/o_builtins/wild_card.c ../Execute/tree_executers/merge_env.c \
+		
 
 OBJ = $(SRC:.c=.o)
 

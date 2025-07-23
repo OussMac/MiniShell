@@ -136,6 +136,7 @@ typedef struct s_token
     int op_case;
     bool marked;
     bool in_acc;
+    bool al_used;
     int here_done;
     int here_times;
     bool space_next;
@@ -393,8 +394,12 @@ int     o_unset(t_tree *node, t_data *data);
 int     o_env(t_tree *node, t_data *data);
 int     o_exit(t_tree *node, t_data *data);
 
-// wild_card
+// expanding.
+// void    expand_env_variables(t_tree *node, t_data *data);
 int     expand_wild_cards(t_tree *node);
+
+// linked env
+void    add_to_envlist(t_envlist **envlist, char *str);
 
 
 // utils in pipleine cuz i didnt recurs it back to rec exec.
