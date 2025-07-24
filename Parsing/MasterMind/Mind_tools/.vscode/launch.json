@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "lldb",
+      "request": "launch",
+      "args": [],
+      "cwd": "/mnt/homes/ayel-bou/Desktop/MasterMindv2.0/MasterMerged/Parsing/MasterMind/Mind_tools",
+      "program": "/mnt/homes/ayel-bou/Desktop/MasterMindv2.0/MasterMerged/Parsing/MasterMind/Mind_tools/build/Debug/outDebug"
+    }
+  ]
+}
