@@ -34,7 +34,7 @@ t_token *re_builder(t_token *id_class)
         {
             in = add_identity(ft_strdup(curr->identity), curr->tok, INIT, curr);
             if (!in)
-                return (list_cleaner(&re_built), list_cleaner(&id_class), NULL);
+                return (clean_fd(re_built), list_cleaner(&re_built), NULL);
             add_back_identity(&re_built, in, D_INIT);
         }
         curr = curr->next;

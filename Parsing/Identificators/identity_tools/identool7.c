@@ -82,6 +82,7 @@ void    store_fd(t_token *id_class, t_data *data)
         if (curr->tok == DEL_ID && curr->del_fd == false)
         {
             curr->here_doc_fd = dup(data->here_fd);
+            close(data->here_fd);
             curr->del_fd = true;
             break ;
         }

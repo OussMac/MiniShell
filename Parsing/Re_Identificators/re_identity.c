@@ -62,7 +62,7 @@ t_token    *re_identity(t_token *id_class)
     string = 0;
     curr = id_class;
     if (!quotes_removal(id_class) || !joining_system(id_class))
-        return (list_cleaner(&id_class), clean_fd(id_class), NULL);
+        return (clean_fd(id_class), list_cleaner(&id_class), NULL);
     while (curr != NULL)
     {
         if (curr->tok == PIPE_ID || curr->tok == OR_ID
@@ -73,6 +73,6 @@ t_token    *re_identity(t_token *id_class)
         curr = curr->next;
     }
     if (!arg_system(id_class))
-        return (list_cleaner(&id_class), clean_fd(id_class), NULL);
+        return (clean_fd(id_class), list_cleaner(&id_class), NULL);
     return (re_builder(id_class));
 }

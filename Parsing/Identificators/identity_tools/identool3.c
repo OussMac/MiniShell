@@ -27,6 +27,7 @@ int unit_call_here_doc(t_token **id_class, char *input, t_data *data)
 {
     if (!here_doc_check(*id_class, data))
     {
+        clean_fd(*id_class);
         list_cleaner(id_class);
         *id_class = NULL;
         return (0);

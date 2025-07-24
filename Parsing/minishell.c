@@ -39,7 +39,7 @@ t_tree *masterpasrse(char *input, t_data *data, t_token **prompts)
 int main(int argc, char **argv, char **env)
 {
     // atexit(f);
-    // atexit(check_fd_leaks);
+    atexit(check_fd_leaks);
     char *input;
     t_data data;
     t_tree *tree;
@@ -59,8 +59,8 @@ int main(int argc, char **argv, char **env)
         if (input[0] != '\0')
             add_history(input);
         tree = masterpasrse(input, &data, &re_built);
-        print_tree(tree);
-        execute_tree(tree, &data, env, re_built);
+        // print_tree(tree);
+        // execute_tree(tree, &data, env, re_built);
     }
     free(input);
 }
@@ -79,11 +79,15 @@ int main(int argc, char **argv, char **env)
 
     keep in mind to add the red pointer into the tree nodes. (CHECKED)
 
-    > Heredoc file descriptor transporation (TODO)
+    > Heredoc file descriptor transporation (Checked)
     
     > Pre parsing for this case (ls << eof) (TODO)
 
-    > re_built instead of tree in case of no command or operator (Checked)
+    > re_built instead of tree in case of no command or operator (CHECKED)
+
+    Change in Plan, the plan in which i leave quotes for expanding, i wont leave them, it interrupt
+    the normal flow of removing quotes [ Case awk '{print $1}'], the quotes should be removed before
+    given to execve in the Execution
 */
 
 /*
