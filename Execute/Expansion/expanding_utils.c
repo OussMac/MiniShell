@@ -64,3 +64,83 @@ size_t	o_ft_strlen(char *s)
 		i++;
 	return (i);
 }
+
+// helper function , i will get the quotes trimmed from parsing anyway (temp)
+char *trim_quotes(char *str)
+{
+    int     i;
+    int     j;
+    char    quote;
+    char    *result;
+
+    if (!str)
+        return (NULL);
+    
+    result = malloc(o_ft_strlen(str) + 1); // maximum possible size
+    if (!result)
+        return (NULL);
+    
+    i = 0;
+    j = 0;
+    while (str[i])
+    {
+        if (str[i] == '\"') // quote opened
+        {
+            quote = str[i++];
+            while (str[i] && str[i] != quote) // copy inner content
+                result[j++] = str[i++];
+            if (str[i] == quote)
+                i++; // skip closing quote
+        }
+        else
+            result[j++] = str[i++];
+    }
+    result[j] = '\0';
+    return (result);
+}
+
+// Trims only real quote marks at edges like "word" or 'word'
+// But keeps literal quote characters inside.
+char	*trim_edge_quotes(char *str)
+{
+    size_t len;
+
+    if (!str)
+        return (NULL);
+
+    len = o_ft_strlen(str);
+    if (len >= 2 && ((str[0] == '"' && str[len - 1] == '"') ||
+                     (str[0] == '\'' && str[len - 1] == '\'')))
+        return (ft_substr(str, 1, len - 2));
+    return (ft_strdup(str)); // no trimming needed
+}
+
+
+bool	has_quotes_in_both_edges(char *str)
+{
+    size_t  len;
+
+    if (!str)
+        return (false);
+
+    len = o_ft_strlen(str);
+    if (len < 2)
+        return (false);
+
+    if ((str[0] == '\'' && str[len - 1] == '\'') ||
+        (str[0] == '\"' && str[len - 1] == '\"'))
+        return (true);
+
+    return (false);
+}
+
+bool is_fully_single_quoted(char *str)
+{
+    size_t len;
+
+    if (!str)
+        return (false);
+    len = o_ft_strlen(str);
+    return (len >= 2 && str[0] == '\'' && str[len - 1] == '\'');
+}
+

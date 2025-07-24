@@ -12,6 +12,7 @@ t_tree *build_tree(t_token *id_class)
     yard = shunting_yard_algorithm(id_class);
     if (!yard)
     {
+        clean_fd(id_class);
         cleaner_red(id_class);
         list_cleaner(&id_class);
     }
@@ -60,6 +61,8 @@ static void put_token(t_tree *tree, t_token *token)
     tree->was_s_quote = token->was_single_quote;
     tree->was_d_quote = token->was_double_quote;
     token->marked = true;
+    if (token->tok == DEL_ID && token->here_doc_fd != -1)
+        tree->here_doc_fd = dup(token->here_doc_fd);
 }
 
 void    recursive_build(t_token *yard, t_tree **tree)

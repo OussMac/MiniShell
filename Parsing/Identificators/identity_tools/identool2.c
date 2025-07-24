@@ -88,6 +88,17 @@ void print_tok(t_red *curr)
                 printf("      └─ ");
                 printf("[ Delimiter was S_Quoted ]\n");
             }
+
+            if (curr->fd_here_doc != -1)
+            {
+                printf("      └─ ");
+                printf("File Descriptor Ready\n");
+            }
+            else if (curr->fd_here_doc == -1)
+            {
+                printf("      └─ ");
+                printf("heredocfd %d\n", curr->fd_here_doc);
+            }
         }
         else if (curr->tok == 13)
             printf("ID-> INPUT_FILE_ID\n");

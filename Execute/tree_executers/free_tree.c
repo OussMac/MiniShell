@@ -68,7 +68,7 @@ void    clean_up(t_tree *tree, t_data *data)
     if (data->env)
         free_envlist(data->env);
     data->env = NULL;
-    if (data->env)
+    if (data->env_vec)
         free_argv(data->env_vec);
     data->env_vec = NULL;
 }

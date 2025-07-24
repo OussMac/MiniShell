@@ -47,3 +47,14 @@ void    cleaner_red(t_token *list)
         list = list->next;
     }
 }
+
+void clean_fd(t_token *id_class)
+{
+    while (id_class != NULL)
+    {
+        if (id_class->tok == DEL_ID
+            && id_class->here_doc_fd != -1)
+            close(id_class->here_doc_fd);
+        id_class = id_class->next;
+    }
+}

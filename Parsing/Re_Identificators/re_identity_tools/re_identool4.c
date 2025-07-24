@@ -50,8 +50,8 @@ t_red *redirection_cop(t_token *id_class)
     new->was_d_quote = id_class->was_double_quote;
     new->was_s_quote = id_class->was_single_quote;
     new->next = NULL;
-    // if (new->tok == DEL_ID)
-    //     new->fd_here_doc = dup(id_class->here_doc_fd);
+    if (new->tok == DEL_ID)
+        new->fd_here_doc = dup(id_class->here_doc_fd);
     return (new);
 }
 

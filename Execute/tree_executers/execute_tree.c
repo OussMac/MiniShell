@@ -1,6 +1,5 @@
 #include "../execute.h"
 
-
 // help function with forbidden functions
 // will code our own.
 char    *get_absolute_path(char *cmd)
@@ -34,37 +33,46 @@ int     exec_node(t_tree *node, t_data *data)
     {
         execve(get_absolute_path(node->argv[0]), node->argv, data->env_vec);
         dprintf(STDERR_FILENO, "Migrane: command not found: %s \n", node->argv[0]);
-        exit(EXIT_FAILURE); // exit child process if execve fails
+        exit(EXECVE_FAILURE); // exit child process if execve fails
     }
 
+    // Parent:
     waitpid(id, &ex_status, 0);
-    return (ex_status);
+
+    // ───── decode status ─────
+    if (WIFEXITED(ex_status))
+        return (WEXITSTATUS(ex_status));
+    if (WIFSIGNALED(ex_status))
+        return (128 + WTERMSIG(ex_status));
+    return (ex_status);  // fallback (shouldn’t happen)
 }
 
 int recursive_execution(t_tree *node, t_data *data) // not static cuz used in pipeline
 {
     if (node->tok == COMMAND_ID) // base case exec cmd
     {
-        expand_env_variables(node, data);
-        if (validate_builtin(node->argv[0]) == true)
-            return (exec_builtin(node, data));
+        expand_env_variables(node, data); // expand env variables
+        expand_wild_cards(node);
         if (node->red)
-            return (handle_red(node, data));
-        return (exec_node(node, data));
+            handle_red(node, data); // if this fails check later.
+
+        if (validate_builtin(node->argv[0]))
+            data->exit_status = exec_builtin(node, data);
+        else
+            data->exit_status = exec_node(node, data);
+        if (node->red)
+            restore_IO(data->saved_in, data->saved_out); // if this fails check later.
+        return (data->exit_status);
     }
-    if (node->tok == PIPE_ID)
+    else if (node->tok == PIPE_ID)
         return (execute_pipeline(node, data, STDIN_FILENO)); // pipeline recurses back to this func
-    if (node->tok == AND_ID || node->tok == OR_ID)
-    {
-        if (node->red)
-            return (handle_red(node, data));
+    else if (node->tok == AND_ID || node->tok == OR_ID)
         return (short_circuit_operand(node, node->tok, data));
-    }
     if (node->left)
         return (recursive_execution(node->left, data)); // go deeper left (dfs algo)
     if (node->right)
         return (recursive_execution(node->right, data)); // when done going left go deeper right.
-    
+
     return (EXIT_SUCCESS); // return 0 assume no cmd to execute is success!
 }
 
@@ -82,15 +90,35 @@ int execute_tree(t_tree *root, t_data *data, char **env, void *re_built)
         }
         // NUllify everything.
         clean_up(root, data);
-        printf("Exit Status --> %d\n", data->exit_status);
-        return (perror("Null root"), EXIT_FAILURE);
+        return (EXIT_FAILURE);
     }
     if (merger(root, data, env) != EXIT_SUCCESS)
     {
         clean_up(root, data);
-        printf("Exit Status --> %d\n", data->exit_status);
         return (perror("Merge Failed"), EXIT_FAILURE);
     }
     rec_exit_status = recursive_execution(root, data);
     return (clean_up(root, data), rec_exit_status);
 }
+
+
+/* to do 
+
+ [1]  ------ handle redirections in builting [DONE]
+
+ [2] ------ Finish Expanding ALgorithm , and edge cases [50%]
+
+ [3] ------ Finish Export Algorithm , and integrate into Expanding [0%]
+
+ [4] ------ Store Exit status for all commands, and integrate into echo $? [60%]
+                ---> (with signals). signals left [0%]
+
+ [5] ------ Get heredoc filedecriptor and intergate into redirections [0%]
+
+ [6] ------ Handle executing scripts and programs that are not in PATH e.i. ./minishell [0%]
+
+ [6.5] ---- awk not working awk '{print $3}' .
+
+ [7] ------ Wildcard working in current directory [DONE]
+
+*/

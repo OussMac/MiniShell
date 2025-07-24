@@ -8,7 +8,7 @@ static int remove_q(t_token *curr, int mode)
     {
         removed = ft_strtrim(curr->identity, "\'");
         if (!removed)
-            return(S);
+            return (S);
         free(curr->identity);
         curr->identity = removed;
         curr->was_single_quote = 1;
@@ -34,13 +34,13 @@ static int quotes_removal(t_token *id_class)
     while (curr != NULL)
     {
         if (curr->tok == S_QUOTE_ID
-            && !ft_strchr(curr->identity, $EXPAND))
+            && !ft_strchr(curr->identity, EXPAND))
         {
             if (!remove_q(curr, SQ))
                 return (S);
         }
         else if (curr->tok == S_QUOTE_ID
-            && ft_strchr(curr->identity, $EXPAND))
+            && ft_strchr(curr->identity, EXPAND))
             curr->tok = STRING_ID;
         else if (curr->tok == D_QUOTE_ID)
         {
@@ -62,7 +62,7 @@ t_token    *re_identity(t_token *id_class)
     string = 0;
     curr = id_class;
     if (!quotes_removal(id_class) || !joining_system(id_class))
-        return (list_cleaner(&id_class), NULL);
+        return (list_cleaner(&id_class), clean_fd(id_class), NULL);
     while (curr != NULL)
     {
         if (curr->tok == PIPE_ID || curr->tok == OR_ID
@@ -72,6 +72,7 @@ t_token    *re_identity(t_token *id_class)
         cmd_arg(&curr, &string);
         curr = curr->next;
     }
-    arg_system(id_class);
+    if (!arg_system(id_class))
+        return (list_cleaner(&id_class), clean_fd(id_class), NULL);
     return (re_builder(id_class));
 }

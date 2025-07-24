@@ -5,7 +5,7 @@ static void ft_putchar(char c)
     write(STDOUT_FILENO, &c, 1);
 }
 
-static bool validate_echo_option(char *str, int *i)
+static bool validate_echo_option(char *str)
 {
     int j;
 
@@ -18,7 +18,6 @@ static bool validate_echo_option(char *str, int *i)
             return (false);
         j++;
     }
-    (*i)++;
     return (true);
 }
 
@@ -34,7 +33,7 @@ static bool echo_printer(char *str, bool first_arg)
     {
         if (first_arg)
         {
-            newline = validate_echo_option(str, &i);
+            newline = validate_echo_option(str);
             if (!newline)
             {
                 first_arg = false;

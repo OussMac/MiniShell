@@ -40,14 +40,15 @@ int identity_scraping(char *ident, enum grammar en,
     return (1);
 }
 
-static int unification(char *input, int *i, t_token *id, t_token **id_class)
+static int unification(char *input, t_data *dt, t_token *id, t_token **id_class)
 {
-    first_unit(input, i, id, id_class);
-    sec_unit(input, i, id, id_class);
-    third_unit(input, i, id, id_class);
-    if (!forth_unit(input, i, id, id_class)
+    if (!first_unit(input, &dt->i, id, id_class)
+        || !sec_unit(input, &dt->i, id, id_class)
+        || !third_unit(input, &dt->i, id, id_class)
+        || !forth_unit(input, dt, id, id_class)
         || !set_ops(*id_class))
     {
+        clean_fd(*id_class);
         list_cleaner(id_class);
         *id_class = NULL;
         return (0);
@@ -56,27 +57,27 @@ static int unification(char *input, int *i, t_token *id, t_token **id_class)
     return (1);
 }
 
-t_token *get_identity(char *input, t_data *data)
+t_token *get_identity(char *input, t_data *dt)
 {
-    int i;
     t_token *id;
     t_token *id_class;
 
-    i = 0;
+    dt->i = 0;
     id = NULL;
     id_class = NULL;
-    while (input[i])
+    while (input[dt->i])
     {
-        if (!unification(input, &i, id, &id_class))
+        if (!unification(input, dt, id, &id_class))
             break ;
-        if (all_whitespaces(input[i]) && input[i] != '\0')
+        if (all_whitespaces(input[dt->i]) && input[dt->i] != '\0')
             continue ;
-        if (!unit_call_here_doc(&id_class, input, data))
+        if (!unit_call_here_doc(&id_class, input, dt))
             break ;
-        unit_call_space_next(id_class, input, &i);
+        unit_call_space_next(id_class, input, &dt->i);
     }
-    if (!syntax_verify(id_class, data, SEF_ALL))
+    if (!syntax_verify(id_class, dt, SEF_ALL))
     {
+        clean_fd(id_class);
         list_cleaner(&id_class);
         id_class = NULL;
     }

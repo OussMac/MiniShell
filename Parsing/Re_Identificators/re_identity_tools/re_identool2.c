@@ -39,7 +39,7 @@ static void delete_args(t_token *id_class)
     }
 }
 
-static void operations(char *temp, t_token *temp2, t_token *curr)
+static int operations(char *temp, t_token *temp2, t_token *curr)
 {
     char *hold;
 
@@ -49,12 +49,14 @@ static void operations(char *temp, t_token *temp2, t_token *curr)
     {
         hold = curr->identity;
         curr->identity = ft_strjoin(temp, temp2->identity);
+        if (!curr->identity)
+            return (0);
         free(hold);
     }
-    free(temp);
+    return (free(temp), 1);
 }
 
-void arg_system(t_token *id_class)
+int arg_system(t_token *id_class)
 {
     char *temp;
     t_token *temp2;
@@ -64,10 +66,14 @@ void arg_system(t_token *id_class)
     while (curr != NULL)
     {
         if (curr->tok == COMMAND_ID)
-            operations(temp, temp2, curr);
+        {
+            if (!operations(temp, temp2, curr))
+                return (0);
+        }
         delete_args(id_class);
         if (curr->next && curr->next->tok == ARG_ID)
             continue;
         curr = curr->next;
     }
+    return (1);
 }

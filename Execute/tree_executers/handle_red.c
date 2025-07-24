@@ -42,11 +42,9 @@ static int  red_append(t_red *red, t_data *data)
 
 int handle_red(t_tree *node, t_data *data)
 {
-    printf("command --> %s\n", node->argv[0]);
-    printf("red --> %s\n", node->red->value);
     t_red *curr_red = node->red;
-    int saved_in = dup(STDIN_FILENO);
-    int saved_out = dup(STDOUT_FILENO);
+    data->saved_in = dup(STDIN_FILENO);
+    data->saved_out = dup(STDOUT_FILENO);
     int redirection_success = 1;
 
     while (curr_red)
@@ -78,14 +76,16 @@ int handle_red(t_tree *node, t_data *data)
         curr_red = curr_red->next;
     }
     int status = EXIT_FAILURE;
-
     if (redirection_success)
-        status = exec_node(node, data);
+        status = EXIT_SUCCESS;
+    return (status);
+}
+
+void    restore_IO(int saved_in, int saved_out)
+{
     // Always restore STDIN/STDOUT
     dup2(saved_in, STDIN_FILENO);
     dup2(saved_out, STDOUT_FILENO);
     close(saved_in);
     close(saved_out);
-
-    return (status);
 }

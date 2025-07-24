@@ -32,6 +32,7 @@ static void init_properties(t_token *new)
 	new->was_double_quote = 0;
 	new->here_document_act = false;
 	new->al_used = false;
+	new->quotes_syntax = 0;
 }
 
 static void re_initialization(t_token *new, t_token *old)
@@ -55,11 +56,12 @@ static void re_initialization(t_token *new, t_token *old)
 	new->was_single_quote = old->was_single_quote;
 	new->here_document_act = old->here_document_act;
 	new->al_used = old->al_used;
-	// if (old->here_doc_fd != -1)
-	// {
-	// 	new->here_doc_fd = dup(old->here_doc_fd);
-	// 	close(old->here_doc_fd);
-	// }
+	new->quotes_syntax = old->quotes_syntax;
+	if (old->here_doc_fd != -1)
+	{
+		new->here_doc_fd = dup(old->here_doc_fd);
+		close(old->here_doc_fd);
+	}
 }
 
 void	add_back_identity(t_token **lst, t_token *new, int mode)

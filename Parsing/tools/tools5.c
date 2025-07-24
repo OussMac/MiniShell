@@ -72,7 +72,7 @@ char    *ft_strtrim(char *s1, char *set)
         e = get_len(s1) - 1;
         while (s1[s] && checkset(s1[s], set))
                 s++;
-        while (s1[e] && checkset(s1[e], set))
+        while (e >= 0 && s1[e] && checkset(s1[e], set))
                 e--;
         if (e == -1)
                 return (ft_substr(s1, s, 0));

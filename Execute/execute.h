@@ -3,14 +3,9 @@
 
 # include "../Parsing/minishell.h"
 # define RECURS_LIMIT (size_t)500
+# define EXECVE_FAILURE 127
 
 
-
-
-
-
-
-/*
 
 
 
@@ -22,6 +17,12 @@
 # define MGN "\e[35m"
 # define CYN "\e[36m"
 # define RST "\e[97m"
+
+
+/*
+
+
+
 
 # include <stdlib.h> // for constants
 # include <stdbool.h> // for booleans

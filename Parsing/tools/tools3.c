@@ -60,9 +60,12 @@ void init_data_struct(t_data *data, char **env)
     data->here_minus = 0;
     data->exit_status = 0;
     data->fail = 0;
+    data->i = 0;
     data->env = NULL;
     data->exp = NULL;
-    data->env_vec = env;
+    data->env_vec = NULL;
+    data->saved_in = -1;
+    data->saved_out = -1;
     // list_exp(&data->exp, env);
     // list_env(&data->env, env);
     // zero_point(data);

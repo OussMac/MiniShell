@@ -41,7 +41,7 @@
 # define HEREDOC1 1
 # define HEREDOC2 2
 # define ONE_QUOTE 9
-# define $EXPAND '$'
+# define EXPAND '$'
 # define DUO_QUOTE 10
 # define POINT_ONLY 0
 # define POINT_N_GET 0
@@ -123,37 +123,6 @@ typedef struct s_tree
     struct s_tree *right;
 } t_tree;
 
-// Linked List To Store Each Entity
-// Where Each Entity With its Id
-typedef struct s_token
-{
-    int op;
-    int br;
-    bool end;
-    int power;
-    bool used;
-    int firsts;
-    int brace_c;
-    int brace_o;
-    int op_case;
-    bool marked;
-    bool in_acc;
-    bool al_used;
-    int here_done;
-    int here_times;
-    bool space_next;
-    int here_doc_fd;
-    int was_single_quote;
-    int was_double_quote;
-    bool here_document_act;
-    bool del_fd;
-    bool cmd_up_next;
-    struct s_token *next;
-    enum grammar tok;
-    char *identity;
-    t_red *red;
-}   t_token;
-
 // Linked List Holding The Enviroment
 typedef struct s_envlist
 {
@@ -182,23 +151,51 @@ typedef struct s_data
     int is_child;
     int here_case;
     int here_minus;
-    int exit_status;
+    int exit_status; // Used as A global Exit_status var in Exec and Parsing.
     int fail;
+    int i;
     t_exportlist *exp;
     t_envlist *env;
     char **env_vec;
+
+    // Exec Data
+    int saved_in;
+    int saved_out;
 }   t_data;
 
-// MiniStruct For Braces Handling
-typedef struct s_brace_t
+// Linked List To Store Each Entity
+// Where Each Entity With its Id
+typedef struct s_token
 {
-    int s_in;
-    int d_in;
-    int brace_op;
-    int brace_cl;
-    int d_quote_state;
-    int s_quote_state;
-}   t_brace_t;
+    int op;
+    int br;
+    bool end;
+    int power;
+    bool used;
+    int firsts;
+    int brace_c;
+    int brace_o;
+    int op_case;
+    bool marked;
+    bool in_acc;
+    bool al_used;
+    int here_done;
+    int here_times;
+    bool space_next;
+    int here_doc_fd;
+    int was_single_quote;
+    int was_double_quote;
+    int quotes_syntax;
+    bool here_document_act;
+    bool del_fd;
+    bool cmd_up_next;
+    struct s_token *next;
+    enum grammar tok;
+    char *identity;
+    t_red *red;
+}   t_token;
+
+
 
 // Signal Tools
 void                sig_handler(int signum);
@@ -243,14 +240,14 @@ int                 identity_scraping(char *ident, enum grammar en, t_token *id,
 char                *scrap(int *index, char *scrapped);
 char                *scrap_string(char *input, int *index);
 int                 len_of_quote(char *input, char quote_case, int index);
-char                *scrap_quote(char *input, int *index, int quote_case);
+char                *scrap_quote(char *input, t_data *dt, int quote_case);
 char                *scrap_braces(char *input, int *index, char *brace);
 
 // Units of Tokening
-void                first_unit(char *input, int *i, t_token *id, t_token **id_class);
-void                sec_unit(char *input, int *index, t_token *id, t_token **id_class);
-void                third_unit(char *input, int *index, t_token *id, t_token **id_class);
-int                 forth_unit(char *input, int *i, t_token *id, t_token **id_class);
+int                first_unit(char *input, int *i, t_token *id, t_token **id_class);
+int                sec_unit(char *input, int *index, t_token *id, t_token **id_class);
+int                third_unit(char *input, int *index, t_token *id, t_token **id_class);
+int                 forth_unit(char *input, t_data *dt, t_token *id, t_token **id_class);
 
 // Builtins
 void                pwd(char **env);
@@ -339,7 +336,7 @@ void                set_end(t_token **op_field);
 t_token             *get_file(t_token *id_class);
 void                set_power(t_token *id_class);
 t_token             *return_op(t_token *op_field);
-void                arg_system(t_token *id_class);
+int                 arg_system(t_token *id_class);
 void                red_system(t_token **id_class);
 void                command_ahead(t_token *id_class);
 t_tree              *build_tree(t_token *id_class);
@@ -361,8 +358,9 @@ int                 add_op(t_token *curr, t_token **op_field, t_token **yard, t_
 int                 add_n_remove(t_token *curr, t_token **op_field, t_token **yard, t_token *in);
 int                 algorithm_options(t_token *curr, t_token **op_field, t_token **yard, t_token *in);
 
-// Cleaner Functions
+// Cleaners Functions
 void                cleaner_red(t_token *list);
+void                clean_fd(t_token *id_class);
 void                list_cleaner(t_token **list);
 
 // test to be removed after
@@ -377,46 +375,55 @@ int                 printer_red(t_red *curr, char *name);
 
 #include <dirent.h>
 
-int     execute_tree(t_tree *root, t_data *data, char **env, void *re_built);
-int     merger(t_tree *root, t_data *data, char **env);
-int     recursive_execution(t_tree *node, t_data *data);
-int     exec_node(t_tree *node, t_data *data);
-int     execute_pipeline(t_tree *node, t_data *data, int input_fd);
-int     short_circuit_operand(t_tree *node, t_grammar operand_id, t_data *data);
-int     handle_red(t_tree *node, t_data *data);
+// Main Exec Functionality.
+int                 exec_node(t_tree *node, t_data *data);
+int                 merger(t_tree *root, t_data *data, char **env);
+int                 recursive_execution(t_tree *node, t_data *data);
+int                 execute_pipeline(t_tree *node, t_data *data, int input_fd);
+int                 execute_tree(t_tree *root, t_data *data, char **env, void *re_built);
+int                 short_circuit_operand(t_tree *node, t_grammar operand_id, t_data *data);
 
-// builtins
-bool    validate_builtin(char *str);
-int     exec_builtin(t_tree *node, t_data *data);
-int     o_echo(t_tree *node);
-int     o_cd(t_tree *node, t_data *data);
-int     o_pwd(t_tree *node, t_data *data);
-int     o_export(t_tree *node, t_data *data);
-int     o_unset(t_tree *node, t_data *data);
-int     o_env(t_tree *node, t_data *data);
-int     o_exit(t_tree *node, t_data *data);
+// Builtins
+int                 o_echo(t_tree *node);
+bool                validate_builtin(char *str);
+int                 o_cd(t_tree *node, t_data *data);
+int                 o_pwd(t_tree *node, t_data *data);
+int                 o_env(t_tree *node, t_data *data);
+int                 o_exit(t_tree *node, t_data *data);
+int                 o_unset(t_tree *node, t_data *data);
+int                 o_export(t_tree *node, t_data *data);
+int                 exec_builtin(t_tree *node, t_data *data);
 
-// expanding.
-void    expand_env_variables(t_tree *node, t_data *data);
-int     expand_wild_cards(t_tree *node);
-int     o_ft_strncmp(const char *s1, const char *s2, size_t n);
-bool    has_quotes(char *str);
-char	*list_to_string(char **lst);
+// Expanding.
+bool                has_quotes(char *str);
+char	            *list_to_string(char **lst);
+int                 expand_wild_cards(t_tree *node);
+void                expand_env_variables(t_tree *node, t_data *data);
+int                 o_ft_strncmp(const char *s1, const char *s2, size_t n);
+char	            *o_ft_itoa(int n);
+char                *trim_quotes(char *str); // temp
+char                *trim_edge_quotes(char *str); // temp
+bool                has_quotes_in_both_edges(char *str); // temp
+bool                is_fully_single_quoted(char *str); // tenp
 
-// linked env
-int     add_to_envlist(t_envlist **envlist, char *str);
-char    **convert_list_to_envp(t_envlist *envlist);
-size_t  envlist_size(t_envlist *env);
-size_t  o_ft_strlen(char *str);
-char    *convert_node_to_str(t_envlist *env_node);
+// Linked env
+size_t              o_ft_strlen(char *str);
+size_t              envlist_size(t_envlist *env);
+char                *convert_node_to_str(t_envlist *env_node);
+char                **convert_list_to_envp(t_envlist *envlist);
+int                 add_to_envlist(t_envlist **envlist, char *str);
+
+// Redirections 
+int                 handle_red(t_tree *node, t_data *data);
+void                restore_IO(int saved_in, int saved_out);
 
 
-// utils in pipleine cuz i didnt recurs it back to rec exec.
-char    *get_absolute_path(char *cmd);
+// Utilsin pipleine cuz i didnt recurs it back to rec exec.
+char                *get_absolute_path(char *cmd);
 
-// free_tree (error handling)
-void    clean_up(t_tree *tree, t_data *data);
-void    free_argv(char **argv);
+// Free_tree (error handling)
+void                clean_up(t_tree *tree, t_data *data);
+void                free_argv(char **argv);
 
 
 typedef struct s_plist

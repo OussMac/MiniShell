@@ -27,12 +27,10 @@ void voiders(int argc, char **argv, char **env)
 
 t_tree *masterpasrse(char *input, t_data *data, t_token **prompts)
 {
-    t_brace_t br;
     t_token *token;
     // t_token *prompts;
 
     // Pre parsing Braces case of (ls << eof)
-    ft_bzero(&br, sizeof(t_brace_t));
     token = get_identity(input, data);
     *prompts = re_identity(token);
     return (build_tree(*prompts));
