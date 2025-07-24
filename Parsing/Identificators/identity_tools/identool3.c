@@ -23,9 +23,9 @@ int whitespaces(char x)
     return (1);
 }
 
-int unit_call_here_doc(t_token **id_class, char *input, t_data *data, t_brace_t *br)
+int unit_call_here_doc(t_token **id_class, char *input, t_data *data)
 {
-    if (!here_doc_check(*id_class, data, br))
+    if (!here_doc_check(*id_class, data))
     {
         list_cleaner(id_class);
         *id_class = NULL;

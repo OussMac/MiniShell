@@ -1,7 +1,8 @@
 #include "../minishell.h"
 #include <string.h>
-// Print a single node's data
+#include <stdio.h>
 
+// Translate grammar token to string
 static const char *grammar_to_str(enum grammar tok)
 {
     switch (tok)
@@ -28,51 +29,51 @@ static const char *grammar_to_str(enum grammar tok)
     }
 }
 
+// Print a single node’s info
 static void print_node(t_tree *node)
 {
     if (!node)
         return;
 
-    // Print token name
     printf("%s", grammar_to_str(node->tok));
 
-    // If node has a value, print it in brackets
     if (node->value)
-        printf(" [%s]\n", node->value);
-    if (node->red)
     {
-        
-        printer_red(node->red, " [Red] ");
+        printf(" [%s]\n", node->value);
+        if (node->tok == DEL_ID)
+        {
+            printf("Was S Quoted >> %d\n", node->was_s_quote);
+            printf("Was D Quoted >> %d\n", node->was_d_quote);
+        }
     }
+    else
+        printf("\n");
+
+    if (node->red)
+        printer_red(node->red, " [Red] ");
 }
 
-// Recursive helper to print the tree with indentation and branches
+// Recursive helper to print tree with visual branches
 static void ft_print_tree(t_tree *node, const char *prefix, int is_last)
 {
     if (!node)
         return;
 
-    // Print prefix and branch symbol
+    // Print current prefix + branch
     printf("%s", prefix);
     if (is_last)
         printf("└─ ");
     else
         printf("├─ ");
 
-    // Print the current node
+    // Print current node
     print_node(node);
-    // printf("\n");
 
-    // Prepare new prefix for children
-    size_t len = strlen(prefix);
-    char new_prefix[len + 4];
-    strcpy(new_prefix, prefix);
-    if (is_last)
-        strcat(new_prefix, "   ");
-    else
-        strcat(new_prefix, "│  ");
+    // Prepare new prefix (safe version)
+    char new_prefix[1024];
+    snprintf(new_prefix, sizeof(new_prefix), "%s%s", prefix, is_last ? "   " : "│  ");
 
-    // Count how many children (left, right) exist
+    // Count children
     int child_count = 0;
     if (node->left) child_count++;
     if (node->right) child_count++;
@@ -90,7 +91,7 @@ static void ft_print_tree(t_tree *node, const char *prefix, int is_last)
     }
 }
 
-// Entry function to print the whole tree
+// Entry function
 void print_tree(t_tree *root)
 {
     if (!root)

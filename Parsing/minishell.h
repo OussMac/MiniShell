@@ -10,7 +10,6 @@
 # include <signal.h>
 # include <stdbool.h>
 # include <fcntl.h>
-# include <sys/wait.h>
 
 // Macros
 # define F 1
@@ -36,10 +35,13 @@
 # define M_POW 2
 # define H_POW 3
 # define SEF_DOC 1
+# define HERE_SEF 0
+# define SEF_ALL 1
 # define ALL_SEF 0
 # define HEREDOC1 1
 # define HEREDOC2 2
 # define ONE_QUOTE 9
+# define $EXPAND '$'
 # define DUO_QUOTE 10
 # define POINT_ONLY 0
 # define POINT_N_GET 0
@@ -230,11 +232,11 @@ int                 check_doubles(char x, char x2);
 void                cpy_identity(char *dst, char *src);
 int                 len_of_string(char *input, int index);
 int                 ft_strnstr(char *haystack, char *needle, size_t len);
-t_token             *get_identity(char *input, t_data *data, t_brace_t *br);
+t_token             *get_identity(char *input, t_data *data);
 void	            add_back_identity(t_token **lst, t_token *new, int mode);
 void                unit_call_space_next(t_token *id_class, char *input, int *index);
 t_token	            *add_identity(char *content, enum grammar tok, int mode, t_token *infos);
-int                 unit_call_here_doc(t_token **id_class, char *input, t_data *data, t_brace_t *br);
+int                 unit_call_here_doc(t_token **id_class, char *input, t_data *data);
 int                 identity_scraping(char *ident, enum grammar en, t_token *id, t_token **id_class);
 
 // Identity Scrapers
@@ -301,8 +303,8 @@ int                 push_br(t_token **stack_br, t_token *to_push);
 void                print_error(char *error, char *err, int mode);
 void                syntax_error_found(t_token *curr, t_data *data);
 void                clean_stacks(t_token **stackone, t_token **stacktwo);
-int                 syntax_verify(t_token *token, t_data *data, t_brace_t *br);
-int                 doubles_verify(t_token *token, t_data *data, t_brace_t *br);
+int                 syntax_verify(t_token *token, t_data *data, int mode);
+int                 doubles_verify(t_token *token, t_data *data);
 int                 realt_quotes(char *input, int doubles_case, int index, char *err);
 
 // Here_Document Tools
@@ -315,12 +317,12 @@ char                *get_delimiter(t_token *token);
 int                 get_here_times(t_token *id_class);
 void                get_quotes_state(t_token *delimiter);
 void                store_fd(t_token *id_class, t_data *data);
-int                 hold_and_check(t_token *hold, t_token *curr);
+int                 hold_and_check(t_token *hold, t_token *curr, int mode);
 int                 change_id(t_token *next_heredoc, t_data *data);
 int                 delimiter_next(t_token *next_heredoc, t_data *data);
-int                 sef_doc(t_token *token, t_data *data, t_brace_t *br);
+int                 sef_doc(t_token *token, t_data *data, int mode);
 int                 requirements(t_token *curr, t_token *id_class, t_data *data);
-int                 here_doc_check(t_token *id_class, t_data *data, t_brace_t *br);
+int                 here_doc_check(t_token *id_class, t_data *data);
 
 // Re_Identification Of Tokens
 t_token             *re_builder(t_token *id_class);
@@ -395,13 +397,17 @@ int     o_env(t_tree *node, t_data *data);
 int     o_exit(t_tree *node, t_data *data);
 
 // expanding.
-// void    expand_env_variables(t_tree *node, t_data *data);
+void    expand_env_variables(t_tree *node, t_data *data);
 int     expand_wild_cards(t_tree *node);
+int     o_ft_strncmp(const char *s1, const char *s2, size_t n);
+bool    has_quotes(char *str);
+char	*list_to_string(char **lst);
 
 // linked env
-int add_to_envlist(t_envlist **envlist, char *str);
+int     add_to_envlist(t_envlist **envlist, char *str);
 char    **convert_list_to_envp(t_envlist *envlist);
 size_t  envlist_size(t_envlist *env);
+size_t  o_ft_strlen(char *str);
 char    *convert_node_to_str(t_envlist *env_node);
 
 
@@ -410,6 +416,7 @@ char    *get_absolute_path(char *cmd);
 
 // free_tree (error handling)
 void    clean_up(t_tree *tree, t_data *data);
+void    free_argv(char **argv);
 
 
 typedef struct s_plist

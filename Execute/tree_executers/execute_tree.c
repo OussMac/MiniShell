@@ -1,17 +1,6 @@
 #include "../execute.h"
 
 
-static void print_arg_vector(char **arg_vector)
-{
-    if (arg_vector == NULL)
-        return;
-
-    for (int i = 0; arg_vector[i] != NULL; i++)
-    {
-        printf("%s\n", arg_vector[i]);
-    }
-}
-
 // help function with forbidden functions
 // will code our own.
 char    *get_absolute_path(char *cmd)
@@ -39,14 +28,11 @@ char    *get_absolute_path(char *cmd)
 int     exec_node(t_tree *node, t_data *data)
 {
     int     ex_status;
-
-    print_arg_vector(data->env_vec);
     pid_t   id = fork();
 
     if (id == 0)
     {
         execve(get_absolute_path(node->argv[0]), node->argv, data->env_vec);
-        perror("");
         dprintf(STDERR_FILENO, "Migrane: command not found: %s \n", node->argv[0]);
         exit(EXIT_FAILURE); // exit child process if execve fails
     }
@@ -59,7 +45,7 @@ int recursive_execution(t_tree *node, t_data *data) // not static cuz used in pi
 {
     if (node->tok == COMMAND_ID) // base case exec cmd
     {
-        // expand_env_variables(node, data);
+        expand_env_variables(node, data);
         if (validate_builtin(node->argv[0]) == true)
             return (exec_builtin(node, data));
         if (node->red)
@@ -94,6 +80,7 @@ int execute_tree(t_tree *root, t_data *data, char **env, void *re_built)
             // free_rebuilt(re_built);
             // return (exec_list(NULL)); // passing Null for now.
         }
+        // NUllify everything.
         clean_up(root, data);
         printf("Exit Status --> %d\n", data->exit_status);
         return (perror("Null root"), EXIT_FAILURE);

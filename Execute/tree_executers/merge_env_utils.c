@@ -49,5 +49,6 @@ char    *convert_node_to_str(t_envlist *env_node)
     {
         str[i++] = env_node->value[j++];
     }
+    str[i] = '\0';
     return (str);
 }

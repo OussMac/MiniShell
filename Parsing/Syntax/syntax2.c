@@ -42,7 +42,7 @@ static void in_alert(t_token *token, int *flag_in)
     }
 }
 
-static int closing_evaluation(t_token *token, t_data *data, t_brace_t *br) // Might remove the t_brace_t seems not used
+static int closing_evaluation(t_token *token, t_data *data) // Might remove the t_brace_t seems not used
 {
     t_token *point;
     t_token *braces;
@@ -68,7 +68,7 @@ static int closing_evaluation(t_token *token, t_data *data, t_brace_t *br) // Mi
     return (1);
 }
 
-int doubles_verify(t_token *token, t_data *data, t_brace_t *br)
+int doubles_verify(t_token *token, t_data *data)
 {
     int flag_in;
     t_token *curr;
@@ -89,7 +89,7 @@ int doubles_verify(t_token *token, t_data *data, t_brace_t *br)
         }
         curr = curr->next;
     }
-    if (!closing_evaluation(token, data, br))
+    if (!closing_evaluation(token, data))
     {
         print_error(BRACE_ERR, NULL, 0);
         return (0);

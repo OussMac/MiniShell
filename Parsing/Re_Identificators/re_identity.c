@@ -33,11 +33,15 @@ static int quotes_removal(t_token *id_class)
     curr = id_class;
     while (curr != NULL)
     {
-        if (curr->tok == S_QUOTE_ID)
+        if (curr->tok == S_QUOTE_ID
+            && !ft_strchr(curr->identity, $EXPAND))
         {
             if (!remove_q(curr, SQ))
                 return (S);
         }
+        else if (curr->tok == S_QUOTE_ID
+            && ft_strchr(curr->identity, $EXPAND))
+            curr->tok = STRING_ID;
         else if (curr->tok == D_QUOTE_ID)
         {
             if (!remove_q(curr, DQ))

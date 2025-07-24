@@ -31,6 +31,8 @@ static void init_tree(t_tree **node)
     (*node)->right = NULL;
     (*node)->red = NULL;
     (*node)->argv = NULL;
+    (*node)->was_s_quote = 0;
+    (*node)->was_d_quote = 0;
     (*node)->op_case = 0;
 }
 
@@ -55,6 +57,8 @@ static void put_token(t_tree *tree, t_token *token)
     tree->tok = token->tok;
     tree->op_case = token->op_case;
     tree->red = token->red;
+    tree->was_s_quote = token->was_single_quote;
+    tree->was_d_quote = token->was_double_quote;
     token->marked = true;
 }
 

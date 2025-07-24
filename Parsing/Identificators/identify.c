@@ -56,7 +56,7 @@ static int unification(char *input, int *i, t_token *id, t_token **id_class)
     return (1);
 }
 
-t_token *get_identity(char *input, t_data *data, t_brace_t *br)
+t_token *get_identity(char *input, t_data *data)
 {
     int i;
     t_token *id;
@@ -71,11 +71,11 @@ t_token *get_identity(char *input, t_data *data, t_brace_t *br)
             break ;
         if (all_whitespaces(input[i]) && input[i] != '\0')
             continue ;
-        if (!unit_call_here_doc(&id_class, input, data, br))
+        if (!unit_call_here_doc(&id_class, input, data))
             break ;
         unit_call_space_next(id_class, input, &i);
     }
-    if (!syntax_verify(id_class, data, br))
+    if (!syntax_verify(id_class, data, SEF_ALL))
     {
         list_cleaner(&id_class);
         id_class = NULL;

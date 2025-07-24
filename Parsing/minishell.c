@@ -1,30 +1,51 @@
 #include "minishell.h"
 
-static void voiders(int argc, char **argv, char **env)
+void f()
+{
+    system("leaks minishell");
+}
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+void check_fd_leaks(void)
+{
+    char cmd[64];
+    snprintf(cmd, sizeof(cmd), "lsof -p %d", getpid());
+    printf("=== FD Leak Check ===\n");
+    system(cmd);
+}
+
+
+void voiders(int argc, char **argv, char **env)
 {
     (void)argc;
     (void)argv;
     (void)env;
 }
 
-static t_tree   *masterparse(char *input, t_data *data)
+t_tree *masterpasrse(char *input, t_data *data, t_token **prompts)
 {
     t_brace_t br;
     t_token *token;
-    t_token *prompts;
+    // t_token *prompts;
 
     // Pre parsing Braces case of (ls << eof)
     ft_bzero(&br, sizeof(t_brace_t));
-    token = get_identity(input, data, &br);
-    prompts = re_identity(token);
-    return (build_tree(prompts));
+    token = get_identity(input, data);
+    *prompts = re_identity(token);
+    return (build_tree(*prompts));
 }
 
 int main(int argc, char **argv, char **env)
 {
+    // atexit(f);
+    // atexit(check_fd_leaks);
     char *input;
     t_data data;
     t_tree *tree;
+    t_token *re_built;
 
     tree = NULL;
     input = NULL;
@@ -39,37 +60,37 @@ int main(int argc, char **argv, char **env)
             break ;
         if (input[0] != '\0')
             add_history(input);
-        tree = masterparse(input, &data);
+        tree = masterpasrse(input, &data, &re_built);
         print_tree(tree);
-        execute_tree(tree, &data, env, NULL);
+        execute_tree(tree, &data, env, re_built);
     }
     free(input);
 }
 
 // ls || cat | (cat) && clear | (cat & pwd) case to check in tree
-// Master@Mindv3.0> echo foo | grep "found" > log && ls < input || echo "found" > success
+// Master@Mindv3.0> echo foo | grep "found" > log && ls < input || echo "found" > success [ Case Solved ]
 
-/*REMINIDER 
+/* Parsing Reminder
+
     heredoc delimiter if a next delimiter to be joined has quotes
     its not going to be saved, since we save for only the first one
-    put in mind to fix later inchallah
+    put in mind to fix later inchallah (CHECKED)
 
     need to check for $ if its wrapped around quotes it will be the only
-    token that we should not remove quotes from, KEEP IN MIND
+    token that we should not remove quotes from, KEEP IN MIND (CHECKED)
 
-    keep in mind to add the red pointer into the tree nodes.
+    keep in mind to add the red pointer into the tree nodes. (CHECKED)
 
-    > Heredoc file descriptor transporation
+    > Heredoc file descriptor transporation (TODO)
     
-    > Pre parsing for this case (ls << eof)
+    > Pre parsing for this case (ls << eof) (TODO)
 
-    > Expanding not removing quotes
-    > re_built instead of tree in case of no command or operator
+    > re_built instead of tree in case of no command or operator (Checked)
 */
 
 /*
     Execution Reminder 
     Master@Mindv3.0> ./minishell
     Migrane: command not found: ./minishell
-    Need to handle .
+    Need to handle ./Executable
 */

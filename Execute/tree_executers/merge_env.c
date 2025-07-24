@@ -1,15 +1,5 @@
 #include "../execute.h"
 
-static size_t ft_strlen(char *str)
-{
-    int i;
-
-    i = 0;
-    while (str[i])
-        i++;
-    return (i);
-}
-
 static char *get_value(char *str)
 {
     int     equals;
@@ -23,7 +13,7 @@ static char *get_value(char *str)
         if (str[equals++] == '=')
             break ;
     }
-    value = ft_substr(str, equals, ft_strlen(str));
+    value = ft_substr(str, equals, o_ft_strlen(str));
     return (value);
 }
 
@@ -89,17 +79,20 @@ char **convert_list_to_envp(t_envlist *envlist)
     int         i;
 
     env_size = envlist_size(envlist);
-    envp = malloc (env_size * sizeof(char *));
+    envp = malloc ((env_size + 1)* sizeof(char *));
     if (!envp)
     {
         // cleanup exit;
         return (NULL);
     }
     cur = envlist;
+    i = 0;
     while(cur)
     {
         envp[i] = convert_node_to_str(cur);
         cur = cur->next;
+        i++;
     }
+    envp[i] = NULL;
     return (envp);
 }

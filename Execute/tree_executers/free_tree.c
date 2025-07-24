@@ -31,7 +31,7 @@ static void free_redir(t_red *red)
     }
 }
 
-static void free_argv(char **argv)
+void free_argv(char **argv)
 {
     int i;
 
@@ -62,7 +62,13 @@ void    free_tree(t_tree *node)
 
 void    clean_up(t_tree *tree, t_data *data)
 {
-    free_tree(tree);
-    free_envlist(data->env);
-    free_argv(data->env_vec);
+    if (tree)
+        free_tree(tree);
+    tree = NULL;
+    if (data->env)
+        free_envlist(data->env);
+    data->env = NULL;
+    if (data->env)
+        free_argv(data->env_vec);
+    data->env_vec = NULL;
 }

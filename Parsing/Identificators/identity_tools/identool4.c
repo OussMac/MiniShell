@@ -54,13 +54,13 @@ static char *scrap_del(char *delimiter)
     return (del);
 }
 
-static int  open_heredoc(t_token *id_class, t_token *curr, t_data *data, t_brace_t *br)
+static int  open_heredoc(t_token *id_class, t_token *curr, t_data *data)
 {
     char *in;
     char *del;
     char *gename;
 
-    if (!sef_doc(id_class, data, br))
+    if (!sef_doc(id_class, data, HERE_SEF))
         return (0);
     gename = name_generator();
     del = scrap_del(get_delimiter(curr));
@@ -86,7 +86,7 @@ static int  open_heredoc(t_token *id_class, t_token *curr, t_data *data, t_brace
     return(free(del), free(in), free(gename), 1);
 }
 
-int here_doc_check(t_token *id_class, t_data *data, t_brace_t *br)
+int here_doc_check(t_token *id_class, t_data *data)
 {
     t_token *curr;
 
@@ -97,7 +97,7 @@ int here_doc_check(t_token *id_class, t_data *data, t_brace_t *br)
         {
             id_class->here_times = 0; // ?? set it on the same first node??
             if (!change_id(curr->next, data)
-                || !open_heredoc(id_class, curr, data, br))
+                || !open_heredoc(id_class, curr, data))
                 return (0);
         }
         curr = curr->next;

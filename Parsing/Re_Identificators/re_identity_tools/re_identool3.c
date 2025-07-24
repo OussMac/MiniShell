@@ -38,6 +38,11 @@ static t_token *get_last_cmd(t_token *id_class)
         last_cmd(curr, &x, &y, &cmd);
         if (x > 0 && y == 1)
             break ;
+        if (curr->op)
+        {
+            x = 0;
+            y = 0;
+        }
         curr = curr->next;
     }
     return (cmd);

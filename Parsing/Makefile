@@ -1,5 +1,5 @@
 CC = cc 
-SANITIZE=# -fsanitize=address -g
+SANITIZE= -fsanitize=address -g3
 CFLAG = -I$(READLINE_DIR)/include # zdt readline library (MAC) -Wall -Wextra -Werror
 READLINE_DIR := ../lib/readline/install
 LDFLAGS += -L$(READLINE_DIR)/lib -lreadline -lhistory -lncurses
@@ -47,8 +47,8 @@ SRC = minishell.c Identificators/identity_tools/identool0.c\
 		../Execute/o_builtins/o_exit.c ../Execute/o_builtins/o_export.c \
 		../Execute/o_builtins/o_pwd.c ../Execute/o_builtins/o_unset.c \
 		../Execute/o_builtins/wild_card.c ../Execute/tree_executers/merge_env.c \
-		../Execute/tree_executers/merge_env_utils.c
-
+		../Execute/tree_executers/merge_env_utils.c ../Execute/Expansion/expanding.c \
+		../Execute/Expansion/expanding_utils.c
 OBJ = $(SRC:.c=.o)
 
 all: $(NAME)

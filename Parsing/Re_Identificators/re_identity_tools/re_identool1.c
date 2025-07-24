@@ -44,6 +44,7 @@ t_token *re_builder(t_token *id_class)
         command_ahead(re_built);
         red_system(&re_built);
     }
+    // printer(re_built, "re_built ");
     list_cleaner(&id_class);
     return (re_built);
 }

@@ -1,5 +1,8 @@
 #include "../execute.h"
 
+
+
+// for debugging.
 void    print_env(t_envlist *env)
 {
     t_envlist *cur;
