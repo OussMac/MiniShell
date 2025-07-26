@@ -374,7 +374,18 @@ int                 printer_red(t_red *curr, char *name);
 // ouss functions  -----------------------------------------------------------------
 // ---------------------------------------------------------------------------------
 
-#include <dirent.h>
+#include <dirent.h> // for wildcard reading directory entries.
+
+typedef struct s_exp_tokens
+{
+    char    *string;
+    bool    is_env_var;
+    bool    double_q;
+    bool    single_q;
+    bool    wrap_me;
+    int     index;
+    struct s_exp_tokens *next;
+}   t_exp_tokens;
 
 // Main Exec Functionality.
 int                 exec_node(t_tree *node, t_data *data);
@@ -396,15 +407,16 @@ int                 o_export(t_tree *node, t_data *data);
 int                 exec_builtin(t_tree *node, t_data *data);
 
 // Expanding.
-char	            *list_to_string(char **lst);
-int                 expand_wild_cards(t_tree *node);
-void                expand_env_variables(t_tree *node, t_data *data);
-int                 o_ft_strncmp(const char *s1, const char *s2, size_t n);
 char	            *o_ft_itoa(int n);
 char                *trim_quotes(char *str); // temp
+char	            *list_to_string(char **lst);
 char                *trim_edge_quotes(char *str); // temp
+int                 expand_wild_cards(t_tree *node);
+bool                is_fully_single_quoted(char *str); // temp
 bool                has_quotes_in_both_edges(char *str); // temp
-bool                is_fully_single_quoted(char *str); // tenp
+void                expand_env_variables(t_tree *node, t_data *data);
+t_exp_tokens        *o_mini_parser(t_tree *node, t_data *data, char *str);
+int                 o_ft_strncmp(const char *s1, const char *s2, size_t n);
 
 // Linked env
 size_t              o_ft_strlen(char *str);
@@ -422,8 +434,13 @@ void                restore_IO(int saved_in, int saved_out);
 char                *get_absolute_path(char *cmd);
 
 // Free_tree (error handling)
-void                clean_up(t_tree *tree, t_data *data);
 void                free_argv(char **argv);
+void                clean_up(t_tree *tree, t_data *data);
+
+
+// debugiing 
+void print_exp_list(t_exp_tokens *head);
+
 
 
 typedef struct s_plist

@@ -32,7 +32,11 @@ int     exec_node(t_tree *node, t_data *data)
     if (id == 0)
     {
         execve(get_absolute_path(node->argv[0]), node->argv, data->env_vec);
-        dprintf(STDERR_FILENO, "Migrane: command not found: %s \n", node->argv[0]);
+        if (node->argv[0] && node->argv[0][0] == '/') // use strchr
+            dprintf(STDERR_FILENO, "Migrane: %s: No such file or directory\n", node->argv[0]);
+        else
+            dprintf(STDERR_FILENO, "Migrane: command not found: %s \n", node->argv[0]);
+        // maybe free();
         exit(EXECVE_FAILURE); // exit child process if execve fails
     }
 
@@ -56,8 +60,8 @@ int recursive_execution(t_tree *node, t_data *data) // not static cuz used in pi
         if (node->red)
             handle_red(node, data); // if this fails check later.
 
-        if (validate_builtin(node->argv[0]))
-            data->exit_status = exec_builtin(node, data);
+        // if (validate_builtin(node->argv[0]))
+        //     data->exit_status = exec_builtin(node, data);
         else
             data->exit_status = exec_node(node, data);
         if (node->red)

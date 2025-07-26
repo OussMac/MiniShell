@@ -54,13 +54,13 @@ int main(int argc, char **argv, char **env)
     while (1)
     {
         input = readline("\033[32mMaster@Mindv3.0> \033[0m");
+        data.og_input = ft_strdup(input);
         if (input == NULL)
             break ;
         if (input[0] != '\0')
             add_history(input);
         tree = masterpasrse(input, &data, &re_built);
         // print_tree(tree);
-        data.og_input = ft_strdup(input);
         execute_tree(tree, &data, env, re_built);
     }
     free(input);

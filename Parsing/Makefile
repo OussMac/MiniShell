@@ -49,6 +49,7 @@ SRC = minishell.c Identificators/identity_tools/identool0.c\
 		../Execute/o_builtins/wild_card.c ../Execute/tree_executers/merge_env.c \
 		../Execute/tree_executers/merge_env_utils.c ../Execute/Expansion/expanding.c \
 		../Execute/Expansion/expanding_utils.c ../Execute/Expansion/expanding_utils2.c \
+		../Execute/Expansion/miniparser.c
 
 OBJ = $(SRC:.c=.o)
 
