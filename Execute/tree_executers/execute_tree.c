@@ -51,7 +51,7 @@ int     exec_node(t_tree *node, t_data *data)
     return (ex_status);  // fallback (shouldn’t happen)
 }
 
-int recursive_execution(t_tree *node, t_data *data) // not static cuz used in pipeline
+int recursive_execution(t_tree *node, t_data *data) // not static cuz used in pipeline and shortcircuit
 {
     if (node->tok == COMMAND_ID) // base case exec cmd
     {
@@ -60,8 +60,8 @@ int recursive_execution(t_tree *node, t_data *data) // not static cuz used in pi
         if (node->red)
             handle_red(node, data); // if this fails check later.
 
-        // if (validate_builtin(node->argv[0]))
-        //     data->exit_status = exec_builtin(node, data);
+        if (validate_builtin(node->argv[0]))
+            data->exit_status = exec_builtin(node, data);
         else
             data->exit_status = exec_node(node, data);
         if (node->red)
