@@ -34,37 +34,24 @@ static  void delete(t_envlist *node)
 
 static void delete_node(t_envlist **env, t_envlist *to_delete)
 {
-    t_envlist *last_node;
-    t_envlist *before_last;
-    t_envlist *curr;
+    t_envlist *curr = *env;
+    t_envlist *prev = NULL;
 
-    curr = *env;
-    last_node = get_last(*env);
-    if (curr == to_delete) // First node
+    while (curr)
     {
-        if (curr->next)
+        if (curr == to_delete)
         {
-            curr = curr->next;
-            delete(*env);
-            *env = curr;
-        }
-        else
-        {
-            delete(*env);
-            *env = NULL;
-        }
-    }
-    else if (last_node == to_delete)
-    {
-        before_last = get_before_last(*env);
-        before_last->next = NULL;
-        delete(last_node);
-    }
-    else
-    {
-        // code algo if was in the middle tmr.
-    }
+            if (prev)
+                prev->next = curr->next;
+            else
+                *env = curr->next;  // deleting head
 
+            delete(curr);
+            return;
+        }
+        prev = curr;
+        curr = curr->next;
+    }
 }
 
 // scans the envlist and finds argument node to unset it.
@@ -77,8 +64,11 @@ static void unset_node(char *argument, t_envlist **env)
     curr = *env;
     while (curr)
     {
-        if (o_ft_strncmp(argument,curr->variable , o_ft_strlen(argument)) == 0) // found env variable.
+        if (ft_strcmp(argument, curr->variable) == 0)
+        {
             delete_node(env, curr);
+            break;
+        }
         curr = curr->next;
     }
 

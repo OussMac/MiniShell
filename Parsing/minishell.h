@@ -161,6 +161,8 @@ typedef struct s_data
     // Exec Data
     int     saved_in;
     int     saved_out;
+    bool    env_is_set;
+    bool    last_cleanup;
 }   t_data;
 
 // Linked List To Store Each Entity

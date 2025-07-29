@@ -41,11 +41,14 @@ static int tree_traverser(t_tree *root, size_t *recurs_count)
 
 static int  merge_env(t_data *data, char **env)
 {
+    if (data->env_is_set)
+        return (EXIT_SUCCESS);
     if (create_envlist(&data->env, env) != EXIT_SUCCESS || !data->env)
         return (EXIT_FAILURE);
     data->env_vec = convert_list_to_envp(data->env);
     if (!data->env_vec)
         return (EXIT_FAILURE);
+    data->env_is_set = true;
     return (EXIT_SUCCESS);
 }
 

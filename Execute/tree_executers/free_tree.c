@@ -63,12 +63,18 @@ void    free_tree(t_tree *node)
 void    clean_up(t_tree *tree, t_data *data)
 {
     if (tree)
+    {
         free_tree(tree);
-    tree = NULL;
-    if (data->env)
+        tree = NULL;
+    }
+    if (data->env && data->last_cleanup)
+    {
         free_envlist(data->env);
-    data->env = NULL;
+        data->env = NULL;
+    }
     if (data->env_vec)
+    {
         free_argv(data->env_vec);
-    data->env_vec = NULL;
+        data->env_vec = NULL;
+    }
 }
