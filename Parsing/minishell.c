@@ -54,7 +54,6 @@ int main(int argc, char **argv, char **env)
     while (1)
     {
         input = readline("\033[32mMaster@Mindv3.0> \033[0m");
-        data.og_input = ft_strdup(input);
         if (input == NULL)
             break ;
         if (input[0] != '\0')

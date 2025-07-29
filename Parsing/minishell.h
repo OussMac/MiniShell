@@ -161,7 +161,6 @@ typedef struct s_data
     // Exec Data
     int     saved_in;
     int     saved_out;
-    char    *og_input;
 }   t_data;
 
 // Linked List To Store Each Entity

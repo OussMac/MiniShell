@@ -3,17 +3,26 @@
 char    *find_in_env(t_envlist *envlist, char *key)
 {
     t_envlist   *cur;
-    char        *no_equal;
 
     cur = envlist;
     while (cur)
     {
-        no_equal = ft_substr(cur->variable, 0, o_ft_strlen(cur->variable) - 1);
-        if (strcmp(key, no_equal) == 0)
+        if (o_ft_strncmp(key, cur->variable, o_ft_strlen(key)) == 0)
             return (ft_strdup(cur->value)); // return value
         cur = cur->next;
     }
     return (NULL);
+}
+
+static bool is_expandable(char *str)
+{
+    int i;
+
+    i = 0;
+    while (str[i])
+        if (str[i++] == '$')
+            return (true);
+    return (false);
 }
 
 
@@ -96,144 +105,65 @@ static char *expand_variable(char *str, t_data *data)
     return (expanded);
 }
 
-size_t tokens_list_size(t_exp_tokens *head)
-{
-    size_t count;
-    t_exp_tokens *current;
-
-    current = head;
-    count = 0;
-    while (current)
-    {
-        count++;
-        current = current->next;
-    }
-    return (count);
-}
-
-char *trim_outer_spaces(char *str)
-{
-    size_t start;
-    size_t end;
-
-    if (!str)
-        return (NULL);
-
-    start = 0;
-    while (str[start] && o_ft_strlen(str) > start && str[start] == ' ')
-        start++;
-
-    end = o_ft_strlen(str);
-    while (end > start && str[end - 1] == ' ')
-        end--;
-
-    return (ft_substr(str, start, end - start)); // check if this fails.
-}
-
-// size_t  single_quote_count(char **list, t_exp_tokens *tokens)
-// {
-//     size_t          q_count;
-//     size_t          i;
-//     t_exp_tokens    *prev;
-
-//     i = 0;
-//     q_count = 0;
-//     prev = tokens;
-//     while(list[i] && tokens)
-//     {
-//         // skip none single quotes
-//         if (tokens->is_env_var)
-//         {
-//             i++;
-//             tokens = tokens->next;
-//             continue;
-//         }
-//         // if to the right env var : flag it to be wrapped
-//         if (list[i] && list[i][0] == '\'' && tokens->next && tokens->next->is_env_var)
-//         {
-//             tokens->next->wrap_me = true;
-//             q_count++;
-//         }
-//         else if (list[i] && list[i][0] == '\'' && tokens->double_q)
-//         {
-//             // hadi needs to be rredone.
-//             if ((list[i + 1] && list[i + 1][0] == '\'' || !list[i + 1]) && (i > 0 && list[i - 1] && list[i - 1][0] == '\''))
-//                 tokens->wrap_me = true; // flag lone single quotes to be wrapped
-//             q_count++;
-//         }
-//         // if to the left env var : flag it to be wrapped
-//         if (tokens->is_env_var && list[i + 1] && list[i + 1][0] == '\'')
-//         {
-//             tokens->wrap_me = true;
-//             q_count++;
-//         }
-//         i++;
-//         prev = tokens;
-//         tokens = tokens->next;
-//     }
-//     return (q_count);
-// }
-
-// char    **wrap_back(char **expanded, t_exp_tokens *tokens)
-// {
-//     size_t  q_count;
-
-//     q_count = single_quote_count(expanded, tokens);
-//     printf("char * pointers to cut from allocation ===> %zu\n", q_count);
-//     printf("total %zu - quotes %zu = %zu\n", tokens_list_size(tokens), q_count, tokens_list_size(tokens) - q_count);
-
-
-//     return (NULL); // null for now.
-// }
-
 
 
 // entry function 
 void expand_env_variables(t_tree *node, t_data *data)
 {
-    t_exp_tokens    *tokens;
-    t_exp_tokens    *curr;
-    char            **expanded;
-    char            *trimmed;
-    int             i;
+    int     i;
+    char    *trimmed;
+    char    *edge_cleaned;
+    char    *og_string;
+    char    *expanded;
 
-
-
-
-    if (!node)
-        return ; // can't ever happen.
-    tokens = o_mini_parser(node, data, data->og_input);
-    if (!tokens)
-        return ; // check for failure.
-    expanded = malloc (sizeof(char *) * (tokens_list_size(tokens) + 1));
-    if (!expanded)
-        return ; // check
-    curr = tokens;
     i = 0;
-    while (curr)
+    if (!node)
+        return ;
+    while (node->argv[i])
     {
-        if (curr->is_env_var && !curr->single_q)
-            expanded[i] = expand_variable(curr->string, data);
-        else
+        // [1] save_original.
+        og_string = ft_strdup(node->argv[i]);
+
+        // [2] trim quotes except for ['] single quote.
+
+        // printf(YLW"[Before Trimming]===> [ %s ]"RST"\n", node->argv[i]);
+        trimmed = trim_quotes(node->argv[i]);
+        free(node->argv[i]);
+        node->argv[i] = trimmed;
+        // printf(YLW"[Trimmed]===> [ %s ]"RST"\n", node->argv[i]);
+
+        // [3] if is expandable aand not wrapped around the og string single quotes.
+        if (is_expandable(node->argv[i]) && !is_fully_single_quoted(og_string))
         {
-            trimmed = trim_outer_spaces(curr->string);
-            expanded[i] = ft_strdup(trimmed); // check for fail
+            expanded = expand_variable(node->argv[i], data); // always check for failure.
+            free(node->argv[i]);
+            node->argv[i] = expanded;
+
         }
-        curr = curr->next;
+        
+        // [4] remove edge quotes
+        if (has_quotes_in_both_edges(og_string)) // only cases like '$HOME' but not '$HOME'and
+        {
+            edge_cleaned = trim_edge_quotes(node->argv[i]);
+            free(node->argv[i]);
+            node->argv[i] = edge_cleaned;
+        }
+        free(og_string);
         i++;
     }
-    expanded[i] = NULL;
-    print_exp_list(tokens);
-    
-    for (int j = 0; expanded[j]; ++j) {
-    printf("< exp %s>\n", expanded[j]);}
-
-    for (int j = 0; node->argv[j]; ++j) {
-    printf("< og %s>\n", node->argv[j]);}
-
-    free(node->argv);
-    node->argv = expanded;
 }
+
+
+    // loop throught the argvector 
+    // detect $
+    // pass through quotetrimmer
+    // launch pocket insertion algorithm 
+    // ----> inser the new expaned string using the environment 
+    //      if env returns NULL: do nothing to the $string
+    //      else expand and pocket insert
+    //      return new pointer to an expanded string
+    //      and free old one
+
 
     /*
 
@@ -243,8 +173,5 @@ void expand_env_variables(t_tree *node, t_data *data)
         '/mnt/homes/oimzilen' /mnt/homes/oimzilen
 
         need to handle this edge case in expanding.
-
-
-        Important:
-        use data of was single quoted or double quoted or mini parse og string.
+    
     */

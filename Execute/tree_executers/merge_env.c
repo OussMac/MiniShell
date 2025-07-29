@@ -23,14 +23,14 @@ static char *get_key(char *str)
     char    *key;
 
     if (!str)
-        return (perror("NULL Key in envp."), NULL);
+        return (perror("NULL Key in envp."), NULL); // cant ever happen unless i pass it.
     equals = 0;
     while (str[equals])
     {
         if (str[equals++] == '=')
             break ;
     }
-    key = ft_substr(str, 0, equals);
+    key = ft_substr(str, 0, equals - 1); // if this fails it will return a NULL.
     return (key);
 }
 
@@ -41,23 +41,14 @@ int add_to_envlist(t_envlist **envlist, char *str)
 
     new_env = malloc (sizeof(t_envlist));
     if (!new_env)
-    {
-        // clean_up
         return (EXIT_FAILURE);
-    }
     new_env->variable = get_key(str);
     if (!new_env->variable)
-    {
-        // clean up
-        return (EXIT_FAILURE);
-    }
+        return (free(new_env), EXIT_FAILURE);
     new_env->value = get_value(str);
     if (!new_env->value)
-    {
-        // clean_ up
-        return (EXIT_FAILURE);
-    }
-    new_env->pointed = false;
+        return (free(new_env), free(new_env->variable), EXIT_FAILURE);
+    new_env->pointed = true; // comes from the parent so by default exported.
     new_env->next = NULL;
     if (!*envlist)
         *envlist = new_env;

@@ -66,7 +66,6 @@ void init_data_struct(t_data *data, char **env)
     data->env_vec = NULL;
     data->saved_in = -1;
     data->saved_out = -1;
-    data->og_input = NULL;
     // list_exp(&data->exp, env);
     // list_env(&data->env, env);
     // zero_point(data);

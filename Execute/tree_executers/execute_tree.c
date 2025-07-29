@@ -58,8 +58,10 @@ int recursive_execution(t_tree *node, t_data *data) // not static cuz used in pi
         expand_env_variables(node, data); // expand env variables
         expand_wild_cards(node);
         if (node->red)
-            handle_red(node, data); // if this fails check later.
-
+        {
+            if (handle_red(node, data) != EXIT_SUCCESS)
+                return (EXIT_FAILURE);
+        }
         if (validate_builtin(node->argv[0]))
             data->exit_status = exec_builtin(node, data);
         else
@@ -86,21 +88,17 @@ int execute_tree(t_tree *root, t_data *data, char **env, void *re_built)
     int rec_exit_status;
     if (!root)
     {
-        // if (re_built != NULL)
+        // if (re_built != NULL) // only redirections case no commands.
         {
             // clean_up(root, data);
             // free_rebuilt(re_built);
             // return (exec_list(NULL)); // passing Null for now.
         }
         // NUllify everything.
-        clean_up(root, data);
-        return (EXIT_FAILURE);
+        return (clean_up(root, data), EXIT_FAILURE);
     }
     if (merger(root, data, env) != EXIT_SUCCESS)
-    {
-        clean_up(root, data);
-        return (perror("Merge Failed"), EXIT_FAILURE);
-    }
+        return (clean_up(root, data), perror("Merge Failed"), EXIT_FAILURE);
     rec_exit_status = recursive_execution(root, data);
     return (clean_up(root, data), rec_exit_status);
 }

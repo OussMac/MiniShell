@@ -1,33 +1,17 @@
 #include "../execute.h"
 
-
-
-// for debugging.
-void    print_env(t_envlist *env)
+static int  create_envlist(t_envlist **envlist, char **envp)
 {
-    t_envlist *cur;
-
-    cur = env;
-
-    while (cur)
-    {
-        printf(" ==> key [ %s ] ", cur->variable);
-        printf(" - value [ %s ] .\n", cur->value);
-        cur = cur->next;
-    }
-
-}
-
-static t_envlist    *create_envlist(char **envp)
-{
-    t_envlist *envlist;
     int i;
 
     i = 0;
-    envlist = NULL;
-    while (envp[i])
-        add_to_envlist(&envlist, envp[i++]);
-    return (envlist);
+    *envlist = NULL;
+    while (envp[i]) // iterating over og **envp
+    {
+        if (add_to_envlist(envlist, envp[i++]) != EXIT_SUCCESS)
+            return (EXIT_FAILURE);
+    }
+    return (EXIT_SUCCESS);
 }
 
 static int tree_traverser(t_tree *root, size_t *recurs_count)
@@ -37,12 +21,9 @@ static int tree_traverser(t_tree *root, size_t *recurs_count)
     (*recurs_count)++;
     if (root->tok == COMMAND_ID)
     {
-        root->argv = ft_split(root->value, ' ');
+        root->argv = ft_split(root->value, ' '); // will have them split from parsing now its just like this for execution usage.
         if (!root->argv)
-        {
-            // clean_up();
-            // EXIT_FAILURE;
-        }
+            return (EXIT_FAILURE);
         return (EXIT_SUCCESS);
     }
     if (root->left)
@@ -60,8 +41,7 @@ static int tree_traverser(t_tree *root, size_t *recurs_count)
 
 static int  merge_env(t_data *data, char **env)
 {
-    data->env = create_envlist(env);
-    if (!data->env)
+    if (create_envlist(&data->env, env) != EXIT_SUCCESS || !data->env)
         return (EXIT_FAILURE);
     data->env_vec = convert_list_to_envp(data->env);
     if (!data->env_vec)
