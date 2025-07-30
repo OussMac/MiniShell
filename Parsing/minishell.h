@@ -129,6 +129,7 @@ typedef struct s_envlist
     char *value;
     bool pointed;
     char *variable;
+    bool exported;
     struct s_envlist *next;
 }   t_envlist;
 
@@ -161,8 +162,7 @@ typedef struct s_data
     // Exec Data
     int     saved_in;
     int     saved_out;
-    bool    env_is_set;
-    bool    last_cleanup;
+    bool    env_is_set; // tracks if we already built env.
 }   t_data;
 
 // Linked List To Store Each Entity
@@ -406,6 +406,7 @@ int                 o_exit(t_tree *node, t_data *data);
 int                 o_unset(t_tree *node, t_data *data);
 int                 o_export(t_tree *node, t_data *data);
 int                 exec_builtin(t_tree *node, t_data *data);
+size_t              arg_count(char **argv);
 
 // Expanding.
 char	            *o_ft_itoa(int n);
@@ -437,6 +438,7 @@ char                *get_absolute_path(char *cmd);
 // Free_tree (error handling)
 void                free_argv(char **argv);
 void                clean_up(t_tree *tree, t_data *data);
+void                free_envlist(t_envlist *env);
 
 
 // debugiing 

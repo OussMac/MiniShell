@@ -1,6 +1,6 @@
 #include "../execute.h"
 
-static void free_envlist(t_envlist *env)
+void free_envlist(t_envlist *env)
 {
     t_envlist   *tmp;
 
@@ -66,11 +66,6 @@ void    clean_up(t_tree *tree, t_data *data)
     {
         free_tree(tree);
         tree = NULL;
-    }
-    if (data->env && data->last_cleanup)
-    {
-        free_envlist(data->env);
-        data->env = NULL;
     }
     if (data->env_vec)
     {

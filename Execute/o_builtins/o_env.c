@@ -8,7 +8,7 @@ int o_env(t_tree *node, t_data *data)
     curr = data->env;
     while(curr != NULL)
     {
-        if (curr->pointed && curr->value)
+        if (curr->exported && curr->value)
             printf("%s=%s\n", curr->variable, curr->value);
         curr = curr->next;
     }

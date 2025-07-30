@@ -48,7 +48,8 @@ int add_to_envlist(t_envlist **envlist, char *str)
     new_env->value = get_value(str);
     if (!new_env->value)
         return (free(new_env), free(new_env->variable), EXIT_FAILURE);
-    new_env->pointed = true; // comes from the parent so by default exported.
+    new_env->pointed = false;
+    new_env->exported = true; // comes from parent by default exported.
     new_env->next = NULL;
     if (!*envlist)
         *envlist = new_env;

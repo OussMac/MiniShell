@@ -1,15 +1,5 @@
 #include "../execute.h"
 
-static size_t  arg_count(char **argv)
-{
-    size_t  argc;
-
-    argc = 0;
-    while (argv[argc])
-        argc++;
-    return (argc);
-}
-
 static t_envlist *get_before_last(t_envlist *env)
 {
     while (env->next->next) // protect from segfault.

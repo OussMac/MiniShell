@@ -62,8 +62,7 @@ int main(int argc, char **argv, char **env)
         // print_tree(tree);
         execute_tree(tree, &data, env, re_built);
     }
-    data.last_cleanup = true;
-    clean_up(tree, &data); // heap user after free.
+    free_envlist(data.env);
     free(input);
     return (EXIT_SUCCESS);
 }
