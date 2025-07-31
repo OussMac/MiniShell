@@ -27,8 +27,7 @@ int hold_and_check(t_token *hold, t_token *curr, int mode)
 		return (F);
 	if ((hold->tok == STRING_ID && curr->tok == BRACE_O_ID)
 		|| hold->tok == BRACE_C_ID && curr->tok == STRING_ID
-		|| hold->tok == BRACE_C_ID && !curr->op_case && !curr->br
-		|| curr->tok == BRACE_C_ID && mode == HERE_SEF)
+		|| hold->tok == BRACE_C_ID && !curr->op_case && !curr->br)
 		return (F);
 	if ((hold->tok == DEL_ID && curr->tok == BRACE_O_ID)
 		|| hold->tok == BRACE_C_ID && curr->tok == DEL_ID)

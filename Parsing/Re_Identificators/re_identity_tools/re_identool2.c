@@ -39,14 +39,24 @@ static void delete_args(t_token *id_class)
     }
 }
 
+
+
 static int operations(t_token *id_class)
 {
     t_token *arg = get_argument(id_class);
     if (!arg)
+    {
+        add_arg_to_list(&id_class->arg, new_argument(id_class));
         return (1);
+    }
     t_arg *new = new_argument(arg);
     if (!new)
         return (0);
+    if (id_class->cmd_added == false)
+    {
+        add_arg_to_list(&id_class->arg, new_argument(id_class));
+        id_class->cmd_added = true;
+    }
     add_arg_to_list(&id_class->arg, new);
     return (1);
 }

@@ -26,7 +26,7 @@ static char *quote_expander(char *str)
     in_quote = false;
     while (str[i])
     {
-        if (str[i] = '\'')
+        if (str[i] == '\'')
         {
             if (!in_quote)
                 in_quote = false;
@@ -121,7 +121,7 @@ static char *expand_var(char *str, t_data *data)
         else
         {
             val = find_in_env(data->env, cut_list[i]);
-            printf(YLW"%s"RST"\n", val);
+            // printf(YLW"%s"RST"\n", val);
             if (val != NULL)
                 exp_list[i] = val;
             else
@@ -146,10 +146,10 @@ static char *expand_var(char *str, t_data *data)
     return (expanded);
 }
 
-// static char *convert_to_string(t_arg *arg)
-// {
-//     arg->
-// }
+static char *convert_to_string(t_arg *arg)
+{
+    return (ft_strdup(arg->value));
+}
 
 static char *rewrap_inquotes(char *str)
 {
@@ -262,11 +262,12 @@ char **convert_list_to_argv(t_arg *arg, t_data *data)
     expand_list(arg, data);
     if (!arg)
         puts("NULL arg");
-    print_exp_list(arg);
+    // printf(BLU"===> [%zu]"RST"\n", argc);
+    // print_exp_list(arg);
     i = 0;
     while(arg)
     {
-        // argv[i] = convert_to_string(arg);
+        argv[i] = convert_to_string(arg); // check for fail
         // while (arg && !arg->space_next)
         // {
         //     // join_strings();
@@ -276,5 +277,6 @@ char **convert_list_to_argv(t_arg *arg, t_data *data)
         i++;
     }
     argv[i] = NULL;
+    print_argv(argv);
     return (argv);
 }

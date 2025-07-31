@@ -21,9 +21,7 @@ static int tree_traverser(t_tree *root,t_data *data, size_t *recurs_count)
     (*recurs_count)++;
     if (root->tok == COMMAND_ID)
     { 
-        root->argv = convert_list_to_argv(root->arg, data);
-        free(root->argv);
-        root->argv = ft_split(root->value, ' ');
+        root->argv = convert_list_to_argv(root->arg, data); // matnsach tfreei fldakhl
         if (!root->argv)
             return (EXIT_FAILURE);
         return (EXIT_SUCCESS);

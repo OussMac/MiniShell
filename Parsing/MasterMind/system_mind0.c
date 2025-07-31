@@ -64,7 +64,12 @@ static void put_token(t_tree *tree, t_token *token)
     tree->arg = token->arg;
     token->marked = true;
     if (token->tok == DEL_ID && token->here_doc_fd != -1)
+    {
         tree->here_doc_fd = dup(token->here_doc_fd);
+        close(token->here_doc_fd);
+    }
+    else if (token->here_doc_fd == -1)
+        tree->here_doc_fd = -1;
 }
 
 void    recursive_build(t_token *yard, t_tree **tree)

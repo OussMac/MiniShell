@@ -52,7 +52,7 @@ t_token    *re_identity(t_token *id_class)
 {
     int string;
     t_token *curr;
-
+    
     if (id_class == NULL)
         return (NULL);
     string = 0;
@@ -70,8 +70,5 @@ t_token    *re_identity(t_token *id_class)
     }
     if (!arg_system(id_class))
         return (clean_fd(id_class), list_cleaner(&id_class), NULL);
-    debbuger_tk(id_class);
-    return (re_builder(id_class)); // uncommented this
-    // printer(id_class, "Re_ident ");
-    // return (NULL);
+    return (re_builder(id_class));
 }

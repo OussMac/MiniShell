@@ -33,6 +33,7 @@ static void init_properties(t_token *new)
 	new->was_double_quote = 0;
 	new->here_document_act = false;
 	new->al_used = false;
+	new->cmd_added = false;
 	new->quotes_syntax = 0;
 }
 
@@ -58,14 +59,8 @@ static void re_initialization(t_token *new, t_token *old)
 	new->was_single_quote = old->was_single_quote;
 	new->here_document_act = old->here_document_act;
 	new->al_used = old->al_used;
+	new->cmd_added = old->cmd_added;
 	new->quotes_syntax = old->quotes_syntax;
-	if (old->here_doc_fd != -1)
-	{
-		new->here_doc_fd = dup(old->here_doc_fd);
-		close(old->here_doc_fd);
-	}
-	else if (old->here_doc_fd == -1)
-		new->here_doc_fd = -1;
 }
 
 void	add_back_identity(t_token **lst, t_token *new, int mode)
@@ -92,17 +87,23 @@ t_token	*add_identity(char *content, enum grammar tok, int mode, t_token *infos)
 	new_node = malloc(sizeof(t_token));
 	if (!content || !new_node)
 		return (NULL);
-	if (new_node)
-	{
-		new_node->identity = ft_strdup(content);
-		free(content);
-		if (!new_node->identity)
-			return (NULL);
-		new_node->tok = tok;
-		new_node->next = NULL;
-	}
+	new_node->identity = ft_strdup(content);
+	free(content);
+	if (!new_node->identity)
+		return (NULL);
+	new_node->tok = tok;
+	new_node->next = NULL;
 	if (mode == INIT)
+	{
 		re_initialization(new_node, infos);
+		if (infos->here_doc_fd != -1)
+		{
+			new_node->here_doc_fd = dup(infos->here_doc_fd);
+			close(infos->here_doc_fd);
+		}
+		else
+			new_node->here_doc_fd = -1;
+	}
 	return (new_node);
 }
 

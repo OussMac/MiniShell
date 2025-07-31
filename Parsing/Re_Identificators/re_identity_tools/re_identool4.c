@@ -45,14 +45,14 @@ t_red *redirection_cop(t_token *id_class)
     new = malloc(sizeof(t_red));
     if (!new)
         exit(F);
-    new->value = ft_strdup(id_class->identity);
+    new->value = ft_strdup(id_class->identity); // check failure
     new->tok = id_class->tok;
     new->was_d_quote = id_class->was_double_quote;
     new->was_s_quote = id_class->was_single_quote;
     new->next = NULL;
     if (new->tok == DEL_ID && id_class->here_doc_fd != -1)
     {
-        new->fd_here_doc = dup(id_class->here_doc_fd);
+        new->fd_here_doc = dup(id_class->here_doc_fd); // check failure
         close(id_class->here_doc_fd);
     }
     else if (id_class->here_doc_fd == -1)

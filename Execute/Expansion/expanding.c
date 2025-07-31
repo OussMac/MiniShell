@@ -1,6 +1,5 @@
 #include "../execute.h"
 #include <string.h>
-
 char    *find_in_env(t_envlist *envlist, char *key)
 {
     t_envlist   *cur;
@@ -14,7 +13,6 @@ char    *find_in_env(t_envlist *envlist, char *key)
     }
     return (NULL);
 }
-
 
 static bool is_expandable(char *str)
 {

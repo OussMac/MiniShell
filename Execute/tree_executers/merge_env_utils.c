@@ -35,7 +35,7 @@ char    *convert_node_to_str(t_envlist *env_node)
     int     j;
 
     env_len = env_strlen(env_node);
-    str = malloc (env_len + 1);
+    str = malloc (env_len + 2); // one for equal and one for null.
     if (!str)
         return (NULL);
     i = 0;
@@ -44,6 +44,7 @@ char    *convert_node_to_str(t_envlist *env_node)
         str[i] = env_node->variable[i];
         i++;
     }
+    str[i++] = '=';
     j = 0;
     while (env_node->value[j])
     {

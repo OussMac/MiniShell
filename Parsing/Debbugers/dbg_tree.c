@@ -51,6 +51,8 @@ static void print_node(t_tree *node)
 
     if (node->red)
         printer_red(node->red, " [Red] ");
+    if (node->arg)
+        printer_arg(node->arg, " [Arg] ");
 }
 
 // Recursive helper to print tree with visual branches
@@ -96,5 +98,6 @@ void print_tree(t_tree *root)
 {
     if (!root)
         return;
+
     ft_print_tree(root, "", 1);
 }

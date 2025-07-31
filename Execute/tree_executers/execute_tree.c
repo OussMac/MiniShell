@@ -71,7 +71,10 @@ int recursive_execution(t_tree *node, t_data *data) // not static cuz used in pi
         return (data->exit_status);
     }
     else if (node->tok == PIPE_ID)
-        return (execute_pipeline(node, data, STDIN_FILENO)); // pipeline recurses back to this func
+    {
+        data->exit_status = execute_pipeline(node, data, STDIN_FILENO);
+        return (data->exit_status); // pipeline recurses back to this func
+    }
     else if (node->tok == AND_ID || node->tok == OR_ID)
         return (short_circuit_operand(node, node->tok, data));
     if (node->left)

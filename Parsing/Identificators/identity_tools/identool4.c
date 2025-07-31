@@ -77,6 +77,7 @@ static int  open_heredoc(t_token *id_class, t_token *curr, t_data *data)
             puterror("MasterMind: Here-Doc Delimited By End Of File\n");
             close(data->here_fd);
             break;
+            // may check for fd and laeks
         }
         cpy_to_file(in, data);
         in = readline("Here_doc> ");

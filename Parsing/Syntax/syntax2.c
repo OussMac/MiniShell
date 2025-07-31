@@ -42,7 +42,7 @@ static void in_alert(t_token *token, int *flag_in)
     }
 }
 
-static int closing_evaluation(t_token *token, t_data *data) // Might remove the t_brace_t seems not used
+static int closing_evaluation(t_token *token, t_data *data)
 {
     t_token *point;
     t_token *braces;
@@ -52,7 +52,7 @@ static int closing_evaluation(t_token *token, t_data *data) // Might remove the 
     braces = get_all_braces(token);
     point = braces;
     if (!braces)
-        return(0);
+        return (0);
     while (braces != NULL)
     {
         if (!push_br(&stack_br, braces))
@@ -91,6 +91,7 @@ int doubles_verify(t_token *token, t_data *data)
     }
     if (!closing_evaluation(token, data))
     {
+        printf("here\n");
         print_error(BRACE_ERR, NULL, 0);
         return (0);
     }

@@ -28,6 +28,7 @@ t_token *re_builder(t_token *id_class)
 
     re_built = NULL;
     curr = id_class;
+    // debbuger_tk(id_class);
     while (curr != NULL)
     {
         if (!(1 <= curr->tok && curr->tok <= 4))
@@ -44,7 +45,7 @@ t_token *re_builder(t_token *id_class)
         command_ahead(re_built);
         red_system(&re_built);
     }
-    // printer(re_built, "re_built ");
     list_cleaner(&id_class);
+    // debbuger_tk(re_built);
     return (re_built);
 }

@@ -30,8 +30,6 @@ t_tree *masterpasrse(char *input, t_data *data, t_token **prompts)
     t_token *token;
 
     // Pre parsing Braces case of (ls << eof)
-    // if (!edge_braces(input, data))
-    //     return (NULL);
     token = get_identity(input, data);
     *prompts = re_identity(token);
     return (build_tree(*prompts));
@@ -63,6 +61,7 @@ int main(int argc, char **argv, char **env)
         print_tree(tree);
         execute_tree(tree, &data, env, re_built);
     }
+    free_argv(data.env_vec);
     free_envlist(data.env);
     free(input);
     return (EXIT_SUCCESS);
@@ -72,6 +71,7 @@ int main(int argc, char **argv, char **env)
 // Master@Mindv3.0> echo foo | grep "found" > log && ls < input || echo "found" > success [ Case Solved ]
 
 /* Parsing Reminder
+
     heredoc delimiter if a next delimiter to be joined has quotes
     its not going to be saved, since we save for only the first one
     put in mind to fix later inchallah (CHECKED)
@@ -83,13 +83,22 @@ int main(int argc, char **argv, char **env)
 
     > Heredoc file descriptor transporation (Checked)
     
-    > Pre parsing for this case (ls << eof) (TODO)
+    > Pre parsing for this case (ls << eof) (Checked)
+
+    > Delimiter trimming with no WhiteSpaces (Checked)
+
+    > Add the Command itself to the first arg in arg struct (Checked)
+
+    > Check the red_system need to protect Malloc Failure (TODO)
+
+    > Ft_strdup Failure in building the tree recursively (TODO)
 
     > re_built instead of tree in case of no command or operator (CHECKED)
 
     Change in Plan, the plan in which i leave quotes for expanding, i wont leave them, it interrupt
     the normal flow of removing quotes [ Case awk '{print $1}'], the quotes should be removed before
     given to execve in the Execution
+
 */
 
 /*

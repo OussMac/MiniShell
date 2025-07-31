@@ -118,6 +118,13 @@ typedef struct s_arg
     struct s_arg *next;
 }   t_arg;
 
+// Preparsing List For Braces
+typedef struct s_brace
+{
+    char *value;
+    struct s_brace *next;
+}   t_brace;
+
 // MasterMindTree
 typedef struct s_tree
 {
@@ -169,7 +176,6 @@ typedef struct s_data
     t_exportlist *exp;
     t_envlist *env;
     char **env_vec;
-
     // Exec Data
     int saved_in;
     int saved_out;
@@ -202,6 +208,7 @@ typedef struct s_token
     bool here_document_act;
     bool del_fd;
     bool cmd_up_next;
+    bool cmd_added;
     struct s_token *next;
     enum grammar tok;
     char *identity;
@@ -310,12 +317,12 @@ char                *set_pointer_exp(t_data *data, char *pointed, int len, int m
 void                puterror(char *str);
 t_token             *get_all_braces(t_token *token);
 int                 scan_for_doubles(t_token *token);
+int                 doubles_verify(t_token *token, t_data *data);
 int                 push_br(t_token **stack_br, t_token *to_push);
 void                print_error(char *error, char *err, int mode);
 void                syntax_error_found(t_token *curr, t_data *data);
 void                clean_stacks(t_token **stackone, t_token **stacktwo);
 int                 syntax_verify(t_token *token, t_data *data, int mode);
-int                 doubles_verify(t_token *token, t_data *data);
 int                 realt_quotes(char *input, int doubles_case, int index, char *err);
 
 // Here_Document Tools
@@ -456,7 +463,8 @@ void                free_argv(char **argv);
 void                clean_up(t_tree *tree, t_data *data);
 void                free_envlist(t_envlist *env);
 
-// debugiing
+
+void print_argv(char **argv);
 
 typedef struct s_plist
 {

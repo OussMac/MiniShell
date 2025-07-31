@@ -16,7 +16,7 @@ static t_token *extract_list(t_token *id_class, t_data *data)
                     || id_class->tok == OR_ID)
                 && id_class->next->tok == HERE_DOC_ID && i != 0))
             break;
-        id = add_identity(ft_strdup(id_class->identity), id_class->tok, INIT, id_class);
+        id = add_identity(ft_strdup(id_class->identity), id_class->tok, D_INIT, NULL); // might come back to check (dir INIT)
         if (!id)
         {
             data->fail = 1;

@@ -42,8 +42,8 @@ int printer(t_token *curr, char *name)
     while (curr)
     {
         printf("\e[0;36;1m%s > %s\n\e[0m", name , curr->identity);
-        if (curr->red)
-            printer_red(curr->red, "Redirections ");
+        // if (curr->red) 
+        //     printer_red(curr->red, "Redirections ");
         curr = curr->next;
     }
     return (1);
@@ -92,12 +92,12 @@ void print_tok(t_red *curr)
             if (curr->fd_here_doc != -1)
             {
                 printf("      └─ ");
-                printf("File Descriptor Ready\n");
+                printf("File Descriptor Ready [fd %d]\n", curr->fd_here_doc);
             }
             else if (curr->fd_here_doc == -1)
             {
                 printf("      └─ ");
-                printf("heredocfd %d\n", curr->fd_here_doc);
+                printf("heredoc [fd %d]\n", curr->fd_here_doc);
             }
         }
         else if (curr->tok == 13)

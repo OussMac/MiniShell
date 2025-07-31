@@ -3,6 +3,7 @@
 void debbuger_tk(t_token *id_class)
 {
     t_token *trav = id_class;
+    printf("***************************************\n");
     while (trav != NULL)
     {
         printf("RE_identity> %s\n", trav->identity);
@@ -84,7 +85,9 @@ void debbuger_tk(t_token *id_class)
             if (trav->space_next == true)
                 printf("Space next True\n");
             if (trav->here_doc_fd != -1)
-                printf("File Descriptor Stored\n");
+                printf("File Descriptor Stored [fd %d]\n", trav->here_doc_fd);
+            else if (trav->here_doc_fd == -1)
+                printf("File desciptor Unsaved\n");
         }
         else if (trav->tok == 13)
         {
@@ -117,6 +120,10 @@ void debbuger_tk(t_token *id_class)
                 printer_red(trav->red, "Red ");
             if (trav->arg)
                 printer_arg(trav->arg, "Ags ");
+            if (trav->was_single_quote == 1)
+                printf("was s quoted\n");
+            else
+                printf("not quoted\n");
 
         }
         else if (trav->tok == 17)
@@ -130,4 +137,5 @@ void debbuger_tk(t_token *id_class)
         trav = trav->next;
         printf("****************\n");
     }
+    printf("***************************************\n");
 }
