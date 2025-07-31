@@ -1,5 +1,44 @@
 # include "../execute.h"
 
+void print_argv(char **argv)
+{
+    int i;
+
+    i = 0;
+    while (argv[i])
+    {
+        printf("argv[%d] = %s\n", i, argv[i]);
+        i++;
+    }
+}
+
+static char *quote_expander(char *str)
+{
+    int     i;
+    char    **lst;
+    bool    in_quote;
+
+    i = 0;
+    lst = ft_split(str, '\'');
+    if (!lst)
+        return (NULL);
+    print_argv(lst);
+    in_quote = false;
+    while (str[i])
+    {
+        if (str[i] = '\'')
+        {
+            if (!in_quote)
+                in_quote = false;
+            else
+                in_quote = true;
+        }
+
+        i++;
+    }
+    return (str);
+}
+
 static char    *find_in_env(t_envlist *envlist, char *key)
 {
     t_envlist   *cur;
@@ -7,7 +46,7 @@ static char    *find_in_env(t_envlist *envlist, char *key)
     cur = envlist;
     while (cur)
     {
-        if (o_ft_strncmp(key, cur->variable, o_ft_strlen(key)) == 0)
+        if (ft_strcmp(key, cur->variable) == 0)
             return (ft_strdup(cur->value)); // return value
         cur = cur->next;
     }
@@ -82,6 +121,7 @@ static char *expand_var(char *str, t_data *data)
         else
         {
             val = find_in_env(data->env, cut_list[i]);
+            printf(YLW"%s"RST"\n", val);
             if (val != NULL)
                 exp_list[i] = val;
             else
@@ -111,6 +151,31 @@ static char *expand_var(char *str, t_data *data)
 //     arg->
 // }
 
+static char *rewrap_inquotes(char *str)
+{
+    int     i;
+    int     j;
+    size_t  len;
+    char    *new;
+
+    len = o_ft_strlen(str);
+    new = malloc ((size_t)(len + 2 + 1)); // for ' ' and \0
+    if (!new)
+        return (NULL);
+    new[0] = '\'';
+    i = 1;
+    j = 0;
+    while (str[j])
+    {
+        new[i] = str[j];
+        j++;
+        i++;
+    }
+    new[i++] = '\'';
+    new[i] = '\0';
+    return (new);
+}
+
 static bool still_s_quotes(char *str)
 {
     int i;
@@ -130,6 +195,7 @@ void    expand_list(t_arg *arg, t_data *data)
     t_arg   *curr;
     char    *expanded;
     char    *trimmed;
+    char    *edge_clean;
 
     curr = arg;
     while (curr)
@@ -138,22 +204,31 @@ void    expand_list(t_arg *arg, t_data *data)
         {
             if (still_s_quotes(curr->value))
             {
-                // strip quotes
-                // expand
-                // rewrap quotes.
+                // edge_clean = trim_edge_quotes(curr->value); // check if this fails.
+                // free(curr->value);
+                // expanded = expand_var(edge_clean, data); // check if fails
+                // free(edge_clean);
+                // curr->value = rewrap_inquotes(expanded);
+                // free(expanded);
+
+                // better algo get curr->val
+                // send it to quote_expander
+                expanded = quote_expander(curr->value);
+                free(curr->value);
+                curr->value = expanded;
             }
             else
             {
-                expanded = expand_var(arg->value, data); // check if fails
-                free(arg->value);
-                arg->value = expanded;
+                expanded = expand_var(curr->value, data); // check if fails
+                free(curr->value);
+                curr->value = expanded;
             }
         }
         else
         {
-            trimmed = trim_edge_quotes(arg->value);
-            free(arg->value);
-            arg->value = trimmed;
+            trimmed = trim_edge_quotes(curr->value);
+            free(curr->value);
+            curr->value = trimmed;
         }
         curr = curr->next;
     }
@@ -185,17 +260,18 @@ char **convert_list_to_argv(t_arg *arg, t_data *data)
         return (NULL);
     }
     expand_list(arg, data);
+    if (!arg)
+        puts("NULL arg");
     print_exp_list(arg);
-    exit(1);
     i = 0;
     while(arg)
     {
         // argv[i] = convert_to_string(arg);
-        while (arg && !arg->space_next)
-        {
-            // join_strings();
-            arg = arg->next;
-        }
+        // while (arg && !arg->space_next)
+        // {
+        //     // join_strings();
+        //     arg = arg->next;
+        // }
         arg = arg->next;
         i++;
     }

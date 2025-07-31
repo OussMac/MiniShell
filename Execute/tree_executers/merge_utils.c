@@ -20,8 +20,10 @@ static int tree_traverser(t_tree *root,t_data *data, size_t *recurs_count)
         return (EXIT_FAILURE);
     (*recurs_count)++;
     if (root->tok == COMMAND_ID)
-    {
+    { 
         root->argv = convert_list_to_argv(root->arg, data);
+        free(root->argv);
+        root->argv = ft_split(root->value, ' ');
         if (!root->argv)
             return (EXIT_FAILURE);
         return (EXIT_SUCCESS);
@@ -57,16 +59,16 @@ int merger(t_tree *root, t_data *data, char **env)
 {
     static size_t   r_c;
 
+    if (merge_env(data, env) != EXIT_SUCCESS)
+    {
+        // here not cleaned up yet check all the things that happen in merge_env.
+        return (perror("Failed To Merge ENV"), EXIT_FAILURE);
+    }
     if (tree_traverser(root, data, &r_c) != EXIT_SUCCESS)
     {
         r_c = 0;
         return (perror("Recursion Limit"), EXIT_FAILURE);
     }
     r_c = 0;
-    if (merge_env(data, env) != EXIT_SUCCESS)
-    {
-        // here not cleaned up yet check all the things that happen in merge_env.
-        return (perror("Failed To Merge ENV"), EXIT_FAILURE);
-    }
     return (EXIT_SUCCESS);
 }

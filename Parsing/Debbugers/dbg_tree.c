@@ -96,6 +96,5 @@ void print_tree(t_tree *root)
 {
     if (!root)
         return;
-    puts("tt");
     ft_print_tree(root, "", 1);
 }
