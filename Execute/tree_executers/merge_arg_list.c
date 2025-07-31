@@ -1,7 +1,6 @@
-#include "../execute.h"
-#include <string.h>
+# include "../execute.h"
 
-char    *find_in_env(t_envlist *envlist, char *key)
+static char    *find_in_env(t_envlist *envlist, char *key)
 {
     t_envlist   *cur;
 
@@ -15,20 +14,20 @@ char    *find_in_env(t_envlist *envlist, char *key)
     return (NULL);
 }
 
-
-static bool is_expandable(char *str)
+static size_t   arglist_size(t_arg *arg)
 {
-    int i;
+    size_t  size;
 
-    i = 0;
-    while (str[i])
-        if (str[i++] == '$')
-            return (true);
-    return (false);
+    size = 0;
+    while (arg)
+    {
+        size++;
+        arg = arg->next;
+    }
+    return (size);
 }
 
-
-static char *expand_variable(char *str, t_data *data)
+static char *expand_var(char *str, t_data *data)
 {
     char    *expanded;
     char    **cut_list;
@@ -64,7 +63,7 @@ static char *expand_variable(char *str, t_data *data)
     while (cut_list[i])
     {
         if (i == 0 && !first_exp)
-            exp_list[i] = ft_strdup(cut_list[i]);
+            exp_list[i] = ft_strdup(cut_list[i]); // if this fails.
         else if (cut_list[i][0] == '\0') // just "$"
             exp_list[i] = ft_strdup("$"); // if this fails.
         else if (cut_list[i][0] == '?')
@@ -107,73 +106,99 @@ static char *expand_variable(char *str, t_data *data)
     return (expanded);
 }
 
+// static char *convert_to_string(t_arg *arg)
+// {
+//     arg->
+// }
 
-
-// entry function 
-void expand_env_variables(t_tree *node, t_data *data)
+static bool still_s_quotes(char *str)
 {
-    int     i;
-    char    *trimmed;
-    char    *edge_cleaned;
-    char    *og_string;
-    char    *expanded;
+    int i;
 
     i = 0;
-    if (!node)
-        return ;
-    while (node->argv[i])
+    while(str[i])
     {
-        // [1] save_original.
-        og_string = ft_strdup(node->argv[i]);
-
-        // [2] trim quotes except for ['] single quote.
-
-        // printf(YLW"[Before Trimming]===> [ %s ]"RST"\n", node->argv[i]);
-        trimmed = trim_quotes(node->argv[i]);
-        free(node->argv[i]);
-        node->argv[i] = trimmed;
-        // printf(YLW"[Trimmed]===> [ %s ]"RST"\n", node->argv[i]);
-
-        // [3] if is expandable aand not wrapped around the og string single quotes.
-        if (is_expandable(node->argv[i]) && !is_fully_single_quoted(og_string))
-        {
-            expanded = expand_variable(node->argv[i], data); // always check for failure.
-            free(node->argv[i]);
-            node->argv[i] = expanded;
-
-        }
-        
-        // [4] remove edge quotes
-        if (has_quotes_in_both_edges(og_string)) // only cases like '$HOME' but not '$HOME'and
-        {
-            edge_cleaned = trim_edge_quotes(node->argv[i]);
-            free(node->argv[i]);
-            node->argv[i] = edge_cleaned;
-        }
-        free(og_string);
+        if (str[i] == '\'')
+            return (true);
         i++;
+    }
+    return (false);
+}
+
+void    expand_list(t_arg *arg, t_data *data)
+{
+    t_arg   *curr;
+    char    *expanded;
+    char    *trimmed;
+
+    curr = arg;
+    while (curr)
+    {
+        if (!curr->was_s_quote)
+        {
+            if (still_s_quotes(curr->value))
+            {
+                // strip quotes
+                // expand
+                // rewrap quotes.
+            }
+            else
+            {
+                expanded = expand_var(arg->value, data); // check if fails
+                free(arg->value);
+                arg->value = expanded;
+            }
+        }
+        else
+        {
+            trimmed = trim_edge_quotes(arg->value);
+            free(arg->value);
+            arg->value = trimmed;
+        }
+        curr = curr->next;
+    }
+
+}
+
+static void print_exp_list(t_arg *arg)
+{
+    while (arg)
+    {
+        printf("[ %s ]\n", arg->value);
+        printf("was single quoted [ %d ]\n", arg->was_s_quote);
+        arg = arg->next;
     }
 }
 
 
-    // loop throught the argvector 
-    // detect $
-    // pass through quotetrimmer
-    // launch pocket insertion algorithm 
-    // ----> inser the new expaned string using the environment 
-    //      if env returns NULL: do nothing to the $string
-    //      else expand and pocket insert
-    //      return new pointer to an expanded string
-    //      and free old one
+char **convert_list_to_argv(t_arg *arg, t_data *data)
+{
+    char        **argv;
+    size_t      argc;
+    int         i;
 
-
-    /*
-
-        bash-3.2$ echo '$HOME' "$HOME"
-        $HOME /mnt/homes/oimzilen
-        bash-3.2$ echo "'$HOME' "$HOME""
-        '/mnt/homes/oimzilen' /mnt/homes/oimzilen
-
-        need to handle this edge case in expanding.
-    
-    */
+    argc = arglist_size(arg);
+    argv = malloc ((argc + 1)* sizeof(char *));
+    if (!argv)
+    {
+        // cleanup exit;
+        return (NULL);
+    }
+    expand_list(arg, data);
+    print_exp_list(arg);
+    exit(1);
+    i = 0;
+    while(arg)
+    {
+        // argv[i] = convert_to_string(arg);
+        while (arg && !arg->space_next)
+        {
+            // join_strings();
+            arg = arg->next;
+        }
+        arg = arg->next;
+        i++;
+    }
+    argv[i] = NULL;
+    return (argv);
+}

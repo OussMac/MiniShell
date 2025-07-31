@@ -30,6 +30,7 @@ static void init_tree(t_tree **node)
     (*node)->value = NULL;
     (*node)->left = NULL;
     (*node)->right = NULL;
+    (*node)->arg = NULL;
     (*node)->red = NULL;
     (*node)->argv = NULL;
     (*node)->was_s_quote = 0;
@@ -60,6 +61,7 @@ static void put_token(t_tree *tree, t_token *token)
     tree->red = token->red;
     tree->was_s_quote = token->was_single_quote;
     tree->was_d_quote = token->was_double_quote;
+    tree->arg = token->arg;
     token->marked = true;
     if (token->tok == DEL_ID && token->here_doc_fd != -1)
         tree->here_doc_fd = dup(token->here_doc_fd);

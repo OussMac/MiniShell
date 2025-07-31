@@ -115,6 +115,9 @@ void debbuger_tk(t_token *id_class)
                 printf("HERE_DOC_INPUT\n");
             if (trav->red)
                 printer_red(trav->red, "Red ");
+            if (trav->arg)
+                printer_arg(trav->arg, "Ags ");
+
         }
         else if (trav->tok == 17)
         {

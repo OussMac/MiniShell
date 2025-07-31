@@ -108,6 +108,16 @@ typedef struct s_red
     struct s_red *next;
 }   t_red;
 
+// Commands Arguments List
+typedef struct s_arg
+{
+    char *value;
+    t_grammar tok;
+    int was_s_quote;
+    bool space_next;
+    struct s_arg *next;
+}   t_arg;
+
 // MasterMindTree
 typedef struct s_tree
 {
@@ -119,6 +129,7 @@ typedef struct s_tree
     int was_s_quote;
     int was_d_quote;
     struct s_red *red;
+    struct s_arg *arg;
     struct s_tree *left;
     struct s_tree *right;
 } t_tree;
@@ -160,8 +171,8 @@ typedef struct s_data
     char **env_vec;
 
     // Exec Data
-    int     saved_in;
-    int     saved_out;
+    int saved_in;
+    int saved_out;
     bool    env_is_set; // tracks if we already built env.
 }   t_data;
 
@@ -195,6 +206,7 @@ typedef struct s_token
     enum grammar tok;
     char *identity;
     t_red *red;
+    t_arg *arg;
 }   t_token;
 
 
@@ -326,30 +338,31 @@ int                 here_doc_check(t_token *id_class, t_data *data);
 // Re_Identification Of Tokens
 t_token             *re_builder(t_token *id_class);
 t_token             *re_identity(t_token *id_class);
-int                 joining_system(t_token *id_class);
 void                cmd_arg(t_token **curr, int *string);
 void                identify_argument(t_token **id_class);
 void                re_identifications(t_token *curr, int *string);
 
 // MasterMind System
-int                 conditions(t_token *curr);
 int                 red_checks(t_token *curr);
+t_arg               *new_argument(t_token *new);
 void                set_end(t_token **op_field);
 t_token             *get_file(t_token *id_class);
 void                set_power(t_token *id_class);
 t_token             *return_op(t_token *op_field);
 int                 arg_system(t_token *id_class);
 void                red_system(t_token **id_class);
-void                command_ahead(t_token *id_class);
 t_tree              *build_tree(t_token *id_class);
 t_token             *delete_red(t_token **id_class);
+t_arg               *last_arg_node(t_arg *arg_list);
 void                set_last_cmd(t_token *id_class);
 void                mark_unmarked(t_token *id_class);
+void                command_ahead(t_token *id_class);
 t_red               *redirection_cop(t_token *id_class);
 void                add_back_red(t_red **cmd, t_red *in);
 int                 add_token(t_token *curr, t_token **yard);
 t_token             *shunting_yard_algorithm(t_token *id_class);
 void                recursive_build(t_token *yard, t_tree **tree);
+void                add_arg_to_list(t_arg **arg_list, t_arg *arg);
 int                 mark_ending(t_token *op_field, t_token **yard);
 void                add_front_identity(t_token **lst, t_token *new);
 int                 add_all_to_yard(t_token **yard, t_token **op_field);
@@ -368,12 +381,12 @@ void                list_cleaner(t_token **list);
 // test to be removed after
 void                print_tree(t_tree *root);
 int                 printer(t_token *curr, char *name);
+int                 printer_arg(t_arg *curr, char *name);
 int                 printer_red(t_red *curr, char *name);
 
 
 
 // ouss functions  -----------------------------------------------------------------
-// ---------------------------------------------------------------------------------
 
 #include <dirent.h> // for wildcard reading directory entries.
 
@@ -420,6 +433,9 @@ void                expand_env_variables(t_tree *node, t_data *data);
 t_exp_tokens        *o_mini_parser(t_tree *node, t_data *data, char *str);
 int                 o_ft_strncmp(const char *s1, const char *s2, size_t n);
 
+// expanding o2
+char                **convert_list_to_argv(t_arg *arg, t_data *data);
+
 // Linked env
 size_t              o_ft_strlen(char *str);
 size_t              envlist_size(t_envlist *env);
@@ -440,11 +456,7 @@ void                free_argv(char **argv);
 void                clean_up(t_tree *tree, t_data *data);
 void                free_envlist(t_envlist *env);
 
-
-// debugiing 
-void print_exp_list(t_exp_tokens *head);
-
-
+// debugiing
 
 typedef struct s_plist
 {

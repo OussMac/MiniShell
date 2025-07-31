@@ -33,15 +33,11 @@ static int quotes_removal(t_token *id_class)
     curr = id_class;
     while (curr != NULL)
     {
-        if (curr->tok == S_QUOTE_ID
-            && !ft_strchr(curr->identity, EXPAND))
+        if (curr->tok == S_QUOTE_ID)
         {
             if (!remove_q(curr, SQ))
                 return (S);
         }
-        else if (curr->tok == S_QUOTE_ID
-            && ft_strchr(curr->identity, EXPAND))
-            curr->tok = STRING_ID;
         else if (curr->tok == D_QUOTE_ID)
         {
             if (!remove_q(curr, DQ))
@@ -61,7 +57,7 @@ t_token    *re_identity(t_token *id_class)
         return (NULL);
     string = 0;
     curr = id_class;
-    if (!quotes_removal(id_class) || !joining_system(id_class))
+    if (!quotes_removal(id_class))
         return (clean_fd(id_class), list_cleaner(&id_class), NULL);
     while (curr != NULL)
     {
@@ -74,5 +70,8 @@ t_token    *re_identity(t_token *id_class)
     }
     if (!arg_system(id_class))
         return (clean_fd(id_class), list_cleaner(&id_class), NULL);
-    return (re_builder(id_class));
+    // return (re_builder(id_class));
+    // printer(id_class, "Re_ident ");
+    debbuger_tk(id_class);
+    return (NULL);
 }

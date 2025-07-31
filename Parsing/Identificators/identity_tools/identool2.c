@@ -123,3 +123,21 @@ int printer_red(t_red *curr, char *name)
     }
     return (1);
 }
+
+int printer_arg(t_arg *curr, char *name)
+{
+    while (curr != NULL)
+    {
+        printf("      └─ ");
+        printf("\e[0;36;1m%s > %s --> \e[0m", name , curr->value);
+        // print_tok(curr);
+        printf("Quoted > %d\n", curr->was_s_quote);
+        if (curr->space_next == true)
+        {
+            printf("      └─ ");
+            printf("Space Next True\n");
+        }
+        curr = curr->next;
+    }
+    return (1);
+}

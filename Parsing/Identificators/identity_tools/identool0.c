@@ -17,6 +17,7 @@ static void init_properties(t_token *new)
 	new->power = 0;
 	new->firsts = 0;
 	new->red = NULL;
+	new->arg = NULL;
 	new->brace_o = 0;
 	new->op_case = 0;
 	new->brace_c = 0;
@@ -41,6 +42,7 @@ static void re_initialization(t_token *new, t_token *old)
 	new->op = old->op;
 	new->end = old->end;
 	new->red = old->red;
+	new->arg = old->arg;
 	new->used = old->used;
 	new->power = old->power;
 	new->in_acc = old->in_acc;

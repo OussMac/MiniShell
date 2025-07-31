@@ -28,9 +28,10 @@ void voiders(int argc, char **argv, char **env)
 t_tree *masterpasrse(char *input, t_data *data, t_token **prompts)
 {
     t_token *token;
-    // t_token *prompts;
 
     // Pre parsing Braces case of (ls << eof)
+    // if (!edge_braces(input, data))
+    //     return (NULL);
     token = get_identity(input, data);
     *prompts = re_identity(token);
     return (build_tree(*prompts));
@@ -59,7 +60,7 @@ int main(int argc, char **argv, char **env)
         if (input[0] != '\0')
             add_history(input);
         tree = masterpasrse(input, &data, &re_built);
-        // print_tree(tree);
+        print_tree(tree);
         execute_tree(tree, &data, env, re_built);
     }
     free_envlist(data.env);
@@ -71,7 +72,6 @@ int main(int argc, char **argv, char **env)
 // Master@Mindv3.0> echo foo | grep "found" > log && ls < input || echo "found" > success [ Case Solved ]
 
 /* Parsing Reminder
-
     heredoc delimiter if a next delimiter to be joined has quotes
     its not going to be saved, since we save for only the first one
     put in mind to fix later inchallah (CHECKED)
@@ -97,4 +97,8 @@ int main(int argc, char **argv, char **env)
     Master@Mindv3.0> ./minishell
     Migrane: command not found: ./minishell
     Need to handle ./Executable
+
+    Case --> if multiple heredoc found redirected inisde of a command, close the firsts ones, 
+    and only execute the command on the last heredoc
+    Case --> [ls < l | cat] if the redirection failed nothing will be piped
 */

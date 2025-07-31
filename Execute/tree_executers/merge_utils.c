@@ -14,26 +14,26 @@ static int  create_envlist(t_envlist **envlist, char **envp)
     return (EXIT_SUCCESS);
 }
 
-static int tree_traverser(t_tree *root, size_t *recurs_count)
+static int tree_traverser(t_tree *root,t_data *data, size_t *recurs_count)
 {
     if (*recurs_count == RECURS_LIMIT)
         return (EXIT_FAILURE);
     (*recurs_count)++;
     if (root->tok == COMMAND_ID)
     {
-        root->argv = ft_split(root->value, ' '); // will have them split from parsing now its just like this for execution usage.
+        root->argv = convert_list_to_argv(root->arg, data);
         if (!root->argv)
             return (EXIT_FAILURE);
         return (EXIT_SUCCESS);
     }
     if (root->left)
     {
-        if (tree_traverser(root->left, recurs_count) != EXIT_SUCCESS)
+        if (tree_traverser(root->left, data, recurs_count) != EXIT_SUCCESS)
             return (EXIT_FAILURE);
     }
     if (root->right)
     {
-        if (tree_traverser(root->right, recurs_count) != EXIT_SUCCESS)
+        if (tree_traverser(root->right, data, recurs_count) != EXIT_SUCCESS)
             return (EXIT_FAILURE);
     }
     return (EXIT_SUCCESS);
@@ -57,7 +57,7 @@ int merger(t_tree *root, t_data *data, char **env)
 {
     static size_t   r_c;
 
-    if (tree_traverser(root, &r_c) != EXIT_SUCCESS)
+    if (tree_traverser(root, data, &r_c) != EXIT_SUCCESS)
     {
         r_c = 0;
         return (perror("Recursion Limit"), EXIT_FAILURE);

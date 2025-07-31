@@ -1,5 +1,5 @@
 CC = cc 
-SANITIZE= -fsanitize=address -g3
+SANITIZE= #-fsanitize=address -g3
 CFLAG = -I$(READLINE_DIR)/include # zdt readline library (MAC) -Wall -Wextra -Werror
 READLINE_DIR := ../lib/readline/install
 LDFLAGS += -L$(READLINE_DIR)/lib -lreadline -lhistory -lncurses
@@ -32,8 +32,9 @@ SRC = minishell.c Identificators/identity_tools/identool0.c\
 		Re_Identificators/re_identity_tools/re_identool3.c\
 		Re_Identificators/re_identity_tools/re_identool4.c\
 		Re_Identificators/re_identity_tools/re_identool5.c\
+		Re_Identificators/re_identity_tools/re_identool6.c\
 		MasterMind/system_mind0.c MasterMind/system_mind1.c\
-		MasterMind/Mind_tools/mind_tools0.c MasterMind/Mind_tools/mind_tools1.c\
+		MasterMind/Mind_tools/mind_tools1.c\
 		MasterMind/Mind_tools/mind_tools2.c MasterMind/Mind_tools/mind_tools3.c \
 		Debbugers/dbg_tree.c tools/tools10.c\
 		\
@@ -49,7 +50,8 @@ SRC = minishell.c Identificators/identity_tools/identool0.c\
 		../Execute/o_builtins/wild_card.c ../Execute/tree_executers/merge_env.c \
 		../Execute/tree_executers/merge_env_utils.c ../Execute/Expansion/expanding.c \
 		../Execute/Expansion/expanding_utils.c ../Execute/Expansion/expanding_utils2.c \
-		../Execute/fail_malloc.c ../Execute/o_builtins/builtin_utils.c
+		../Execute/fail_malloc.c ../Execute/o_builtins/builtin_utils.c \
+		../Execute/tree_executers/merge_arg_list.c
 
 OBJ = $(SRC:.c=.o)
 
