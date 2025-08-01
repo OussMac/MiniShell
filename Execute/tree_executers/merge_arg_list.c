@@ -241,31 +241,21 @@ static char *quote_expander(char *str, t_data *data)
 
 
 
-
-void    expand_list(t_arg *arg, t_data *data)
+// core expanding function. expands the argument linked list.
+int expand_list(t_arg *arg, t_data *data)
 {
     t_arg   *curr;
     char    *expanded;
     char    *trimmed;
-    char    *edge_clean;
 
     curr = arg;
     while (curr)
     {
-        if (!curr->was_s_quote)
+        if (!curr->was_s_quote) // if not literal string , meaning expandable
         {
             if (still_s_quotes(curr->value))
             {
-                // edge_clean = trim_edge_quotes(curr->value); // check if this fails.
-                // free(curr->value);
-                // expanded = expand_var(edge_clean, data); // check if fails
-                // free(edge_clean);
-                // curr->value = rewrap_inquotes(expanded);
-                // free(expanded);
-
-                // better algo get curr->val
-                // send it to quote_expander
-                expanded = quote_expander(curr->value, data);
+                expanded = quote_expander(curr->value, data); // send it to quote_expander
                 free(curr->value);
                 curr->value = expanded;
             }
@@ -276,7 +266,7 @@ void    expand_list(t_arg *arg, t_data *data)
                 curr->value = expanded;
             }
         }
-        else
+        else // literal string just trim edge quotes.
         {
             trimmed = trim_edge_quotes(curr->value);
             free(curr->value);
@@ -284,11 +274,11 @@ void    expand_list(t_arg *arg, t_data *data)
         }
         curr = curr->next;
     }
-
+    return (EXIT_SUCCESS);
 }
 
 
-
+// helper function.
 static void print_exp_list(t_arg *arg)
 {
     while (arg)
@@ -329,7 +319,7 @@ static char *join_until_space(t_arg **p_arg)
     return res;
 }
 
-
+// entry function
 char **convert_list_to_argv(t_arg *arg, t_data *data)
 {
     char        **argv;
@@ -339,20 +329,13 @@ char **convert_list_to_argv(t_arg *arg, t_data *data)
     argc = arglist_size(arg);
     argv = malloc ((argc + 1)* sizeof(char *));
     if (!argv)
-    {
-        // cleanup exit;
-        return (NULL);
-    }
-    expand_list(arg, data);
-    if (!arg)
-        puts("NULL arg");
-    // printf(BLU"===> [%zu]"RST"\n", argc);
-    // print_exp_list(arg);
+        return (NULL); // cleanup return;
+    if (expand_list(arg, data) != EXIT_SUCCESS) // expanding.
+        return (free(argv), NULL);
     i = 0;
     while(arg)
     {
-        // instead of strdup + arg=arg->next, we now join as needed:
-        argv[i] = join_until_space(&arg);
+        argv[i] = join_until_space(&arg);  // join as needed using space_next
         if (!argv[i])
         {
             // cleanup on failure
@@ -363,6 +346,5 @@ char **convert_list_to_argv(t_arg *arg, t_data *data)
         i++;
     }
     argv[i] = NULL;
-    // print_argv(argv);
     return (argv);
 }
