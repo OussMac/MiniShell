@@ -1,5 +1,30 @@
 # include "../execute.h"
 
+char	*o_ft_strjoin(char *s1, char *s2)
+{
+	char	*ptr;
+	size_t	i;
+	size_t	j;
+
+	if (!s1 && !s2)
+		return (NULL);
+	if (!s1)
+		return (ft_strdup(s2));
+	if (!s2)
+		return (ft_strdup(s1));
+	ptr = (char *) malloc ((o_ft_strlen(s1) + o_ft_strlen(s2)) + 1);
+	if (ptr == NULL)
+		return (NULL);
+	i = -1;
+	while (s1[++i])
+		ptr[i] = s1[i];
+	j = -1;
+	while (s2[++j])
+		ptr[i + j] = s2[j];
+	ptr[i + j] = '\0';
+	return ((ptr));
+}
+
 char	*trim_edge_quotes(char *str)
 {
     size_t len;
@@ -132,41 +157,57 @@ static char	**alloc_parts(char *s)
 
 static int	fill_parts(char **parts, char *s, t_data *data)
 {
-	int	i = 0;
-	int	p = 0;
-	int	keylen;
+	int		i;
+	int		p;
+	int		keylen;
 	char	*seg;
 	char	*val;
+	int		start;
 
+	i = 0;
+	p = 0;
 	while (s[i])
 	{
 		if (s[i] == '$')
 		{
 			if (s[i + 1] == '?')
-				parts[p++] = o_ft_itoa(data->exit_status), i += 2;
+			{
+				parts[p] = o_ft_itoa(data->exit_status);
+				p++;
+				i += 2;
+			}
 			else
 			{
 				keylen = 0;
-				while (ft_isalnum(s[i+1+keylen]) || s[i+1+keylen] == '_')
+				while (ft_isalnum(s[i + 1 + keylen]) || s[i + 1 + keylen] == '_')
 					keylen++;
-				if (keylen)
+				if (keylen > 0)
 				{
 					seg = ft_substr(s, i + 1, keylen);
 					val = find_in_env(data->env, seg);
 					free(seg);
-					parts[p++] = val ? val : ft_strdup("");
+					if (val != NULL)
+						parts[p] = val;
+					else
+						parts[p] = ft_strdup("");
+					p++;
 					i += keylen + 1;
 				}
 				else
-					parts[p++] = ft_strdup("$"), i++;
+				{
+					parts[p] = ft_strdup("$");
+					p++;
+					i++;
+				}
 			}
 		}
 		else
 		{
-			int	start = i;
+			start = i;
 			while (s[i] && s[i] != '$')
 				i++;
-			parts[p++] = ft_substr(s, start, i - start);
+			parts[p] = ft_substr(s, start, i - start);
+			p++;
 		}
 	}
 	parts[p] = NULL;
@@ -199,127 +240,6 @@ char	*expand_var(char *str, t_data *data)
 	return (expanded);
 }
 
-//-----------------
-
-static char *rewrap_inquotes(char *str)
-{
-    int     i;
-    int     j;
-    size_t  len;
-    char    *new;
-
-    len = o_ft_strlen(str);
-    new = malloc ((size_t)(len + 2 + 1)); // for ' ' and \0
-    if (!new)
-        return (NULL);
-    new[0] = '\'';
-    i = 1;
-    j = 0;
-    while (str[j])
-    {
-        new[i] = str[j];
-        j++;
-        i++;
-    }
-    new[i++] = '\'';
-    new[i] = '\0';
-    return (new);
-}
-
-static bool still_s_quotes(char *str)
-{
-    int i;
-
-    i = 0;
-    while(str[i])
-    {
-        if (str[i] == '\'')
-            return (true);
-        i++;
-    }
-    return (false);
-}
-
-#include "../execute.h"
-
-// quote_expander:
-//   - walks the input one char at a time
-//   - whenever it sees a single‐quote, it copies that quote,
-//     then expands everything up to the next quote,
-//     then copies the closing quote
-//   - whenever it sees non‐quote text, it collects until the next quote
-//     and runs expand_var() on that entire chunk
-//   - returns a brand‐new heap buffer with all quotes and expansions
-static char *quote_expander(char *str, t_data *data)
-{
-    int     i = 0;
-    int     len = (int)o_ft_strlen(str);
-    char   *result = ft_strdup("");    // start empty
-    char   *tmp, *seg, *exp, *q;
-
-    if (!result)
-        return NULL;
-
-    while (i < len)
-    {
-        if (str[i] == '\'')
-        {
-
-            // 1) copy the opening quote
-            tmp = ft_strjoin(result, "'");
-            free(result);
-            result = tmp;
-            i++;
-
-            // 2) collect everything up to the next quote
-            int start = i;
-            while (i < len && str[i] != '\'')
-                i++;
-            seg = ft_substr(str, start, i - start);
-
-            // 3) expand that segment
-            exp = expand_var(seg, data);
-            free(seg);
-
-            // 4) append the expansion
-            tmp = ft_strjoin(result, exp);
-            free(result);
-            free(exp);
-            result = tmp;
-
-            // 5) copy the closing quote, if present
-            if (i < len && str[i] == '\'')
-            {
-                tmp = ft_strjoin(result, "'");
-                free(result);
-                result = tmp;
-                i++;
-            }
-        }
-        else
-        {
-            // Unquoted text: collect until the next quote or end
-            int start = i;
-            while (i < len && str[i] != '\'')
-                i++;
-            seg = ft_substr(str, start, i - start);
-
-            // Expand that entire chunk at once
-            exp = expand_var(seg, data);
-            free(seg);
-
-            // Append
-            tmp = ft_strjoin(result, exp);
-            free(result);
-            free(exp);
-            result = tmp;
-        }
-    }
-
-    return result;
-}
-
-
 
 
 // core expanding function. expands the argument linked list.
@@ -332,26 +252,17 @@ int expand_list(t_arg *arg, t_data *data)
     curr = arg;
     while (curr)
     {
-        if (!curr->was_s_quote) // if not literal string , meaning expandable
-        {
-            if (still_s_quotes(curr->value))
-            {
-                expanded = quote_expander(curr->value, data); // send it to quote_expander
-                free(curr->value);
-                curr->value = expanded;
-            }
-            else
-            {
-                expanded = expand_var(curr->value, data); // check if fails
-                free(curr->value);
-                curr->value = expanded;
-            }
-        }
-        else // literal string just trim edge quotes.
+        if (curr->was_s_quote) // Literal string - just trim edge quotes
         {
             trimmed = trim_edge_quotes(curr->value);
             free(curr->value);
             curr->value = trimmed;
+        }
+        else // Everything else - expand variables
+        {
+            expanded = expand_var(curr->value, data);
+            free(curr->value);
+            curr->value = expanded;
         }
         curr = curr->next;
     }
@@ -382,7 +293,7 @@ static char *join_until_space(t_arg **p_arg)
 
     while (curr)
     {
-        tmp = ft_strjoin(res, curr->value);
+        tmp = o_ft_strjoin(res, curr->value);
         free(res);
         res = tmp;
 
@@ -435,9 +346,11 @@ char **convert_list_to_argv(t_arg *arg, t_data *data)
         if (!argv[i])
         {
             // cleanup on failure
-            while (i-- > 0) free(argv[i]);
+            while (i-- > 0) 
+                free(argv[i]);
             free(argv);
-            return NULL;
+            puts("tt");
+            return (NULL);
         }
         i++;
     }
