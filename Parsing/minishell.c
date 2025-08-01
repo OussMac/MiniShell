@@ -57,7 +57,7 @@ int main(int argc, char **argv, char **env)
         if (input[0] != '\0')
             add_history(input);
         tree = masterpasrse(input, &data, &re_built);
-        print_tree(tree);
+        // print_tree(tree);
         execute_tree(tree, &data, env, re_built);
     }
     free_argv(data.env_vec);

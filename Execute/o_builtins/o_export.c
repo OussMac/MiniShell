@@ -1,5 +1,19 @@
 #include "../execute.h"
 
+bool    has_equal(char *str)
+{
+    int i;
+
+    i = 0;
+    while (str[i])
+    {
+        if (str[i] == ' ')
+            return (true);
+        i++;
+    }
+    return (false);
+}
+
 static void free_exp_list(t_envlist *exp_list)
 {
     t_envlist   *tmp;
@@ -103,15 +117,24 @@ int o_export(t_tree *node, t_data *data)
 {
     int         argc;
     t_envlist   *export_lst;
+    int         i;
 
     argc = arg_count(node->argv);
     export_lst = NULL;
-    if (argc == 1) // only export case.
-    {
-        // copy and sort list; sorted version.
-        if (sort_list(&export_lst, data->env) != EXIT_SUCCESS)
+    // copy and sort list; sorted version.
+    if (sort_list(&export_lst, data->env) != EXIT_SUCCESS)
             return (EXIT_FAILURE);
+    i = 1;
+    if (argc == 1) // only export case.
         print_export_list(export_lst);
+    else
+    {
+        while (node->argv[i])
+        {
+            if (has_equal(node->argv[i]))
+                add_to_envlist(&data->env, node->argv[i]); // check if fails.
+            i++;
+        }
     }
     return (EXIT_SUCCESS);
 }

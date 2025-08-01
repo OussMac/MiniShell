@@ -34,6 +34,8 @@ static int count_args(char **argv)
 int o_exit(t_tree *node, t_data *data)
 {
     long exit_call;
+    int in_parent;
+
 
     char **argv = node->argv;
     if (!count_args(argv))
@@ -42,7 +44,8 @@ int o_exit(t_tree *node, t_data *data)
         puterror("exit: too many arguments\n");
         return (1);
     }
-    if (!data->is_child)
+    in_parent = isatty(STDIN_FILENO);
+    if (in_parent)
         printf("exit\n");
     if (count_args(argv) == 11)
         exit(data->exit_status);
