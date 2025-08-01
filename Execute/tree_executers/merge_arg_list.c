@@ -12,12 +12,54 @@ void print_argv(char **argv)
     }
 }
 
+char *o_ft_strtrim(char *s, char *set)
+{
+    size_t start = 0;
+    size_t end;
+
+    if (!s || !set)
+        return NULL;
+
+    // skip leading characters in 'set'
+    while (s[start] && ft_strchr(set, s[start]))
+        start++;
+
+    end = o_ft_strlen(s);
+    if (end == 0)
+        return ft_substr(s, 0, 0);
+
+    end--; // move to last character
+
+    // skip trailing characters in 'set'
+    while (end > start && ft_strchr(set, s[end]))
+        end--;
+
+    // extract trimmed substring
+    return ft_substr(s, start, end - start + 1);
+}
+
+char *trim_key_spaces(char *key)
+{
+    char *trimmed;
+
+    if (!key)
+        return (NULL);
+    trimmed = o_ft_strtrim(key, " \t\n\v\f\r");
+    if (!trimmed)
+        return (NULL);
+    return (trimmed);
+}
+
 
 static char    *find_in_env(t_envlist *envlist, char *key)
 {
     t_envlist   *cur;
+    char        *trimmed_key;
 
     cur = envlist;
+    trimmed_key = trim_key_spaces(key);
+    // free(key); 
+    key = trimmed_key; // might have a leak , will have to revisit this.
     while (cur)
     {
         if (ft_strcmp(key, cur->variable) == 0)
@@ -39,87 +81,112 @@ static size_t   arglist_size(t_arg *arg)
     }
     return (size);
 }
+/// expand var
 
-static char *expand_var(char *str, t_data *data)
+int	ft_isalnum(int c)
 {
-    char    *expanded;
-    char    **cut_list;
-    char    **exp_list;
-    bool    first_exp;
-    int     i;
-    int     count;
-    size_t  len;
-    char    *val;
-    char    *status_temp;
-    char    *status_str;
+	if (c >= '0' && c <= '9')
+		return (1);
+	if (c >= 'A' && c <= 'Z')
+		return (1);
+	if (c >= 'a' && c <= 'z')
+		return (1);
+	return (0);
+}
+static int	count_dollars(char *s)
+{
+	int	i = 0;
+	int	cnt = 0;
 
-    // special case: string is exactly "$"
-    if (o_ft_strncmp(str, "$", 2) == 0)
-        return (ft_strdup("$"));
-
-    cut_list = ft_split(str, '$');
-    if (!cut_list)
-        return (NULL);
-
-    // count how many strings in the list for allocation
-    count = 0;
-    while (cut_list[count])
-        count++;
-
-    // allocate expanded list of pointers to chars char **agv.
-    exp_list = malloc(sizeof(char *) * (count + 2)); // +1 for possible trailing $, if not just close it with NULL 
-    if (!exp_list)
-        return (free_argv(cut_list), NULL); // free previously allocated cutlist
-
-    first_exp = (str[0] == '$'); //flag to check if first is also expandable
-    i = 0;
-    while (cut_list[i])
-    {
-        if (i == 0 && !first_exp)
-            exp_list[i] = ft_strdup(cut_list[i]); // if this fails.
-        else if (cut_list[i][0] == '\0') // just "$"
-            exp_list[i] = ft_strdup("$"); // if this fails.
-        else if (cut_list[i][0] == '?')
-        {
-            // $? is handled here
-            status_str = o_ft_itoa(data->exit_status); // check if this fails.
-            if (cut_list[i][0] != '\0') // [$][?][d][d][\0]  this case.
-            {
-                status_temp = ft_strjoin(status_str, cut_list[i] + 1); // check if this fails.
-                free(status_str);
-                exp_list[i] = status_temp;
-            }
-            else // this case [$][?][\0]
-                exp_list[i] = status_str;
-        }
-        else
-        {
-            val = find_in_env(data->env, cut_list[i]);
-            // printf(YLW"%s"RST"\n", val);
-            if (val != NULL)
-                exp_list[i] = val;
-            else
-                exp_list[i] = ft_strdup(""); // if this fails.
-        }
-        i++;
-    }
-
-    // edge case if at the end there is a dollar
-    len = o_ft_strlen(str);
-    if (len > 0 && str[len - 1] == '$')
-    {
-        exp_list[i] = ft_strdup("$");  // preserve literal trailing $
-        i++;
-    }
-
-    exp_list[i] = NULL; //close the list
-
-    free_argv(cut_list);
-    expanded = list_to_string(exp_list); // convert the list to one single stirng.
-    free_argv(exp_list);
-    return (expanded);
+	while (s[i])
+	{
+		if (s[i] == '$')
+			cnt++;
+		i++;
+	}
+	return (cnt);
 }
 
+static char	**alloc_parts(char *s)
+{
+	int		dc = count_dollars(s);
+	char	**parts;
+
+	/* at most twice as many parts as dollars, plus terminator */
+	parts = malloc(sizeof(char *) * (dc * 2 + 2));
+	return (parts);
+}
+
+static int	fill_parts(char **parts, char *s, t_data *data)
+{
+	int	i = 0;
+	int	p = 0;
+	int	keylen;
+	char	*seg;
+	char	*val;
+
+	while (s[i])
+	{
+		if (s[i] == '$')
+		{
+			if (s[i + 1] == '?')
+				parts[p++] = o_ft_itoa(data->exit_status), i += 2;
+			else
+			{
+				keylen = 0;
+				while (ft_isalnum(s[i+1+keylen]) || s[i+1+keylen] == '_')
+					keylen++;
+				if (keylen)
+				{
+					seg = ft_substr(s, i + 1, keylen);
+					val = find_in_env(data->env, seg);
+					free(seg);
+					parts[p++] = val ? val : ft_strdup("");
+					i += keylen + 1;
+				}
+				else
+					parts[p++] = ft_strdup("$"), i++;
+			}
+		}
+		else
+		{
+			int	start = i;
+			while (s[i] && s[i] != '$')
+				i++;
+			parts[p++] = ft_substr(s, start, i - start);
+		}
+	}
+	parts[p] = NULL;
+	return (p);
+}
+
+static char	*join_parts(char **parts)
+{
+	char	*res;
+
+	res = list_to_string(parts);
+	free_argv(parts);
+	return (res);
+}
+
+char	*expand_var(char *str, t_data *data)
+{
+	char	**parts;
+	char	*expanded;
+
+	parts = alloc_parts(str);
+	if (!parts)
+		return (NULL);
+	if (fill_parts(parts, str, data) < 0)
+	{
+		free(parts);
+		return (NULL);
+	}
+	expanded = join_parts(parts);
+	return (expanded);
+}
+
+//-----------------
 
 static char *rewrap_inquotes(char *str)
 {

@@ -37,3 +37,14 @@ in Bash
 this command does:
 creates log file > containing "foo echo foo"
 creates success file > containing "foo echo foo"
+
+
+
+
+
+echo "'$HOME''$HOME''$HOME'" "'$HOME'" '$HOME        '                 "'$HOME'""'$HOME        '"
+
+Bash
+'/Users/oussmac''/Users/oussmac''/Users/oussmac' '/Users/oussmac' $HOME         '/Users/oussmac''/Users/oussmac        '
+'/Users/oussmac''/Users/oussmac''/Users/oussmac' '/Users/oussmac' $HOME         '/Users/oussmac''/Users/oussmac        '
+me
