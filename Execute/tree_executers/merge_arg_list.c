@@ -12,32 +12,6 @@ void print_argv(char **argv)
     }
 }
 
-static char *quote_expander(char *str)
-{
-    int     i;
-    char    **lst;
-    bool    in_quote;
-
-    i = 0;
-    lst = ft_split(str, '\'');
-    if (!lst)
-        return (NULL);
-    print_argv(lst);
-    in_quote = false;
-    while (str[i])
-    {
-        if (str[i] == '\'')
-        {
-            if (!in_quote)
-                in_quote = false;
-            else
-                in_quote = true;
-        }
-
-        i++;
-    }
-    return (str);
-}
 
 static char    *find_in_env(t_envlist *envlist, char *key)
 {
@@ -146,10 +120,6 @@ static char *expand_var(char *str, t_data *data)
     return (expanded);
 }
 
-static char *convert_to_string(t_arg *arg)
-{
-    return (ft_strdup(arg->value));
-}
 
 static char *rewrap_inquotes(char *str)
 {
@@ -190,6 +160,88 @@ static bool still_s_quotes(char *str)
     return (false);
 }
 
+#include "../execute.h"
+
+// quote_expander:
+//   - walks the input one char at a time
+//   - whenever it sees a single‐quote, it copies that quote,
+//     then expands everything up to the next quote,
+//     then copies the closing quote
+//   - whenever it sees non‐quote text, it collects until the next quote
+//     and runs expand_var() on that entire chunk
+//   - returns a brand‐new heap buffer with all quotes and expansions
+static char *quote_expander(char *str, t_data *data)
+{
+    int     i = 0;
+    int     len = (int)o_ft_strlen(str);
+    char   *result = ft_strdup("");    // start empty
+    char   *tmp, *seg, *exp;
+
+    if (!result)
+        return NULL;
+
+    while (i < len)
+    {
+        if (str[i] == '\'')
+        {
+            // 1) copy the opening quote
+            tmp = ft_strjoin(result, "'");
+            free(result);
+            result = tmp;
+            i++;
+
+            // 2) collect everything up to the next quote
+            int start = i;
+            while (i < len && str[i] != '\'')
+                i++;
+            seg = ft_substr(str, start, i - start);
+
+            // 3) expand that segment
+            exp = expand_var(seg, data);
+            free(seg);
+
+            // 4) append the expansion
+            tmp = ft_strjoin(result, exp);
+            free(result);
+            free(exp);
+            result = tmp;
+
+            // 5) copy the closing quote, if present
+            if (i < len && str[i] == '\'')
+            {
+                tmp = ft_strjoin(result, "'");
+                free(result);
+                result = tmp;
+                i++;
+            }
+        }
+        else
+        {
+            // Unquoted text: collect until the next quote or end
+            int start = i;
+            while (i < len && str[i] != '\'')
+                i++;
+            seg = ft_substr(str, start, i - start);
+
+            // Expand that entire chunk at once
+            exp = expand_var(seg, data);
+            free(seg);
+
+            // Append
+            tmp = ft_strjoin(result, exp);
+            free(result);
+            free(exp);
+            result = tmp;
+        }
+    }
+
+    return result;
+}
+
+
+
+
+
 void    expand_list(t_arg *arg, t_data *data)
 {
     t_arg   *curr;
@@ -213,7 +265,7 @@ void    expand_list(t_arg *arg, t_data *data)
 
                 // better algo get curr->val
                 // send it to quote_expander
-                expanded = quote_expander(curr->value);
+                expanded = quote_expander(curr->value, data);
                 free(curr->value);
                 curr->value = expanded;
             }
@@ -235,6 +287,8 @@ void    expand_list(t_arg *arg, t_data *data)
 
 }
 
+
+
 static void print_exp_list(t_arg *arg)
 {
     while (arg)
@@ -243,6 +297,36 @@ static void print_exp_list(t_arg *arg)
         printf("was single quoted [ %d ]\n", arg->was_s_quote);
         arg = arg->next;
     }
+}
+
+// Joins successive t_arg->value pieces until space_next==true
+static char *join_until_space(t_arg **p_arg)
+{
+    t_arg *curr = *p_arg;
+    char  *res = ft_strdup("");
+    char  *tmp;
+
+    if (!res)
+        return NULL;
+
+    while (curr)
+    {
+        tmp = ft_strjoin(res, curr->value);
+        free(res);
+        res = tmp;
+
+        // if the parser marked a space after this piece, consume it and stop
+        if (curr->space_next)
+        {
+            curr = curr->next;
+            break;
+        }
+        // otherwise, keep joining the next piece
+        curr = curr->next;
+    }
+
+    *p_arg = curr;  // advance the caller’s pointer
+    return res;
 }
 
 
@@ -267,16 +351,18 @@ char **convert_list_to_argv(t_arg *arg, t_data *data)
     i = 0;
     while(arg)
     {
-        argv[i] = convert_to_string(arg); // check for fail
-        // while (arg && !arg->space_next)
-        // {
-        //     // join_strings();
-        //     arg = arg->next;
-        // }
-        arg = arg->next;
+        // instead of strdup + arg=arg->next, we now join as needed:
+        argv[i] = join_until_space(&arg);
+        if (!argv[i])
+        {
+            // cleanup on failure
+            while (i-- > 0) free(argv[i]);
+            free(argv);
+            return NULL;
+        }
         i++;
     }
     argv[i] = NULL;
-    print_argv(argv);
+    // print_argv(argv);
     return (argv);
 }

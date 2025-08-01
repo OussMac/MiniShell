@@ -55,7 +55,6 @@ int recursive_execution(t_tree *node, t_data *data) // not static cuz used in pi
 {
     if (node->tok == COMMAND_ID) // base case exec cmd
     {
-        expand_env_variables(node, data); // expand env variables
         expand_wild_cards(node);
         if (node->red)
         {
