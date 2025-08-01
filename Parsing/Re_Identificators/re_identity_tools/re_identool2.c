@@ -39,8 +39,6 @@ static void delete_args(t_token *id_class)
     }
 }
 
-
-
 static int operations(t_token *id_class)
 {
     t_token *arg = get_argument(id_class);

@@ -55,11 +55,13 @@ int execute_pipeline(t_tree *root, t_data *data, int input_fd)
     int prev;
     int fds[2];
     int status;
+    pid_t last_pid;
     
     prev = input_fd;
 
     plist = NULL;
     flatten_pipeline(root, &plist);
+    last_pid = -1;
     curr = plist;
     while (curr)
     {
@@ -79,6 +81,7 @@ int execute_pipeline(t_tree *root, t_data *data, int input_fd)
 
             exit(recursive_execution(curr->cmd_node, data));
         }
+        last_pid = pid;
         if (prev != STDIN_FILENO)
             close(prev);
         if (is_pipe)
@@ -88,7 +91,12 @@ int execute_pipeline(t_tree *root, t_data *data, int input_fd)
     if (prev != STDIN_FILENO)
         close(prev);
     free_pipe_list(plist);
-    while (wait(&status) > 0)
-        ;
-    return (WEXITSTATUS(status));
+    int w_pid = -1;
+    int ex_st;
+    while ((w_pid = wait(&status)) > 0)
+    {
+        if (w_pid == last_pid)
+            ex_st = WEXITSTATUS(status);
+    };
+    return (ex_st);
 }

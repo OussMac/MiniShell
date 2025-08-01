@@ -36,16 +36,18 @@ void set_last_cmd(t_token *id_class)
     }
 }
 
-t_red *redirection_cop(t_token *id_class)
+t_red *redirection_cop(t_token *id_class, int *fail)
 {
     if (!id_class)
-        return (NULL);
+        return (*fail = 0, NULL);
     t_red *new;
 
     new = malloc(sizeof(t_red));
     if (!new)
-        exit(F);
+        return (*fail = 1, NULL);
     new->value = ft_strdup(id_class->identity); // check failure
+    if (!new->value)
+        return (*fail = 1, NULL);
     new->tok = id_class->tok;
     new->was_d_quote = id_class->was_double_quote;
     new->was_s_quote = id_class->was_single_quote;
@@ -53,6 +55,8 @@ t_red *redirection_cop(t_token *id_class)
     if (new->tok == DEL_ID && id_class->here_doc_fd != -1)
     {
         new->fd_here_doc = dup(id_class->here_doc_fd); // check failure
+        if (new->fd_here_doc == -1)
+            return (*fail = 1, NULL);
         close(id_class->here_doc_fd);
     }
     else if (id_class->here_doc_fd == -1)

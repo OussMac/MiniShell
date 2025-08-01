@@ -35,7 +35,7 @@ int identity_scraping(char *ident, enum grammar en,
         return (0);
     id = add_identity(ident, en, D_INIT, NULL);
     if (!id) // maybe clean fds
-        list_cleaner(id_class);
+        return (0);
     add_back_identity(id_class, id, INIT);
     return (1);
 }

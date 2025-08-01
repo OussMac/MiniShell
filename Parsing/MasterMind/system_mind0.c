@@ -11,14 +11,11 @@ t_tree *build_tree(t_token *id_class)
         return (NULL);
     yard = shunting_yard_algorithm(id_class);
     if (!yard)
-    {
-        clean_fd(id_class);
-        cleaner_red(id_class);
-        list_cleaner(&id_class);
-    }
-    list_cleaner(&id_class);
-    recursive_build(yard, &tree);
-    list_cleaner(&yard);
+        return (clean_id_class(&id_class, FAIL), NULL);
+    clean_id_class(&id_class, CLEAN);
+    if (recursive_build(yard, &tree) == ANOMALY)
+        return (clean_yard(&yard, FAIL), NULL); // Clean tree from fds, not red or args
+    clean_yard(&yard, CLEAN);
     return (tree);
 }
 
@@ -26,7 +23,7 @@ static void init_tree(t_tree **node)
 {
     *node = malloc(sizeof(t_tree));
     if (!*node)
-        exit(F);
+        exit(F); // CHECK THIS ONE EHOOOO !!!!!!!! :)
     (*node)->value = NULL;
     (*node)->left = NULL;
     (*node)->right = NULL;
@@ -52,10 +49,11 @@ static t_token *last_unchecked(t_token *yard)
     return (ft_lstlast(yard));
 }
 
-static void put_token(t_tree *tree, t_token *token)
+static int put_token(t_tree *tree, t_token *token)
 {
     tree->value = ft_strdup(token->identity);
-    // Malloc Failure
+    if (!tree->value)
+        return (ANOMALY);
     tree->tok = token->tok;
     tree->op_case = token->op_case;
     tree->red = token->red;
@@ -66,24 +64,30 @@ static void put_token(t_tree *tree, t_token *token)
     if (token->tok == DEL_ID && token->here_doc_fd != -1)
     {
         tree->here_doc_fd = dup(token->here_doc_fd);
+        if (tree->here_doc_fd == -1)
+            return (ANOMALY);
         close(token->here_doc_fd);
     }
     else if (token->here_doc_fd == -1)
         tree->here_doc_fd = -1;
+    return (1);
 }
 
-void    recursive_build(t_token *yard, t_tree **tree)
+int    recursive_build(t_token *yard, t_tree **tree)
 {
     t_token *token;
 
     init_tree(tree);
     token = last_unchecked(yard);
-    put_token(*tree, token);
+    if (put_token(*tree, token) == ANOMALY)
+        return (ANOMALY);
     if (token->op_case)
     {
-        recursive_build(yard, &(*tree)->right);
-        recursive_build(yard, &(*tree)->left);
+        if (recursive_build(yard, &(*tree)->right) == ANOMALY
+            || recursive_build(yard, &(*tree)->left) == ANOMALY)
+            return (ANOMALY);
     }
     else
-        return ;
+        return (1);
+    return (0);
 }

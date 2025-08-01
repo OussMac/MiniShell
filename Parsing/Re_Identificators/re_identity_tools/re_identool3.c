@@ -50,11 +50,14 @@ static t_token *get_last_cmd(t_token *id_class)
 
 static int red_ops(t_token **id_class, t_token **curr, t_token *cmd, t_red *in)
 {
+    int fail;
+
+    fail = 0;
     if ((*curr)->op_case)
         set_last_cmd(*id_class);
     if (red_checks((*curr)) || (*curr)->tok == COMMAND_ID)
     {
-        in = redirection_cop(get_file(*id_class)); // Need to specify case, in which "in" is NULL (Fail or Normal)
+        in = redirection_cop(get_file(*id_class), &fail);
         cmd = get_last_cmd(*id_class);
         if (cmd && in)
         {
@@ -63,33 +66,40 @@ static int red_ops(t_token **id_class, t_token **curr, t_token *cmd, t_red *in)
             if (!(*curr))
                 (*curr) = *id_class;
         }
-        else // else if (!cmd || (!in && flag == Normal Fail))
+        else if ((!in && fail == S) || !cmd)
         {
             if ((*curr)->next)
                 (*curr) = (*curr)->next;
             else
                 return (S);
         }
-        // else if (!in && flag == Bad Fail)
+        else if (!in && fail == F)
+            return (ANOMALY);
     }
     return (F);
 }
 
-void red_system(t_token **id_class)
+int red_system(t_token **id_class)
 {
     t_red *in;
+    int catch;
     t_token *cmd;
     t_token *curr;
 
+    catch = 0;
     in = NULL;
     cmd = NULL;
     curr = *id_class;
     while (curr != NULL)
     {
-        if (!red_ops(id_class, &curr, cmd, in))
-            break ;
+        catch = red_ops(id_class, &curr, cmd, in);
+        if (!catch)
+            break;
+        else if (catch == ANOMALY)
+            return (ANOMALY);
         if (red_checks(curr))
             continue ;
         curr = curr->next;
     }
+    return (1);
 }

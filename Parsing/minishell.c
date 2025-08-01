@@ -29,7 +29,6 @@ t_tree *masterpasrse(char *input, t_data *data, t_token **prompts)
 {
     t_token *token;
 
-    // Pre parsing Braces case of (ls << eof)
     token = get_identity(input, data);
     *prompts = re_identity(token);
     return (build_tree(*prompts));
@@ -58,7 +57,7 @@ int main(int argc, char **argv, char **env)
         if (input[0] != '\0')
             add_history(input);
         tree = masterpasrse(input, &data, &re_built);
-        // print_tree(tree);
+        print_tree(tree);
         execute_tree(tree, &data, env, re_built);
     }
     free_argv(data.env_vec);
@@ -89,9 +88,11 @@ int main(int argc, char **argv, char **env)
 
     > Add the Command itself to the first arg in arg struct (Checked)
 
-    > Check the red_system need to protect Malloc Failure (TODO)
+    > Check the red_system need to protect Malloc Failure (Checked)
 
-    > Ft_strdup Failure in building the tree recursively (TODO)
+    > Need to add the Arg Struct and Red struct into the cleaning (Checked)
+
+    > Ft_strdup Failure in building the tree recursively (TODO) NEED TO CHECK CAREFULLY HOW IT SHOULD BE PROTECTED
 
     > re_built instead of tree in case of no command or operator (CHECKED)
 

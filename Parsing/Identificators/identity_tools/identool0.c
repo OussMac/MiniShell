@@ -99,6 +99,8 @@ t_token	*add_identity(char *content, enum grammar tok, int mode, t_token *infos)
 		if (infos->here_doc_fd != -1)
 		{
 			new_node->here_doc_fd = dup(infos->here_doc_fd);
+			if (new_node->here_doc_fd == -1)
+				return (NULL);
 			close(infos->here_doc_fd);
 		}
 		else

@@ -22,7 +22,7 @@ static char *name_generator(void)
     return (gename);
 }
 
-static void cpy_to_file(char *in, t_data *data)
+void cpy_to_file(char *in, t_data *data)
 {
     int i;
 
@@ -56,7 +56,6 @@ static char *scrap_del(char *delimiter)
 
 static int  open_heredoc(t_token *id_class, t_token *curr, t_data *data)
 {
-    char *in;
     char *del;
     char *gename;
 
@@ -68,23 +67,8 @@ static int  open_heredoc(t_token *id_class, t_token *curr, t_data *data)
     if (data->here_fd == -1)
         return (0);
     unlink(gename);
-    // int fd = dup(STDOUT_FILENO);
-    in = readline("Here_doc> ");
-    while (ft_strcmp(del, in))
-    {
-        if (!in)
-        {
-            puterror("MasterMind: Here-Doc Delimited By End Of File\n");
-            close(data->here_fd);
-            break;
-            // may check for fd and laeks
-        }
-        cpy_to_file(in, data);
-        in = readline("Here_doc> ");
-    }
-    store_fd(id_class, data);
-    // dup2(fd, STDOUT_FILENO);
-    return(free(del), free(in), free(gename), 1);
+    here_doc_ops(id_class, data, del);
+    return(free(del), free(gename), 1);
 }
 
 int here_doc_check(t_token *id_class, t_data *data)

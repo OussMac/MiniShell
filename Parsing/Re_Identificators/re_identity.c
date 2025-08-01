@@ -69,6 +69,6 @@ t_token    *re_identity(t_token *id_class)
         curr = curr->next;
     }
     if (!arg_system(id_class))
-        return (clean_fd(id_class), list_cleaner(&id_class), NULL);
+        return (clean_id_class(&id_class, FAIL), NULL);
     return (re_builder(id_class));
 }

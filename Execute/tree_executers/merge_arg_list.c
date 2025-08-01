@@ -1,5 +1,18 @@
 # include "../execute.h"
 
+char	*trim_edge_quotes(char *str)
+{
+    size_t len;
+
+    if (!str)
+        return (NULL);
+
+    len = o_ft_strlen(str);
+    if (len >= 2 && (str[0] == '\'' && str[len - 1] == '\''))
+        return (ft_substr(str, 1, len - 2));
+    return (ft_strdup(str)); // no trimming needed
+}
+
 void print_argv(char **argv)
 {
     int i;
@@ -60,7 +73,7 @@ static char    *find_in_env(t_envlist *envlist, char *key)
     trimmed_key = trim_key_spaces(key);
     // free(key); 
     key = trimmed_key; // might have a leak , will have to revisit this.
-    while (cur)
+    while (cur) 
     {
         if (ft_strcmp(key, cur->variable) == 0)
             return (ft_strdup(cur->value)); // return value
@@ -242,7 +255,7 @@ static char *quote_expander(char *str, t_data *data)
     int     i = 0;
     int     len = (int)o_ft_strlen(str);
     char   *result = ft_strdup("");    // start empty
-    char   *tmp, *seg, *exp;
+    char   *tmp, *seg, *exp, *q;
 
     if (!result)
         return NULL;
@@ -251,6 +264,7 @@ static char *quote_expander(char *str, t_data *data)
     {
         if (str[i] == '\'')
         {
+
             // 1) copy the opening quote
             tmp = ft_strjoin(result, "'");
             free(result);
@@ -386,6 +400,21 @@ static char *join_until_space(t_arg **p_arg)
     return res;
 }
 
+static void    free_arg_list(t_arg *arg)
+{
+    t_arg   *tmp;
+
+    if (!arg)
+        return ;
+    while (arg)
+    {
+        tmp = arg->next;
+        free(arg->value);
+        free(arg);
+        arg = tmp;
+    }
+}
+
 // entry function
 char **convert_list_to_argv(t_arg *arg, t_data *data)
 {
@@ -396,9 +425,9 @@ char **convert_list_to_argv(t_arg *arg, t_data *data)
     argc = arglist_size(arg);
     argv = malloc ((argc + 1)* sizeof(char *));
     if (!argv)
-        return (NULL); // cleanup return;
+        return (free_arg_list(arg), NULL); // cleanup return;
     if (expand_list(arg, data) != EXIT_SUCCESS) // expanding.
-        return (free(argv), NULL);
+        return (free_arg_list(arg), free(argv), NULL);
     i = 0;
     while(arg)
     {

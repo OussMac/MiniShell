@@ -43,6 +43,9 @@
 # define ONE_QUOTE 9
 # define EXPAND '$'
 # define DUO_QUOTE 10
+# define RED_ARG_CLEAN 0
+# define CLEAN 1
+# define FAIL 0
 # define POINT_ONLY 0
 # define POINT_N_GET 0
 # define ANOMALY -1111
@@ -333,14 +336,17 @@ void                takeoff_quotes(t_token *tok);
 void                space_flag(t_token *id_class);
 char                *get_delimiter(t_token *token);
 int                 get_here_times(t_token *id_class);
+void                cpy_to_file(char *in, t_data *data);
 void                get_quotes_state(t_token *delimiter);
-void                store_fd(t_token *id_class, t_data *data);
-int                 hold_and_check(t_token *hold, t_token *curr, int mode);
+int                 store_fd(t_token *id_class, t_data *data);
 int                 change_id(t_token *next_heredoc, t_data *data);
-int                 delimiter_next(t_token *next_heredoc, t_data *data);
 int                 sef_doc(t_token *token, t_data *data, int mode);
-int                 requirements(t_token *curr, t_token *id_class, t_data *data);
 int                 here_doc_check(t_token *id_class, t_data *data);
+int                 delimiter_next(t_token *next_heredoc, t_data *data);
+int                 hold_and_check(t_token *hold, t_token *curr, int mode);
+int                 requirements(t_token *curr, t_token *id_class, t_data *data);
+int                 here_doc_ops(t_token *id_class, t_data *data, char *del);
+
 
 // Re_Identification Of Tokens
 t_token             *re_builder(t_token *id_class);
@@ -357,18 +363,18 @@ t_token             *get_file(t_token *id_class);
 void                set_power(t_token *id_class);
 t_token             *return_op(t_token *op_field);
 int                 arg_system(t_token *id_class);
-void                red_system(t_token **id_class);
+int                 red_system(t_token **id_class);
 t_tree              *build_tree(t_token *id_class);
 t_token             *delete_red(t_token **id_class);
 t_arg               *last_arg_node(t_arg *arg_list);
 void                set_last_cmd(t_token *id_class);
 void                mark_unmarked(t_token *id_class);
 void                command_ahead(t_token *id_class);
-t_red               *redirection_cop(t_token *id_class);
+t_red               *redirection_cop(t_token *id_class, int *fail);
 void                add_back_red(t_red **cmd, t_red *in);
 int                 add_token(t_token *curr, t_token **yard);
 t_token             *shunting_yard_algorithm(t_token *id_class);
-void                recursive_build(t_token *yard, t_tree **tree);
+int                 recursive_build(t_token *yard, t_tree **tree);
 void                add_arg_to_list(t_arg **arg_list, t_arg *arg);
 int                 mark_ending(t_token *op_field, t_token **yard);
 void                add_front_identity(t_token **lst, t_token *new);
@@ -382,8 +388,12 @@ int                 algorithm_options(t_token *curr, t_token **op_field, t_token
 
 // Cleaners Functions
 void                cleaner_red(t_token *list);
+void                cleaner_arg(t_token *list);
 void                clean_fd(t_token *id_class);
+void                clean_yard(t_token **yard, int mode);
 void                list_cleaner(t_token **list);
+void                clean_id_class(t_token **id_class, int mode);
+
 
 // test to be removed after
 void                print_tree(t_tree *root);
@@ -437,7 +447,6 @@ int                 expand_wild_cards(t_tree *node);
 bool                is_fully_single_quoted(char *str); // temp
 bool                has_quotes_in_both_edges(char *str); // temp
 void                expand_env_variables(t_tree *node, t_data *data);
-t_exp_tokens        *o_mini_parser(t_tree *node, t_data *data, char *str);
 int                 o_ft_strncmp(const char *s1, const char *s2, size_t n);
 
 // expanding o2

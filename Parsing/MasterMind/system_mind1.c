@@ -57,15 +57,14 @@ t_token *shunting_yard_algorithm(t_token *id_class)
     curr = id_class;
     while (curr != NULL)
     {
-        if (!curr->op_case && !curr->br
-            && !add_token(curr, &yard))
-            return (list_cleaner(&yard), NULL);
+        if (!curr->op_case && !curr->br && !add_token(curr, &yard))
+            return (clean_yard(&yard, FAIL), NULL);
         else if ((curr->op_case || curr->br)
             && !operations_field(curr, &op_field, &yard))
-            return (list_cleaner(&yard), NULL);
+            return (clean_yard(&yard, FAIL), NULL);
         curr = curr->next;
     }
     if (!add_all_to_yard(&yard, &op_field))
-        return (list_cleaner(&yard), NULL);
+        return (clean_yard(&yard, FAIL), NULL);
     return (yard);
 }

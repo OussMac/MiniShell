@@ -86,20 +86,7 @@ char *trim_quotes(char *str)
 }
 
 // Trims only real quote marks at edges like "word" or 'word'
-// But keeps literal quote characters inside.
-char	*trim_edge_quotes(char *str)
-{
-    size_t len;
-
-    if (!str)
-        return (NULL);
-
-    len = o_ft_strlen(str);
-    if (len >= 2 && ((str[0] == '"' && str[len - 1] == '"') ||
-                     (str[0] == '\'' && str[len - 1] == '\'')))
-        return (ft_substr(str, 1, len - 2));
-    return (ft_strdup(str)); // no trimming needed
-}
+// But keeps literal quote characters inside
 
 
 bool	has_quotes_in_both_edges(char *str)

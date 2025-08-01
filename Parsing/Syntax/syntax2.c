@@ -48,6 +48,8 @@ static int closing_evaluation(t_token *token, t_data *data)
     t_token *braces;
     t_token *stack_br;
 
+    if (!token)
+        return (1);
     stack_br = NULL;
     braces = get_all_braces(token);
     point = braces;
@@ -91,7 +93,6 @@ int doubles_verify(t_token *token, t_data *data)
     }
     if (!closing_evaluation(token, data))
     {
-        printf("here\n");
         print_error(BRACE_ERR, NULL, 0);
         return (0);
     }

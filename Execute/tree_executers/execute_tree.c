@@ -75,12 +75,20 @@ int recursive_execution(t_tree *node, t_data *data) // not static cuz used in pi
         return (data->exit_status); // pipeline recurses back to this func
     }
     else if (node->tok == AND_ID || node->tok == OR_ID)
-        return (short_circuit_operand(node, node->tok, data));
+    {
+        data->exit_status = short_circuit_operand(node, node->tok, data);
+        return (data->exit_status);
+    }
     if (node->left)
-        return (recursive_execution(node->left, data)); // go deeper left (dfs algo)
+    {
+        data->exit_status = recursive_execution(node->left, data);
+        return (data->exit_status ); // go deeper left (dfs algo)
+    }
     if (node->right)
-        return (recursive_execution(node->right, data)); // when done going left go deeper right.
-
+    {
+        data->exit_status = recursive_execution(node->right, data);
+        return (data->exit_status); // when done going left go deeper right.
+    }
     return (EXIT_SUCCESS); // return 0 assume no cmd to execute is success!
 }
 

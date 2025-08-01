@@ -57,6 +57,8 @@ void    free_tree(t_tree *node)
     free(node->value);
     free_argv(node->argv);
     free_redir(node->red);
+    if (node->here_doc_fd != -1)
+        close(node->here_doc_fd);
     free(node);
 }
 

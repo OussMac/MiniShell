@@ -72,7 +72,7 @@ int push_br(t_token **stack_br, t_token *to_push)
     return (1);
 }
 
-void    store_fd(t_token *id_class, t_data *data)
+int    store_fd(t_token *id_class, t_data *data)
 {
     t_token *curr;
 
@@ -82,10 +82,13 @@ void    store_fd(t_token *id_class, t_data *data)
         if (curr->tok == DEL_ID && curr->del_fd == false)
         {
             curr->here_doc_fd = dup(data->here_fd);
+            if (curr->here_doc_fd == -1)
+                return (0);
             close(data->here_fd);
             curr->del_fd = true;
             break ;
         }
         curr = curr->next;
     }
+    return (1);
 }

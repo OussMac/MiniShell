@@ -20,6 +20,30 @@ static int no_command(t_token *id_class)
     return (0);
 }
 
+static void all_cleaner(t_token **id_class, t_token **re_built, int mode)
+{
+    if (mode == RED_ARG_CLEAN)
+    {
+        cleaner_arg(*re_built);
+        cleaner_red(*re_built);
+    }
+    clean_fd(*id_class);
+    list_cleaner(id_class);
+    clean_fd(*re_built);
+    list_cleaner(re_built);
+}
+
+static int redirection_sys(t_token **re_built, t_token **id_class)
+{
+    if (no_command(*re_built))
+    {
+        command_ahead(*re_built);
+        if (red_system(re_built) == ANOMALY)
+            return (0);
+    }
+    return (1);
+}
+
 t_token *re_builder(t_token *id_class)
 {
     t_token *in;
@@ -28,24 +52,19 @@ t_token *re_builder(t_token *id_class)
 
     re_built = NULL;
     curr = id_class;
-    // debbuger_tk(id_class);
     while (curr != NULL)
     {
         if (!(1 <= curr->tok && curr->tok <= 4))
         {
             in = add_identity(ft_strdup(curr->identity), curr->tok, INIT, curr);
             if (!in)
-                return (clean_fd(re_built), list_cleaner(&re_built), NULL);
+                return (all_cleaner(&id_class, &re_built, CLEAN), NULL);
             add_back_identity(&re_built, in, D_INIT);
         }
         curr = curr->next;
     }
-    if (no_command(re_built))
-    {
-        command_ahead(re_built);
-        red_system(&re_built);
-    }
-    list_cleaner(&id_class);
-    // debbuger_tk(re_built);
+    if (!redirection_sys(&re_built, &id_class))
+        return (all_cleaner(&id_class, &re_built, RED_ARG_CLEAN), NULL);
+    clean_id_class(&id_class, CLEAN);
     return (re_built);
 }
