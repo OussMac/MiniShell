@@ -466,14 +466,12 @@ char **convert_list_to_argv(t_arg *arg, t_data *data)
         argv[i] = join_until_space(&arg);  // join as needed using space_next
         if (!argv[i])
         {
-            // cleanup on failure
-            while (i-- > 0) 
+            while (i-- > 0) // cleanup on failure
                 free(argv[i]);
-            free(argv);
-            return (NULL);
+            return (free(argv), NULL);
         }
         i++;
     }
     argv[i] = NULL;
-    return (argv);
+    return (free_arg_list(arg), argv);
 }
