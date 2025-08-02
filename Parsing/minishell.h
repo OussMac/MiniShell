@@ -183,6 +183,7 @@ typedef struct s_data
     int saved_in;
     int saved_out;
     bool    env_is_set; // tracks if we already built env.
+    int     pid;
 }   t_data;
 
 // Linked List To Store Each Entity

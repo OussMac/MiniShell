@@ -81,7 +81,7 @@ char *trim_key_spaces(char *key)
     return (trimmed);
 }
 
-
+// find variable in environment.
 static char    *find_in_env(t_envlist *envlist, char *key)
 {
     t_envlist   *cur;
@@ -89,8 +89,10 @@ static char    *find_in_env(t_envlist *envlist, char *key)
 
     cur = envlist;
     trimmed_key = trim_key_spaces(key);
-    // free(key); 
-    key = trimmed_key; // might have a leak , will have to revisit this.
+    if (!trimmed_key)
+        return (NULL);
+    free(key); 
+    key = trimmed_key;
     while (cur) 
     {
         if (ft_strcmp(key, cur->variable) == 0)
@@ -114,82 +116,114 @@ static size_t   arglist_size(t_arg *arg)
 }
 /// expand var
 
-int	ft_isalnum(int c)
+static bool ft_isalnum(int c)
 {
 	if (c >= '0' && c <= '9')
-		return (1);
+		return (true);
 	if (c >= 'A' && c <= 'Z')
-		return (1);
+		return (true);
 	if (c >= 'a' && c <= 'z')
-		return (1);
-	return (0);
+		return (true);
+	return (false);
 }
+
+// count number of $ in string.
 static int	count_dollars(char *s)
 {
-	int	i = 0;
-	int	cnt = 0;
+	int	i;
+	int	count;
 
+    i = 0;
+    count = 0;
 	while (s[i])
 	{
 		if (s[i] == '$')
-			cnt++;
+			count++;
 		i++;
 	}
-	return (cnt);
+	return (count);
 }
 
-static char	**alloc_parts(char *s)
+static char	**allocate_pockets(char *s)
 {
-	int		dc = count_dollars(s);
-	char	**parts;
+	int		dollar_count = count_dollars(s);
+	char	**pockets;
 
-	/* at most twice as many parts as dollars, plus terminator */
-	parts = malloc(sizeof(char *) * (dc * 2 + 2));
-	return (parts);
+	// for all possible outcomes, dc * 2 = for text befor $VAR and $VAR, + 2 trailing text after + NULL.
+	pockets = malloc(sizeof(char *) * (dollar_count * 2 + 2));
+	return (pockets);
 }
 
-static int	fill_parts(char **parts, char *s, t_data *data)
+// expands exit status.
+static char *expand_special_cases(char *str, t_data *data, int *i)
+{
+    if (str[*i + 1] == '?')
+    {
+	    *i += 2; // move $ ? ==> +2 
+        return (o_ft_itoa(data->exit_status));
+    }
+    else if (str[*i + 1] == '$')
+    {
+        *i += 2; // move $ $ ==> +2 
+        return (o_ft_itoa(data->pid));
+    }
+    return (NULL); // fallback should never happen.
+}
+
+static char *expand_key(char *str, t_data *data, int keylen, int *i)
+{
+    char    *value;
+    char    *key;
+
+    key = ft_substr(str, *i + 1, keylen); // trims $ from start
+    if (!key)
+        return (NULL);
+	value = find_in_env(data->env, key);
+    if (!value)
+        return (NULL);
+    *i += keylen + 1; // keylen + 1 [$]
+    return (value);
+}
+// normal text no expansion.
+static char *normal_text()
+{
+
+}
+
+// takes string and splits it into parts.
+static int	pocket_insertion(char **pockets, char *s, t_data *data)
 {
 	int		i;
-	int		p;
+	int		j;
 	int		keylen;
-	char	*seg;
-	char	*val;
+	char	*key;
+	char	*value;
 	int		start;
 
 	i = 0;
-	p = 0;
+	j = 0;
 	while (s[i])
 	{
 		if (s[i] == '$')
 		{
-			if (s[i + 1] == '?')
-			{
-				parts[p] = o_ft_itoa(data->exit_status);
-				p++;
-				i += 2;
-			}
+			if (s[i + 1] == '?' || s[i + 1] == '$')
+				pockets[j++] = expand_special_cases(s, data, &i);
 			else
 			{
 				keylen = 0;
 				while (ft_isalnum(s[i + 1 + keylen]) || s[i + 1 + keylen] == '_')
 					keylen++;
-				if (keylen > 0)
+				if (keylen > 0) // valid key
 				{
-					seg = ft_substr(s, i + 1, keylen);
-					val = find_in_env(data->env, seg);
-					free(seg);
-					if (val != NULL)
-						parts[p] = val;
+					value = expand_key(s, data, keylen, &i);
+					if (value != NULL)
+						pockets[j++] = value;
 					else
-						parts[p] = ft_strdup("");
-					p++;
-					i += keylen + 1;
+						pockets[j++] = ft_strdup("");
 				}
-				else
+				else // standalone $
 				{
-					parts[p] = ft_strdup("$");
-					p++;
+					pockets[j++] = ft_strdup("$");
 					i++;
 				}
 			}
@@ -199,15 +233,15 @@ static int	fill_parts(char **parts, char *s, t_data *data)
 			start = i;
 			while (s[i] && s[i] != '$')
 				i++;
-			parts[p] = ft_substr(s, start, i - start);
-			p++;
+			pockets[j] = ft_substr(s, start, i - start);
+			j++;
 		}
 	}
-	parts[p] = NULL;
-	return (p);
+	pockets[j] = NULL;
+	return (j);
 }
 
-static char	*join_parts(char **parts)
+static char	*pocket_joiner(char **parts)
 {
 	char	*res;
 
@@ -216,23 +250,22 @@ static char	*join_parts(char **parts)
 	return (res);
 }
 
+// function entry for expanding a variable can be "$HOME" or "this $USER, is $HOME"
 char	*expand_var(char *str, t_data *data)
 {
-	char	**parts;
+	char	**pockets;
 	char	*expanded;
 
-	parts = alloc_parts(str);
-	if (!parts)
+    if (str[0] == '\0')
+        return (ft_strdup("")); // empty case.
+	pockets = allocate_pockets(str);
+	if (!pockets)
 		return (NULL);
-	if (fill_parts(parts, str, data) < 0)
-	{
-		free(parts);
-		return (NULL);
-	}
-	expanded = join_parts(parts);
+	if (pocket_insertion(pockets, str, data) < 0)
+		return (free_argv(pockets), NULL);
+	expanded = pocket_joiner(pockets);
 	return (expanded);
 }
-
 
 // core expanding function. expands the argument linked list.
 int expand_list(t_arg *arg, t_data *data)
