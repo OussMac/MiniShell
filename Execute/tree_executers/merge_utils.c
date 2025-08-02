@@ -20,7 +20,7 @@ static int tree_traverser(t_tree *root,t_data *data, size_t *recurs_count)
         return (EXIT_FAILURE);
     (*recurs_count)++;
     if (root->tok == COMMAND_ID)
-    { 
+    {
         root->argv = convert_list_to_argv(root->arg, data); // matnsach tfreei fldakhl
         if (!root->argv)
             return (EXIT_FAILURE);

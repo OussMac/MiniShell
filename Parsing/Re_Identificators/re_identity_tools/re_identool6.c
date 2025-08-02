@@ -20,6 +20,7 @@ void add_arg_to_list(t_arg **arg_list, t_arg *arg)
 t_arg *new_argument(t_token *new)
 {
 	t_arg *arg;
+
 	arg = malloc(sizeof(t_arg));
 	if (!arg)
 		return (NULL);

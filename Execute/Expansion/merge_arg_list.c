@@ -429,7 +429,7 @@ static char *join_until_space(t_arg **p_arg)
     }
 
     *p_arg = curr;  // advance the caller’s pointer
-    return res;
+    return (res);
 }
 
 static void    free_arg_list(t_arg *arg)
@@ -440,6 +440,7 @@ static void    free_arg_list(t_arg *arg)
         return ;
     while (arg)
     {
+
         tmp = arg->next;
         free(arg->value);
         free(arg);
@@ -453,13 +454,15 @@ char **convert_list_to_argv(t_arg *arg, t_data *data)
     char        **argv;
     size_t      argc;
     int         i;
+    t_arg       *free_head;
 
+    free_head = arg;
     argc = arglist_size(arg);
     argv = malloc ((argc + 1)* sizeof(char *));
     if (!argv)
-        return (free_arg_list(arg), NULL); // cleanup return;
+        return (free_arg_list(free_head), NULL); // cleanup return;
     if (expand_list(arg, data) != EXIT_SUCCESS) // expanding.
-        return (free_arg_list(arg), free(argv), NULL);
+        return (free_arg_list(free_head), free(argv), NULL);
     i = 0;
     while(arg)
     {
@@ -468,10 +471,10 @@ char **convert_list_to_argv(t_arg *arg, t_data *data)
         {
             while (i-- > 0) // cleanup on failure
                 free(argv[i]);
-            return (free(argv), NULL);
+            return (free(argv), free_arg_list(free_head), NULL);
         }
         i++;
     }
     argv[i] = NULL;
-    return (free_arg_list(arg), argv);
+    return (free_arg_list(free_head), argv);
 }
