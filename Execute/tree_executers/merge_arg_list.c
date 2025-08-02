@@ -25,17 +25,10 @@ char	*o_ft_strjoin(char *s1, char *s2)
 	return ((ptr));
 }
 
+// delete later
 char	*trim_edge_quotes(char *str)
 {
-    size_t len;
-
-    if (!str)
-        return (NULL);
-
-    len = o_ft_strlen(str);
-    if (len >= 2 && (str[0] == '\'' && str[len - 1] == '\''))
-        return (ft_substr(str, 1, len - 2));
-    return (ft_strdup(str)); // no trimming needed
+    return (NULL);
 }
 
 void print_argv(char **argv)
@@ -241,29 +234,24 @@ char	*expand_var(char *str, t_data *data)
 }
 
 
-
 // core expanding function. expands the argument linked list.
 int expand_list(t_arg *arg, t_data *data)
 {
     t_arg   *curr;
     char    *expanded;
-    char    *trimmed;
 
     curr = arg;
     while (curr)
     {
-        if (curr->was_s_quote) // Literal string - just trim edge quotes
-        {
-            trimmed = trim_edge_quotes(curr->value);
-            free(curr->value);
-            curr->value = trimmed;
-        }
-        else // Everything else - expand variables
+        if (!curr->was_s_quote) // if not single quoted, expand
         {
             expanded = expand_var(curr->value, data);
+            if (!expanded)
+                return (EXIT_FAILURE);
             free(curr->value);
             curr->value = expanded;
         }
+        // skips over literal strings s quoted, aymane trims those quotes anyway.
         curr = curr->next;
     }
     return (EXIT_SUCCESS);
@@ -349,7 +337,6 @@ char **convert_list_to_argv(t_arg *arg, t_data *data)
             while (i-- > 0) 
                 free(argv[i]);
             free(argv);
-            puts("tt");
             return (NULL);
         }
         i++;
