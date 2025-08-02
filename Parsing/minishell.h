@@ -408,17 +408,6 @@ int                 printer_red(t_red *curr, char *name);
 
 #include <dirent.h> // for wildcard reading directory entries.
 
-typedef struct s_exp_tokens
-{
-    char    *string;
-    bool    is_env_var;
-    bool    double_q;
-    bool    single_q;
-    bool    wrap_me;
-    int     index;
-    struct s_exp_tokens *next;
-}   t_exp_tokens;
-
 // Main Exec Functionality.
 int                 exec_node(t_tree *node, t_data *data);
 int                 merger(t_tree *root, t_data *data, char **env);
@@ -442,7 +431,6 @@ size_t              arg_count(char **argv);
 // Expanding.
 char	            *o_ft_itoa(int n);
 char                *trim_quotes(char *str); // temp
-char	            *list_to_string(char **lst);
 char                *trim_edge_quotes(char *str); // temp
 int                 expand_wild_cards(t_tree *node);
 bool                is_fully_single_quoted(char *str); // temp
@@ -481,6 +469,14 @@ typedef struct s_plist
     t_tree *cmd_node;
     struct s_plist *next;
 }   t_plist;
+
+typedef struct s_pocket
+{
+    int		i;
+	int		j;
+	int		keylen;
+	char	*value;
+} t_pocket;
 
 // ----------------------------------------------------------------------------
 

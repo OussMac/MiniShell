@@ -1,5 +1,102 @@
 # include "../execute.h"
 
+static	int	ft_len(int nbr)
+{
+	int	len;
+
+	len = 0;
+	if (nbr == -2147483648)
+		return (11);
+	if (nbr < 0)
+	{
+		len++;
+		nbr = -nbr;
+	}
+	if (nbr == 0)
+		len++;
+	while (nbr != 0)
+	{
+		nbr /= 10;
+		len++;
+	}
+	return (len);
+}
+
+static char	*max_int(char *str)
+{
+	char	*tmp;
+	int		i;
+
+	tmp = "-2147483648";
+	i = 0;
+	while (tmp[i])
+	{
+		str[i] = tmp[i];
+		i++;
+	}
+	return (str);
+}
+
+char	*o_ft_itoa(int n)
+{
+	char	*s;
+	int		len;
+
+	len = ft_len(n);
+	s = (char *) malloc ((len + 1) * sizeof(char));
+	if (!s)
+		return (NULL);
+	s[len--] = 0;
+	if (n == 0)
+		s[0] = '0';
+	if (n == -2147483648)
+		return (max_int(s));
+	if (n < 0)
+	{
+		n = -n;
+		s[0] = '-';
+	}
+	while (n != 0)
+	{
+		s[len--] = (n % 10) + 48;
+		n /= 10;
+	}
+	return (s);
+}
+
+size_t	o_ft_strlen(char *s)
+{
+	size_t	i;
+
+	i = 0;
+	while (s[i] != '\0')
+		i++;
+	return (i);
+}
+
+static char	*merge_pockets(char **lst)
+{
+	char	*joined;
+	char	*temp;
+	size_t	i;
+
+	i = 0;
+	joined = NULL;
+	while (lst[i])
+	{
+		temp = joined;
+		joined = ft_strjoin(joined, lst[i]);
+		if (!joined)
+		{
+			// free temp
+			// return NULL
+		}
+		free(temp);
+		i++;
+	}
+	return (joined);
+}
+
 char	*o_ft_strjoin(char *s1, char *s2)
 {
 	char	*ptr;
@@ -176,77 +273,80 @@ static char *expand_key(char *str, t_data *data, int keylen, int *i)
     char    *key;
 
     key = ft_substr(str, *i + 1, keylen); // trims $ from start
+    *i += keylen + 1; // keylen + 1 [$]
     if (!key)
         return (NULL);
 	value = find_in_env(data->env, key);
     if (!value)
         return (NULL);
-    *i += keylen + 1; // keylen + 1 [$]
     return (value);
 }
 // normal text no expansion.
-static char *normal_text()
+static char *normal_text(char *str, int *i)
 {
+    int start;
 
+    start = *i;
+	while (str[*i] && str[*i] != '$')
+			(*i)++;
+	return (ft_substr(str, start, *i - start));
+}
+
+static char *standalone(int *i)
+{
+    (*i)++;
+    return (ft_strdup("$"));
+}
+
+static void init_pocket_struct(t_pocket *pc)
+{
+    pc->i = 0;
+    pc->j = 0;
+    pc->keylen = 0;
+    pc->value = NULL;
 }
 
 // takes string and splits it into parts.
-static int	pocket_insertion(char **pockets, char *s, t_data *data)
+static int	pocket_insertion(char **pockets, char *str, t_data *data)
 {
-	int		i;
-	int		j;
-	int		keylen;
-	char	*key;
-	char	*value;
-	int		start;
+    t_pocket pc;
 
-	i = 0;
-	j = 0;
-	while (s[i])
+    init_pocket_struct(&pc);
+	while (str[pc.i])
 	{
-		if (s[i] == '$')
+		if (str[pc.i] == '$')
 		{
-			if (s[i + 1] == '?' || s[i + 1] == '$')
-				pockets[j++] = expand_special_cases(s, data, &i);
-			else
+			if (str[pc.i + 1] == '?' || str[pc.i + 1] == '$')
+				pockets[pc.j++] = expand_special_cases(str, data, &pc.i);
+			else 
 			{
-				keylen = 0;
-				while (ft_isalnum(s[i + 1 + keylen]) || s[i + 1 + keylen] == '_')
-					keylen++;
-				if (keylen > 0) // valid key
+                pc.keylen = 0;
+				while (ft_isalnum(str[pc.i + 1 + pc.keylen]) || str[pc.i + 1 + pc.keylen] == '_')
+					pc.keylen++;
+				if (pc.keylen > 0) // valid key
 				{
-					value = expand_key(s, data, keylen, &i);
-					if (value != NULL)
-						pockets[j++] = value;
+					pc.value = expand_key(str, data, pc.keylen, &pc.i);
+					if (pc.value != NULL)
+						pockets[pc.j++] = pc.value;
 					else
-						pockets[j++] = ft_strdup("");
+						pockets[pc.j++] = ft_strdup("");
 				}
 				else // standalone $
-				{
-					pockets[j++] = ft_strdup("$");
-					i++;
-				}
+					pockets[pc.j++] = standalone(&pc.i);
 			}
 		}
 		else
-		{
-			start = i;
-			while (s[i] && s[i] != '$')
-				i++;
-			pockets[j] = ft_substr(s, start, i - start);
-			j++;
-		}
+			pockets[pc.j++] = normal_text(str, &pc.i);
 	}
-	pockets[j] = NULL;
-	return (j);
+	return (pockets[pc.j] = NULL, pc.j);
 }
 
-static char	*pocket_joiner(char **parts)
+static char	*pocket_joiner(char **pockets)
 {
 	char	*res;
 
-	res = list_to_string(parts);
-	free_argv(parts);
+	res = merge_pockets(pockets);
+	free_argv(pockets);
 	return (res);
 }
 

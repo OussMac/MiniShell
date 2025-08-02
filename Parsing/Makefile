@@ -48,8 +48,7 @@ SRC = minishell.c Identificators/identity_tools/identool0.c\
 		../Execute/o_builtins/o_exit.c ../Execute/o_builtins/o_export.c \
 		../Execute/o_builtins/o_pwd.c ../Execute/o_builtins/o_unset.c \
 		../Execute/o_builtins/wild_card.c ../Execute/tree_executers/merge_env.c \
-		../Execute/tree_executers/merge_env_utils.c ../Execute/Expansion/expanding.c \
-		../Execute/Expansion/expanding_utils.c ../Execute/Expansion/expanding_utils2.c \
+		../Execute/tree_executers/merge_env_utils.c \
 		../Execute/fail_malloc.c ../Execute/o_builtins/builtin_utils.c \
 		../Execute/tree_executers/merge_arg_list.c
 

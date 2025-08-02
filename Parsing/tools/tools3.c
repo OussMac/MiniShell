@@ -67,7 +67,7 @@ void init_data_struct(t_data *data, char **env)
     data->saved_in = -1;
     data->saved_out = -1;
     data->env_is_set = false;
-    data->pid = 1337;
+    data->pid = 1111;
     // list_exp(&data->exp, env);
     // list_env(&data->env, env);
     // zero_point(data);
