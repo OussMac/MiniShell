@@ -163,6 +163,15 @@ typedef struct s_exportlist
     struct s_exportlist *next;
 }   t_exportlist;
 
+// pocket insertion struct.
+typedef struct s_pocket
+{
+    int		i;
+	int		j;
+	int		keylen;
+	char	*value;
+} t_pocket;
+
 // Struct Holding MasterMind Data
 typedef struct s_data
 {
@@ -184,6 +193,7 @@ typedef struct s_data
     int saved_out;
     bool    env_is_set; // tracks if we already built env.
     int     pid;
+    t_pocket pc;
 }   t_data;
 
 // Linked List To Store Each Entity
@@ -469,14 +479,6 @@ typedef struct s_plist
     t_tree *cmd_node;
     struct s_plist *next;
 }   t_plist;
-
-typedef struct s_pocket
-{
-    int		i;
-	int		j;
-	int		keylen;
-	char	*value;
-} t_pocket;
 
 // ----------------------------------------------------------------------------
 

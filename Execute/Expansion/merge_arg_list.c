@@ -122,12 +122,6 @@ char	*o_ft_strjoin(char *s1, char *s2)
 	return ((ptr));
 }
 
-// delete later
-char	*trim_edge_quotes(char *str)
-{
-    return (NULL);
-}
-
 void print_argv(char **argv)
 {
     int i;
@@ -193,10 +187,10 @@ static char    *find_in_env(t_envlist *envlist, char *key)
     while (cur) 
     {
         if (ft_strcmp(key, cur->variable) == 0)
-            return (ft_strdup(cur->value)); // return value
+            return (free(key), ft_strdup(cur->value)); // return value
         cur = cur->next;
     }
-    return (NULL);
+    return (free(key), NULL);
 }
 
 static size_t   arglist_size(t_arg *arg)
@@ -277,7 +271,6 @@ static char *expand_key(char *str, t_data *data, int keylen, int *i)
     if (!key)
         return (NULL);
 	value = find_in_env(data->env, key);
-    free(key);
     if (!value)
         return (NULL);
     return (value);
@@ -307,39 +300,41 @@ static void init_pocket_struct(t_pocket *pc)
     pc->value = NULL;
 }
 
+static int  expand_key_wrapper(char **pockets, char *str, t_data *data)
+{
+    data->pc.value = expand_key(str, data, data->pc.keylen, &data->pc.i);
+    if (data->pc.value != NULL)
+        pockets[data->pc.j++] = data->pc.value;
+    else
+        pockets[data->pc.j++] = ft_strdup(""); // non printable to detect not passing it to execve.
+    return(EXIT_SUCCESS);
+}
+
 // takes string and splits it into parts.
 static int	pocket_insertion(char **pockets, char *str, t_data *data)
 {
-    t_pocket pc;
-
-    init_pocket_struct(&pc);
-	while (str[pc.i])
+    init_pocket_struct(&data->pc);
+	while (str[data->pc.i])
 	{
-		if (str[pc.i] == '$')
+		if (str[data->pc.i] == '$')
 		{
-			if (str[pc.i + 1] == '?' || str[pc.i + 1] == '$')
-				pockets[pc.j++] = expand_special_cases(str, data, &pc.i);
+			if (str[data->pc.i + 1] == '?' || str[data->pc.i + 1] == '$')
+				pockets[data->pc.j++] = expand_special_cases(str, data, &data->pc.i);
 			else 
 			{
-                pc.keylen = 0;
-				while (ft_isalnum(str[pc.i + 1 + pc.keylen]) || str[pc.i + 1 + pc.keylen] == '_')
-					pc.keylen++;
-				if (pc.keylen > 0) // valid key
-				{
-					pc.value = expand_key(str, data, pc.keylen, &pc.i);
-					if (pc.value != NULL)
-						pockets[pc.j++] = pc.value;
-					else
-						pockets[pc.j++] = ft_strdup("");
-				}
+                data->pc.keylen = 0;
+				while (ft_isalnum(str[data->pc.i + 1 + data->pc.keylen]) || str[data->pc.i + 1 + data->pc.keylen] == '_')
+					data->pc.keylen++;
+				if (data->pc.keylen > 0) // valid key
+					expand_key_wrapper(pockets, str, data); // check for fail.
 				else // standalone $
-					pockets[pc.j++] = standalone(&pc.i);
+					pockets[data->pc.j++] = standalone(&data->pc.i);
 			}
 		}
 		else
-			pockets[pc.j++] = normal_text(str, &pc.i);
+			pockets[data->pc.j++] = normal_text(str, &data->pc.i);
 	}
-	return (pockets[pc.j] = NULL, pc.j);
+	return (pockets[data->pc.j] = NULL, EXIT_SUCCESS);
 }
 
 static char	*pocket_joiner(char **pockets)
@@ -362,7 +357,7 @@ char	*expand_var(char *str, t_data *data)
 	pockets = allocate_pockets(str);
 	if (!pockets)
 		return (NULL);
-	if (pocket_insertion(pockets, str, data) < 0)
+	if (pocket_insertion(pockets, str, data) != EXIT_SUCCESS)
 		return (free_argv(pockets), NULL);
 	expanded = pocket_joiner(pockets);
 	return (expanded);
@@ -389,18 +384,6 @@ int expand_list(t_arg *arg, t_data *data)
         curr = curr->next;
     }
     return (EXIT_SUCCESS);
-}
-
-
-// helper function.
-static void print_exp_list(t_arg *arg)
-{
-    while (arg)
-    {
-        printf("[ %s ]\n", arg->value);
-        printf("was single quoted [ %d ]\n", arg->was_s_quote);
-        arg = arg->next;
-    }
 }
 
 // Joins successive t_arg->value pieces until space_next==true
@@ -476,6 +459,5 @@ char **convert_list_to_argv(t_arg *arg, t_data *data)
         }
         i++;
     }
-    argv[i] = NULL;
-    return (free_arg_list(free_head), argv);
+    return (argv[i] = NULL, free_arg_list(free_head), argv);
 }
