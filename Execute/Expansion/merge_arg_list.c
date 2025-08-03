@@ -272,11 +272,12 @@ static char *expand_key(char *str, t_data *data, int keylen, int *i)
     char    *value;
     char    *key;
 
-    key = ft_substr(str, *i + 1, keylen); // trims $ from start
+    key = ft_substr(str, *i + 1, keylen); // trims $ from start, free after
     *i += keylen + 1; // keylen + 1 [$]
     if (!key)
         return (NULL);
 	value = find_in_env(data->env, key);
+    free(key);
     if (!value)
         return (NULL);
     return (value);
