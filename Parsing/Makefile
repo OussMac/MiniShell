@@ -40,17 +40,21 @@ SRC = minishell.c Identificators/identity_tools/identool0.c\
 		\
 		\
 		\
-		../Execute/tree_executers/execute_tree.c ../Execute/tree_executers/merge_utils.c \
-		../Execute/tree_pipeline/tree_pipeline.c ../Execute/tree_executers/free_tree.c \
-		../Execute/tree_executers/shortcircuit.c ../Execute/tree_executers/handle_red.c \
-		../Execute/o_builtins/o_bultins.c ../Execute/o_builtins/o_echo.c \
-		../Execute/o_builtins/o_cd.c ../Execute/o_builtins/o_env.c \
-		../Execute/o_builtins/o_exit.c ../Execute/o_builtins/o_export.c \
-		../Execute/o_builtins/o_pwd.c ../Execute/o_builtins/o_unset.c \
-		../Execute/o_builtins/wild_card.c ../Execute/tree_executers/merge_env.c \
-		../Execute/tree_executers/merge_env_utils.c \
-		../Execute/fail_malloc.c ../Execute/o_builtins/builtin_utils.c \
-		../Execute/Expansion/merge_arg_list.c
+		../Execute/tree_executers/execute_tree.c ../Execute/tree_executers/merge_utils.c\
+		../Execute/tree_pipeline/tree_pipeline.c ../Execute/tree_executers/free_tree.c	\
+		../Execute/tree_executers/shortcircuit.c ../Execute/tree_executers/handle_red.c	\
+		../Execute/o_builtins/o_bultins.c ../Execute/o_builtins/o_echo.c 				\
+		../Execute/o_builtins/o_cd.c ../Execute/o_builtins/o_env.c 						\
+		../Execute/o_builtins/o_exit.c ../Execute/o_builtins/o_export.c 				\
+		../Execute/o_builtins/o_pwd.c ../Execute/o_builtins/o_unset.c 					\
+		../Execute/o_builtins/wild_card.c ../Execute/tree_executers/merge_env.c 		\
+		../Execute/tree_executers/merge_env_utils.c 									\
+		../Execute/fail_malloc.c ../Execute/o_builtins/builtin_utils.c 					\
+		../Execute/Expansion/expand_arglist.c ../Execute/Expansion/expand_key.c 		\
+		../Execute/Expansion/join_system.c ../Execute/Expansion/merge_arglist.c 		\
+		../Execute/Expansion/pocket_expantion.c ../Execute/Expansion/pocket_insertion.c \
+		../Execute/Expansion/expansion_utils.c
+
 
 OBJ = $(SRC:.c=.o)
 

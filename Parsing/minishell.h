@@ -438,18 +438,21 @@ int                 o_export(t_tree *node, t_data *data);
 int                 exec_builtin(t_tree *node, t_data *data);
 size_t              arg_count(char **argv);
 
-// Expanding.
-char	            *o_ft_itoa(int n);
-char                *trim_quotes(char *str); // temp
-char                *trim_edge_quotes(char *str); // temp
+// Expanding enrty functions.
 int                 expand_wild_cards(t_tree *node);
-bool                is_fully_single_quoted(char *str); // temp
-bool                has_quotes_in_both_edges(char *str); // temp
-void                expand_env_variables(t_tree *node, t_data *data);
-int                 o_ft_strncmp(const char *s1, const char *s2, size_t n);
-
-// expanding o2
+int                 expand_list(t_arg *arg, t_data *data);
 char                **convert_list_to_argv(t_arg *arg, t_data *data);
+int                 pocket_insertion(char **pockets, char *str, t_data *data);
+// Expansion Utils.
+int                 expand_key_wrapper(char **pockets, char *str, t_data *data);
+char                *standalone(int *i);
+char                *normal_text(char *str, int *i);
+char                *expand_key(char *str, t_data *data, int keylen, int *i);
+char                *join_system(t_arg **p_arg);
+char	            *pocket_joiner(char **pockets);
+char	            *o_ft_itoa(int n);
+size_t	            o_ft_strlen(char *s);
+
 
 // Linked env
 size_t              o_ft_strlen(char *str);
