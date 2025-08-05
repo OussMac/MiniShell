@@ -41,7 +41,7 @@ static char    *find_in_env(t_envlist *envlist, char *key)
     cur = envlist;
     trimmed_key = trim_key_spaces(key);
     if (!trimmed_key)
-        return (NULL);
+        return (free(key), NULL);
     free(key); 
     key = trimmed_key;
     while (cur) 
@@ -50,7 +50,7 @@ static char    *find_in_env(t_envlist *envlist, char *key)
             return (free(key), ft_strdup(cur->value)); // return value
         cur = cur->next;
     }
-    return (free(key), NULL);
+    return (free(key), ft_strdup("")); // non printable to detect not passing it to execve.
 }
 
 //entry function.

@@ -194,6 +194,7 @@ typedef struct s_data
     bool    env_is_set; // tracks if we already built env.
     int     pid;
     t_pocket pc;
+    t_tree *head;
 }   t_data;
 
 // Linked List To Store Each Entity
@@ -444,7 +445,7 @@ int                 expand_list(t_arg *arg, t_data *data);
 char                **convert_list_to_argv(t_arg *arg, t_data *data);
 int                 pocket_insertion(char **pockets, char *str, t_data *data);
 // Expansion Utils.
-int                 expand_key_wrapper(char **pockets, char *str, t_data *data);
+char                *expand_key_wrapper(char **pockets, char *str, t_data *data);
 char                *standalone(int *i);
 char                *normal_text(char *str, int *i);
 char                *expand_key(char *str, t_data *data, int keylen, int *i);
@@ -452,6 +453,10 @@ char                *join_system(t_arg **p_arg);
 char	            *pocket_joiner(char **pockets);
 char	            *o_ft_itoa(int n);
 size_t	            o_ft_strlen(char *s);
+
+// Wildcard
+bool                has_star(char *str);
+int                 link_patterns_to_argv(t_tree *node);
 
 
 // Linked env

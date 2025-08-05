@@ -28,12 +28,12 @@ char *standalone(int *i)
     return (ft_strdup("$"));
 }
 
-int  expand_key_wrapper(char **pockets, char *str, t_data *data)
+char *expand_key_wrapper(char **pockets, char *str, t_data *data)
 {
     data->pc.value = expand_key(str, data, data->pc.keylen, &data->pc.i);
     if (data->pc.value != NULL)
-        pockets[data->pc.j++] = data->pc.value;
-    else
-        pockets[data->pc.j++] = ft_strdup(""); // non printable to detect not passing it to execve.
-    return(EXIT_SUCCESS);
+        return (data->pc.value);
+    else if (data->pc.value == NULL)
+        return(NULL);
+    return (perror("WHY!"), NULL); // fallback should never happen
 }

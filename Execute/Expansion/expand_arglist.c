@@ -16,30 +16,26 @@ static int	count_dollars(char *s)
 	return (count);
 }
 
-static char	**allocate_pockets(char *s)
-{
-	int		dollar_count = count_dollars(s);
-	char	**pockets;
-
-	// for all possible outcomes, dc * 2 = for text befor $VAR and $VAR, + 2 trailing text after + NULL.
-	pockets = malloc(sizeof(char *) * (dollar_count * 2 + 2));
-	return (pockets);
-}
-
 // function entry for expanding a variable can be "$HOME" or "this $USER, is $HOME"
 static char	*expand_var(char *str, t_data *data)
 {
 	char	**pockets;
 	char	*expanded;
+	int		dollar_count;
+
 
     if (str[0] == '\0')
         return (ft_strdup("")); // empty case.
-	pockets = allocate_pockets(str);
+	dollar_count = count_dollars(str);
+	pockets = malloc(sizeof(char *) * (dollar_count * 2 + 2));
 	if (!pockets)
 		return (NULL);
 	if (pocket_insertion(pockets, str, data) != EXIT_SUCCESS)
-		return (free_argv(pockets), NULL);
+		return (NULL);
 	expanded = pocket_joiner(pockets);
+	if (!expanded)
+		return (free_argv(pockets), NULL);
+	free_argv(pockets);
 	return (expanded);
 }
 
@@ -54,6 +50,10 @@ int expand_list(t_arg *arg, t_data *data)
     {
         if (!curr->was_s_quote) // if not single quoted, expand
         {
+			// if (has_star(curr->value))
+			// {
+			// 	link_patterns_to_argv(curr); // check for fail
+			// }
             expanded = expand_var(curr->value, data);
             if (!expanded)
                 return (EXIT_FAILURE);

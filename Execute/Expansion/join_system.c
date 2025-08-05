@@ -54,7 +54,8 @@ char	*pocket_joiner(char **pockets)
 	char	*res;
 
 	res = merge_pockets(pockets);
-	free_argv(pockets);
+	if (!res)
+		return (NULL);
 	return (res);
 }
 
@@ -72,6 +73,8 @@ char *join_system(t_arg **p_arg)
     while (curr)
     {
         tmp = o_ft_strjoin(res, curr->value);
+		if(!tmp)
+			return (free(res), NULL);
         free(res);
         res = tmp;
         // if the parser marked a space after this piece, consume it and stop
