@@ -58,7 +58,7 @@ static int env_key(char *str, t_data *data, char **pockets)
 	{
 		pockets[data->pc.j] = expand_key_wrapper(pockets, str, data); // check for fail.
 		if (!pockets[data->pc.j++])
-			return(puts("zbi"), EXIT_FAILURE); // free backwards.
+			return(EXIT_FAILURE); // free backwards.
 	}
 	else // standalone $
 	{

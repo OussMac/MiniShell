@@ -37,6 +37,7 @@ static char    *find_in_env(t_envlist *envlist, char *key)
 {
     t_envlist   *cur;
     char        *trimmed_key;
+    char        anon[2];
 
     cur = envlist;
     trimmed_key = trim_key_spaces(key);
@@ -50,7 +51,9 @@ static char    *find_in_env(t_envlist *envlist, char *key)
             return (free(key), ft_strdup(cur->value)); // return value
         cur = cur->next;
     }
-    return (free(key), ft_strdup("")); // non printable to detect not passing it to execve.
+    anon[0] = (char)1;
+    anon[1] = '\0';
+    return (free(key), ft_strdup(anon)); // non printable to detect not passing it to execve.
 }
 
 //entry function.

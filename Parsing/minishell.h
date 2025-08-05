@@ -196,6 +196,7 @@ typedef struct s_data
     t_pocket pc;
     t_tree *head;
     char *last_executed;
+    int anon_start;
 }   t_data;
 
 // Linked List To Store Each Entity

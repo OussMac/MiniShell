@@ -1,5 +1,49 @@
 #include "../execute.h"
 
+static char **cut_vector(char **argv, int anon_start, size_t argc)
+{
+    int i;
+    char **new_vector;
+    int j;
+
+    new_vector = malloc (sizeof(char *) * (argc - anon_start + 1));
+    if (!new_vector)
+        return (NULL);
+    i = 0;
+    j = anon_start;
+    while (argv[anon_start])
+        new_vector[i++] = argv[anon_start++];
+    new_vector[i] = NULL;
+    while (--j >= 0)
+        free(argv[j]);
+    free(argv);
+    return (new_vector);
+}
+
+static bool anon(t_tree *node, size_t argc, t_data *data)
+{
+    int i;
+
+    i = 0;
+    if (argc == 1 && node->argv[0][0] == (char)1)
+        return (true);
+    else
+    {
+        while (node->argv[i])
+        {
+            if (node->argv[i][0] != (char)1)
+            {
+                node->argv = cut_vector(node->argv, i, argc);
+                if (!node->argv)
+                    return (true);
+                return (false);
+            }
+            i++;
+        }
+    }   
+    return (true);
+}
+
 // help function with forbidden functions
 // will code our own.
 char    *get_absolute_path(char *cmd)
@@ -31,11 +75,14 @@ int     exec_node(t_tree *node, t_data *data)
 
     if (id == 0)
     {
-        execve(get_absolute_path(node->argv[0]), node->argv, data->env_vec);
-        if (node->argv[0] && node->argv[0][0] == '/') // use strchr
-            dprintf(STDERR_FILENO, "Migrane: %s: No such file or directory\n", node->argv[0]); // change this to print error.
-        else
-            dprintf(STDERR_FILENO, "Migrane: command not found: %s \n", node->argv[0]);
+        if (!anon(node, arg_count(node->argv), data))
+        {
+            execve(get_absolute_path(node->argv[0]), node->argv, data->env_vec);
+            if (node->argv[0] && node->argv[0][0] == '/') // use strchr
+                dprintf(STDERR_FILENO, "Migrane: %s: No such file or directory\n", node->argv[0]); // change this to print error.
+            else
+                dprintf(STDERR_FILENO, "Migrane: command not found: %s \n", node->argv[0]);
+        }
         // maybe free();
         clean_up(data->head, data);
         free_argv(data->env_vec);
