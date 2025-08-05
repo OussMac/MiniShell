@@ -447,6 +447,7 @@ int                 add_last_executed(t_tree *node, t_data *data);
 // Expanding enrty functions.
 int                 expand_wild_cards(t_tree *node);
 int                 expand_list(t_arg *arg, t_data *data);
+char                *expand_var(char *str, t_data *data);
 char                **convert_list_to_argv(t_arg *arg, t_data *data);
 int                 pocket_insertion(char **pockets, char *str, t_data *data);
 // Expansion Utils.

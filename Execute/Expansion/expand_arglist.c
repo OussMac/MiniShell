@@ -17,7 +17,7 @@ static int	count_dollars(char *s)
 }
 
 // function entry for expanding a variable can be "$HOME" or "this $USER, is $HOME"
-static char	*expand_var(char *str, t_data *data)
+char	*expand_var(char *str, t_data *data)
 {
 	char	**pockets;
 	char	*expanded;
