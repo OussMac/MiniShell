@@ -4,6 +4,8 @@
 # include "../Parsing/minishell.h"
 # define RECURS_LIMIT (size_t)500
 # define EXECVE_FAILURE 127
+# define EXPORTED true
+# define NO_VALUE false
 
 
 

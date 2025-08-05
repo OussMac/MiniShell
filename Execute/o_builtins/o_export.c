@@ -7,7 +7,7 @@ bool    has_equal(char *str)
     i = 0;
     while (str[i])
     {
-        if (str[i] == ' ')
+        if (str[i] == '=')
             return (true);
         i++;
     }
@@ -23,11 +23,23 @@ static void free_exp_list(t_envlist *exp_list)
     while (exp_list)
     {
         tmp = exp_list->next;
-        free(exp_list->value);
-        free(exp_list->variable);
         free(exp_list);
         exp_list = tmp;
     }
+}
+
+static bool printable(char *str)
+{
+    int i;
+
+    i = 0;
+    while (str[i])
+    {
+        if (str[i] == (char)1)
+            return (false);
+        i++;
+    }
+    return (true);
 }
 
 static void print_export_list(t_envlist *env)
@@ -37,10 +49,12 @@ static void print_export_list(t_envlist *env)
     curr = env;
     while (curr)
     {
-        printf("declare -x %s=\"%s\"\n", curr->variable, curr->value);
+        printf(YLW"declare -x %s"RST, curr->variable);
+        if (printable(curr->value))
+            printf(RED"=\"%s\""RST,curr->value);
+        printf("\n");
         curr = curr->next;
     }
-    // free copy
 }
 
 static int add_to_export_list(t_envlist **export_lst, t_envlist *env)
@@ -132,10 +146,13 @@ int o_export(t_tree *node, t_data *data)
         while (node->argv[i])
         {
             if (has_equal(node->argv[i]))
-                add_to_envlist(&data->env, node->argv[i]); // check if fails.
+                add_to_envlist(&data->env, node->argv[i], EXPORTED);
+            else
+                add_to_envlist(&data->env, node->argv[i], NO_VALUE);
             i++;
         }
     }
+    free_exp_list(export_lst);
     return (EXIT_SUCCESS);
 }
 

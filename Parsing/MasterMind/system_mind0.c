@@ -13,6 +13,7 @@ t_tree *build_tree(t_token *id_class)
     if (!yard)
         return (clean_id_class(&id_class, FAIL), NULL);
     clean_id_class(&id_class, CLEAN);
+    // debbuger_tk(yard); // 7ydo a valgrind
     if (recursive_build(yard, &tree) == ANOMALY)
         return (clean_yard(&yard, FAIL), NULL); // Clean tree from fds, not red or args
     clean_yard(&yard, CLEAN);

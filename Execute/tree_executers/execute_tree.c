@@ -42,6 +42,7 @@ int     exec_node(t_tree *node, t_data *data)
         free_envlist(data->env);
         exit(EXECVE_FAILURE); // exit child process if execve fails
     }
+    
 
     // Parent:
     waitpid(id, &ex_status, 0);
@@ -59,11 +60,14 @@ int recursive_execution(t_tree *node, t_data *data) // not static cuz used in pi
     if (node->tok == COMMAND_ID) // base case exec cmd
     {
         // expand_wild_cards(node);
+
         if (node->red)
         {
             if (handle_red(node, data) != EXIT_SUCCESS)
                 return (EXIT_FAILURE);
         }
+        if (add_last_executed(node, data) != EXIT_SUCCESS)
+            return (EXIT_FAILURE);
         if (validate_builtin(node->argv[0]))
             data->exit_status = exec_builtin(node, data);
         else

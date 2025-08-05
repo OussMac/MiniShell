@@ -195,6 +195,7 @@ typedef struct s_data
     int     pid;
     t_pocket pc;
     t_tree *head;
+    char *last_executed;
 }   t_data;
 
 // Linked List To Store Each Entity
@@ -439,6 +440,9 @@ int                 o_export(t_tree *node, t_data *data);
 int                 exec_builtin(t_tree *node, t_data *data);
 size_t              arg_count(char **argv);
 
+// Export
+int                 add_last_executed(t_tree *node, t_data *data);
+
 // Expanding enrty functions.
 int                 expand_wild_cards(t_tree *node);
 int                 expand_list(t_arg *arg, t_data *data);
@@ -464,7 +468,7 @@ size_t              o_ft_strlen(char *str);
 size_t              envlist_size(t_envlist *env);
 char                *convert_node_to_str(t_envlist *env_node);
 char                **convert_list_to_envp(t_envlist *envlist);
-int                 add_to_envlist(t_envlist **envlist, char *str);
+int                 add_to_envlist(t_envlist **envlist, char *str, bool exported);
 
 // Redirections 
 int                 handle_red(t_tree *node, t_data *data);

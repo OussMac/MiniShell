@@ -5,6 +5,7 @@
 
 static bool g_should_fail = false;
 static const char *g_fail_file = NULL;
+
 static int g_fail_line = -1;
 
 // Call this to make the NEXT malloc fail after a specific line

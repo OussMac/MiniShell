@@ -8,7 +8,7 @@ static int  create_envlist(t_envlist **envlist, char **envp)
     *envlist = NULL;
     while (envp[i]) // iterating over og **envp
     {
-        if (add_to_envlist(envlist, envp[i++]) != EXIT_SUCCESS)
+        if (add_to_envlist(envlist, envp[i++], EXPORTED) != EXIT_SUCCESS)
             return (EXIT_FAILURE);
     }
     return (EXIT_SUCCESS);
