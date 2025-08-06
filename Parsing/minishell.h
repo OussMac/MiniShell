@@ -170,6 +170,7 @@ typedef struct s_pocket
 	int		j;
 	int		keylen;
 	char	*value;
+    size_t  cap;
 } t_pocket;
 
 // Struct Holding MasterMind Data
@@ -451,7 +452,7 @@ char                *expand_var(char *str, t_data *data);
 char                **convert_list_to_argv(t_arg *arg, t_data *data);
 int                 pocket_insertion(char **pockets, char *str, t_data *data);
 // Expansion Utils.
-char                *expand_key_wrapper(char **pockets, char *str, t_data *data);
+char                *expand_key_wrapper(char *str, t_data *data);
 char                *standalone(int *i);
 char                *normal_text(char *str, int *i);
 char                *expand_key(char *str, t_data *data, int keylen, int *i);
@@ -459,6 +460,9 @@ char                *join_system(t_arg **p_arg);
 char	            *pocket_joiner(char **pockets);
 char	            *o_ft_itoa(int n);
 size_t	            o_ft_strlen(char *s);
+char                **realloc_pockets(char **old_pocket, size_t old_cap, size_t new_cap);
+int                 internal_field_seperator(char *raw, t_data *data, char ***pockets);
+bool                has_space(char *str);
 
 // Wildcard
 bool                has_star(char *str);

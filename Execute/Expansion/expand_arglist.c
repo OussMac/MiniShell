@@ -30,6 +30,7 @@ char	*expand_var(char *str, t_data *data)
 	pockets = malloc(sizeof(char *) * (dollar_count * 2 + 2));
 	if (!pockets)
 		return (NULL);
+	data->pc.cap = (size_t)(dollar_count * 2 + 2);
 	if (pocket_insertion(pockets, str, data) != EXIT_SUCCESS)
 		return (NULL);
 	expanded = pocket_joiner(pockets);

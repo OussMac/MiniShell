@@ -28,7 +28,7 @@ char *standalone(int *i)
     return (ft_strdup("$"));
 }
 
-char *expand_key_wrapper(char **pockets, char *str, t_data *data)
+char *expand_key_wrapper(char *str, t_data *data)
 {
     data->pc.value = expand_key(str, data, data->pc.keylen, &data->pc.i);
     if (data->pc.value != NULL)

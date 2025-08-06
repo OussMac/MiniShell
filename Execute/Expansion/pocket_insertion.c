@@ -51,23 +51,51 @@ static int get_keylen(char *str, t_data *data)
 	return (data->pc.keylen);
 }
 
-static int env_key(char *str, t_data *data, char **pockets)
+// static int env_key(char *str, t_data *data, char **pockets)
+// {
+// 	data->pc.keylen = get_keylen(str, data);
+// 	if (data->pc.keylen > 0) // valid key
+// 	{
+// 		pockets[data->pc.j] = expand_key_wrapper(str, data); // check if the key has spaces inside and will have to dynaimaclly change pockets ** to a new fitting array 
+// 		if (!pockets[data->pc.j++])
+// 			return(EXIT_FAILURE); // free backwards.
+// 	}
+// 	else // standalone $
+// 	{
+// 		pockets[data->pc.j] = standalone(&data->pc.i);
+// 		if (!pockets[data->pc.j++])
+// 			return(EXIT_FAILURE); // free backwards.
+// 	}
+// 	return (EXIT_SUCCESS);
+// }
+
+static int env_key(char *str, t_data *data, char ***pockets)
 {
+    char    *raw;
+
 	data->pc.keylen = get_keylen(str, data);
 	if (data->pc.keylen > 0) // valid key
 	{
-		pockets[data->pc.j] = expand_key_wrapper(pockets, str, data); // check for fail.
-		if (!pockets[data->pc.j++])
-			return(EXIT_FAILURE); // free backwards.
+		raw = expand_key_wrapper(str, data);
+        if (!raw)
+            return ((*pockets)[data->pc.j++] = raw, EXIT_FAILURE); // free backwards.
+        if (has_space(raw))
+        {
+            if (internal_field_seperator(raw, data, pockets) != EXIT_SUCCESS)
+				return (data->pc.j++, EXIT_FAILURE);
+        }
+        else
+		    (*pockets)[data->pc.j++] = raw;
 	}
 	else // standalone $
 	{
-		pockets[data->pc.j] = standalone(&data->pc.i);
-		if (!pockets[data->pc.j++])
+		(*pockets)[data->pc.j] = standalone(&data->pc.i);
+		if (!(*pockets)[data->pc.j++])
 			return(EXIT_FAILURE); // free backwards.
 	}
 	return (EXIT_SUCCESS);
 }
+
 
 // entry function
 int	pocket_insertion(char **pockets, char *str, t_data *data)
@@ -85,7 +113,7 @@ int	pocket_insertion(char **pockets, char *str, t_data *data)
 			}
 			else 
 			{
-                if (env_key(str, data, pockets) != EXIT_SUCCESS)
+                if (env_key(str, data, &pockets) != EXIT_SUCCESS)
 					return (fail_procedure(pockets, data), EXIT_FAILURE);
 			}
 		}

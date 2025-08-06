@@ -14,21 +14,6 @@ static bool expandable_check(char *str)
     return (false);
 }
 
-static bool has_space(char *str)
-{
-    int i;
-
-    i = 0;
-    while (str[i])
-    {
-        if (str[i] == ' ')
-            return (true);
-        i++;
-    }
-    return (false);
-}
-
-
 static int red_in(t_red *red, t_data *data)
 {
     int in_fd;
