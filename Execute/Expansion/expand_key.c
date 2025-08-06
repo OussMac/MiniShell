@@ -51,7 +51,7 @@ static char    *find_in_env(t_envlist *envlist, char *key)
             return (free(key), ft_strdup(cur->value)); // return value
         cur = cur->next;
     }
-    anon[0] = (char)1;
+    anon[0] = (char)127;
     anon[1] = '\0';
     return (free(key), ft_strdup(anon)); // non printable to detect not passing it to execve.
 }

@@ -463,6 +463,9 @@ size_t	            o_ft_strlen(char *s);
 char                **realloc_pockets(char **old_pocket, size_t old_cap, size_t new_cap);
 int                 internal_field_seperator(char *raw, t_data *data, char ***pockets);
 bool                has_space(char *str);
+bool                has_delim(char *str);
+char                **IFS_pass(char **argv);
+char                **realloc_argv(char **old, size_t old_size, size_t new_size);
 
 // Wildcard
 bool                has_star(char *str);
@@ -497,6 +500,12 @@ typedef struct s_plist
     t_tree *cmd_node;
     struct s_plist *next;
 }   t_plist;
+
+typedef struct s_ifs
+{
+    char        *string;
+    struct s_ifs *next;
+}   t_ifs;
 
 // ----------------------------------------------------------------------------
 

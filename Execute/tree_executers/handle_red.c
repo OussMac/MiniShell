@@ -14,6 +14,20 @@ static bool expandable_check(char *str)
     return (false);
 }
 
+static bool has_ifs(char *str)
+{
+    int i;
+
+    i = 0;
+    while (str[i])
+    {
+        if (str[i] == (char)127)
+            return (true);
+        i++;
+    }
+    return (false);
+}
+
 static int red_in(t_red *red, t_data *data)
 {
     int in_fd;
@@ -75,13 +89,12 @@ int handle_red(t_tree *node, t_data *data)
         }
         free(curr_red->value);
         curr_red->value = expanded;
-        if (has_space(curr_red->value) && ambig)
+        if (has_ifs(curr_red->value) && ambig)
         {
             redirection_success = 0;
             dprintf(2 , RED"Master@Mind: %s: ambiguous redirect"RST"\n", curr_red->value);
             break ;
         }
-        puts("----------");
         if (curr_red->tok == INPUT_FILE_ID)
         {
             if (red_in(curr_red, data) != EXIT_SUCCESS)

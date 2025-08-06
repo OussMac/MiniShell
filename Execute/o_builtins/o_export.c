@@ -35,7 +35,7 @@ static bool printable(char *str)
     i = 0;
     while (str[i])
     {
-        if (str[i] == (char)1)
+        if (str[i] == (char)127)
             return (false);
         i++;
     }

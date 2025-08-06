@@ -1,5 +1,19 @@
 #include "../execute.h"
 
+bool    has_delim(char *str)
+{
+    int i;
+
+    i = 0;
+    while (str[i])
+    {
+        if (str[i] == (char)27)
+            return (true);
+        i++;
+    }
+    return (false);
+}
+
 bool    has_space(char *str)
 {
     int i;
@@ -14,9 +28,19 @@ bool    has_space(char *str)
     return (false);
 }
 
-static  append_delimiter(char *str)
+static  char *append_delimiter(char *str)
 {
-    
+    char    *new;
+    char    delim[3];
+
+    delim[0] = (char)127;
+    delim[1] = (char)27;
+    delim[2] = '\0';
+
+    new = ft_strjoin(str, delim);
+    if (!new)
+        return (NULL);
+    return (new);
 }
 
 int internal_field_seperator(char *raw, t_data *data, char ***pockets)
@@ -41,11 +65,10 @@ int internal_field_seperator(char *raw, t_data *data, char ***pockets)
     i = 0;
     while (i < mc_argc)
     {
-        (*pockets)[data->pc.j] = ft_strdup(mini_pocket[i]);
+        (*pockets)[data->pc.j] = append_delimiter(mini_pocket[i]);
         if (!(*pockets)[data->pc.j++])
             return (free_argv(mini_pocket), EXIT_FAILURE);
         i++;
     }
-    free_argv(mini_pocket);
-    return (EXIT_SUCCESS);
+    return (free_argv(mini_pocket), EXIT_SUCCESS);
 }

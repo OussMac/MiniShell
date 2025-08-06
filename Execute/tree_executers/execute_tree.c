@@ -25,13 +25,13 @@ static bool anon(t_tree *node, size_t argc, t_data *data)
     int i;
 
     i = 0;
-    if (argc == 1 && node->argv[0][0] == (char)1)
+    if (argc == 1 && node->argv[0][0] == (char)127)
         return (true);
     else
     {
         while (node->argv[i])
         {
-            if (node->argv[i][0] != (char)1)
+            if (node->argv[i][0] != (char)127)
             {
                 node->argv = cut_vector(node->argv, i, argc);
                 if (!node->argv)

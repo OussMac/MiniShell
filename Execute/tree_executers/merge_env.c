@@ -11,7 +11,7 @@ static char *get_value(char *str)
         return (perror("NULL Key in envp."), NULL);
     equals = 0;
     has_equal = false;
-    anon[0] = (char)1;
+    anon[0] = (char)127;
     anon[1] = '\0';
     while (str[equals])
     {

@@ -34,6 +34,7 @@ static size_t   arglist_size(t_arg *arg)
 char **convert_list_to_argv(t_arg *arg, t_data *data)
 {
     char        **argv;
+    char        **new_argv;
     size_t      argc;
     int         i;
     t_arg       *free_head;
@@ -57,5 +58,9 @@ char **convert_list_to_argv(t_arg *arg, t_data *data)
         }
         i++;
     }
-    return (argv[i] = NULL, free_arg_list(free_head), argv);
+    argv[i] = NULL;
+    new_argv = IFS_pass(argv); // argv gets freed inside.
+    if (!new_argv)
+        return (free(argv), free_arg_list(free_head), NULL);
+    return (free(argv), free_arg_list(free_head), new_argv);
 }

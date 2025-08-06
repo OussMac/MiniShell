@@ -54,7 +54,8 @@ SRC = minishell.c Identificators/identity_tools/identool0.c\
 		../Execute/Expansion/join_system.c ../Execute/Expansion/merge_arglist.c 		\
 		../Execute/Expansion/pocket_expantion.c ../Execute/Expansion/pocket_insertion.c \
 		../Execute/Expansion/expansion_utils.c ../Execute/tree_executers/last_exec.c \
-		../Execute/Expansion/ft_realloc.c ../Execute/Expansion/split_IFS.c
+		../Execute/Expansion/ft_realloc.c ../Execute/Expansion/split_IFS.c \
+		../Execute/Expansion/internal_field_seperator_pass.c
 		
 
 OBJ = $(SRC:.c=.o)
