@@ -465,7 +465,9 @@ int                 internal_field_seperator(char *raw, t_data *data, char ***po
 bool                has_space(char *str);
 bool                has_delim(char *str);
 char                **IFS_pass(char **argv);
-char                **realloc_argv(char **old, size_t old_size, size_t new_size);
+void                fail_procedure(char **pockets, t_data *data);
+bool                ft_isalnum(int c);
+char                *expand_special_cases(char *str, t_data *data, int *i);
 
 // Wildcard
 bool                has_star(char *str);
@@ -506,6 +508,25 @@ typedef struct s_ifs
     char        *string;
     struct s_ifs *next;
 }   t_ifs;
+
+typedef struct s_ifs_vars
+{
+    char    **ifs_split;
+    char    **new_argv;
+    t_ifs   *ifs_list;
+    int     i;
+    int     j;
+}   t_ifs_vars;
+
+typedef struct s_convert
+{
+    char        **argv;
+    char        **new_argv;
+    size_t      argc;
+    int         i;
+    t_arg       *free_head;
+}   t_convert;
+
 
 // ----------------------------------------------------------------------------
 

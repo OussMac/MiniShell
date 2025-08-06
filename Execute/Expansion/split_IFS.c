@@ -33,9 +33,9 @@ static  char *append_delimiter(char *str)
     char    *new;
     char    delim[3];
 
-    delim[0] = (char)127;
-    delim[1] = (char)27;
-    delim[2] = '\0';
+    // delim[0] = (char)127;
+    delim[0] = (char)27;
+    delim[1] = '\0';
 
     new = ft_strjoin(str, delim);
     if (!new)
@@ -65,10 +65,9 @@ int internal_field_seperator(char *raw, t_data *data, char ***pockets)
     i = 0;
     while (i < mc_argc)
     {
-        (*pockets)[data->pc.j] = append_delimiter(mini_pocket[i]);
+        (*pockets)[data->pc.j] = append_delimiter(mini_pocket[i++]);
         if (!(*pockets)[data->pc.j++])
             return (free_argv(mini_pocket), EXIT_FAILURE);
-        i++;
     }
     return (free_argv(mini_pocket), EXIT_SUCCESS);
 }

@@ -1,48 +1,60 @@
 #include "../execute.h"
 
-static char **cut_vector(char **argv, int anon_start, size_t argc)
+static char **cut_vector(char **argv, int start, int end)
 {
-    int i;
-    char **new_vector;
-    int j;
+    char    **new_vector;
+    int     i;
+    int     j;
 
-    new_vector = malloc (sizeof(char *) * (argc - anon_start + 1));
+    new_vector = malloc(sizeof(char *) * (end - start + 2));
     if (!new_vector)
         return (NULL);
     i = 0;
-    j = anon_start;
-    while (argv[anon_start])
-        new_vector[i++] = argv[anon_start++];
+    while (start <= end)
+    {
+        new_vector[i] = ft_strdup(argv[start]);
+        if (!new_vector[i])
+        {
+            while (--i >= 0)
+                free(new_vector[i]);
+            return (free(new_vector), NULL);
+        }
+        start++;
+        i++;
+    }
     new_vector[i] = NULL;
-    while (--j >= 0)
-        free(argv[j]);
-    free(argv);
+    free_argv(argv);
     return (new_vector);
 }
 
-static bool anon(t_tree *node, size_t argc, t_data *data)
-{
-    int i;
 
-    i = 0;
+static bool anon(t_tree *node, size_t argc)
+{
+    int start;
+    int end;
+
     if (argc == 1 && node->argv[0][0] == (char)127)
         return (true);
-    else
-    {
-        while (node->argv[i])
-        {
-            if (node->argv[i][0] != (char)127)
-            {
-                node->argv = cut_vector(node->argv, i, argc);
-                if (!node->argv)
-                    return (true);
-                return (false);
-            }
-            i++;
-        }
-    }   
-    return (true);
+
+    start = 0;
+    while (node->argv[start] && node->argv[start][0] == (char)127)
+        start++;
+
+    end = (int)argc - 1;
+    while (end >= start && node->argv[end][0] == (char)127)
+        end--;
+
+    if (start == 0 && (size_t)(end + 1) == argc)
+        return (false);
+
+    node->argv = cut_vector(node->argv, start, end);
+    printf ("==> %s\n", node->argv[0]);
+    print_argv(node->argv);
+    if (!node->argv)
+        return (true);
+    return (false);
 }
+
 
 // help function with forbidden functions
 // will code our own.
@@ -75,19 +87,16 @@ int     exec_node(t_tree *node, t_data *data)
 
     if (id == 0)
     {
-        if (!anon(node, arg_count(node->argv), data))
-        {
             execve(get_absolute_path(node->argv[0]), node->argv, data->env_vec);
             if (node->argv[0] && node->argv[0][0] == '/') // use strchr
                 dprintf(STDERR_FILENO, "Migrane: %s: No such file or directory\n", node->argv[0]); // change this to print error.
             else
-                dprintf(STDERR_FILENO, "Migrane: command not found: %s \n", node->argv[0]);
-        }
-        // maybe free();
-        clean_up(data->head, data);
-        free_argv(data->env_vec);
-        free_envlist(data->env);
-        exit(EXECVE_FAILURE); // exit child process if execve fails
+                dprintf(STDERR_FILENO, "Migrane: %s: command not found\n", node->argv[0]);
+            // maybe free();
+            clean_up(data->head, data);
+            free_argv(data->env_vec);
+            free_envlist(data->env);
+            exit(EXECVE_FAILURE); // exit child process if execve fails
     }
     
 
@@ -107,7 +116,6 @@ int recursive_execution(t_tree *node, t_data *data) // not static cuz used in pi
     if (node->tok == COMMAND_ID) // base case exec cmd
     {
         // expand_wild_cards(node);
-
         if (node->red)
         {
             if (handle_red(node, data) != EXIT_SUCCESS)
@@ -115,10 +123,15 @@ int recursive_execution(t_tree *node, t_data *data) // not static cuz used in pi
         }
         if (add_last_executed(node, data) != EXIT_SUCCESS)
             return (EXIT_FAILURE);
-        if (validate_builtin(node->argv[0]))
-            data->exit_status = exec_builtin(node, data);
+        if (!anon(node, arg_count(node->argv)) && node->argv[0])
+        {
+            if (validate_builtin(node->argv[0]))
+                data->exit_status = exec_builtin(node, data);
+            else
+                data->exit_status = exec_node(node, data);
+        }
         else
-            data->exit_status = exec_node(node, data);
+            data->exit_status = EXIT_SUCCESS;
         if (node->red)
             restore_IO(data->saved_in, data->saved_out); // if this fails check later.
         return (data->exit_status);

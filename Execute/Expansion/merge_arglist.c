@@ -33,34 +33,29 @@ static size_t   arglist_size(t_arg *arg)
 // entry function
 char **convert_list_to_argv(t_arg *arg, t_data *data)
 {
-    char        **argv;
-    char        **new_argv;
-    size_t      argc;
-    int         i;
-    t_arg       *free_head;
+    t_convert   cv;
 
-    free_head = arg;
-    argc = arglist_size(arg);
-    argv = malloc ((argc + 1)* sizeof(char *));
-    if (!argv)
-        return (free_arg_list(free_head), NULL); // cleanup return;
+    cv.free_head = arg;
+    cv.argc = arglist_size(arg);
+    cv.argv = malloc ((cv.argc + 1)* sizeof(char *));
+    if (!cv.argv)
+        return (free_arg_list(cv.free_head), NULL); // cleanup return;
     if (expand_list(arg, data) != EXIT_SUCCESS) // expanding.
-        return (free_arg_list(free_head), free(argv), NULL);
-    i = 0;
+        return (free_arg_list(cv.free_head), free(cv.argv), NULL);
+    cv.i = 0;
     while(arg)
     {
-        argv[i] = join_system(&arg);  // join args if needed.
-        if (!argv[i])
+        cv.argv[cv.i] = join_system(&arg);  // join args if needed.
+        if (!cv.argv[cv.i++])
         {
-            while (i-- > 0) // cleanup
-                free(argv[i]);
-            return (free(argv), free_arg_list(free_head), NULL);
+            while (--cv.i >= 0) // cleanup
+                free(cv.argv[cv.i]);
+            return (free(cv.argv), free_arg_list(cv.free_head), NULL);
         }
-        i++;
     }
-    argv[i] = NULL;
-    new_argv = IFS_pass(argv); // argv gets freed inside.
-    if (!new_argv)
-        return (free(argv), free_arg_list(free_head), NULL);
-    return (free(argv), free_arg_list(free_head), new_argv);
+    cv.argv[cv.i] = NULL;
+    cv.new_argv = IFS_pass(cv.argv); // argv gets freed inside.
+    if (!cv.new_argv)
+        return (free(cv.argv), free_arg_list(cv.free_head), NULL);
+    return (free(cv.argv), free_arg_list(cv.free_head), cv.new_argv);
 }

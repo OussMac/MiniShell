@@ -77,14 +77,12 @@ char *join_system(t_arg **p_arg)
 			return (free(res), NULL);
         free(res);
         res = tmp;
-        // if the parser marked a space after this piece, consume it and stop
-        if (curr->space_next)
+        if (curr->space_next)  // if the parser marked a space after this piece, consume it and stop
         {
             curr = curr->next;
             break;
         }
-        // otherwise, keep joining the next piece
-        curr = curr->next;
+        curr = curr->next; // otherwise, keep joining the next piece
     }
     *p_arg = curr;  // advance the caller’s pointer
     return (res);

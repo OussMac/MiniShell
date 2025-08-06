@@ -81,43 +81,44 @@ static char **ifs_list_to_argv(t_ifs *head)
     return (argv);
 }
 
+static int append_ifs(t_ifs_vars *ifs, char *str)
+{
+    ifs->ifs_split = ft_split(str, (char)27);
+    if (!ifs->ifs_split)
+        return (EXIT_FAILURE);
+    ifs->j = 0;
+    while (ifs->ifs_split[ifs->j])
+    {
+        if (add_ifs_back(&ifs->ifs_list, ifs->ifs_split[ifs->j++]) != EXIT_SUCCESS)
+            return (free_ifs_list(ifs->ifs_list), free_argv(ifs->ifs_split), EXIT_FAILURE);
+    }
+    free_argv(ifs->ifs_split);
+    return (EXIT_SUCCESS);
+}
+
 // // takes the argv but is joined i want to resplit but only the parts that have the delims i put
 char    **IFS_pass(char **argv)
 {
-    char    **ifs_split;
-    char    **new_argv;
-    t_ifs   *ifs_list;
-    int     i;
-    int     j;
+    t_ifs_vars  ifs;
 
-    i = 0;
-    ifs_list = NULL;
-    while (argv[i])
+    ifs.i = 0;
+    ifs.ifs_list = NULL;
+    while (argv[ifs.i])
     {
-        if (has_delim(argv[i]))
+        if (has_delim(argv[ifs.i]))
         {
-            ifs_split = ft_split(argv[i], (char)27);
-            if (!ifs_split)
+            if (append_ifs(&ifs, argv[ifs.i]) != EXIT_SUCCESS)
                 return (NULL);
-            j = 0;
-            while (ifs_split[j])
-            {
-                if (add_ifs_back(&ifs_list, ifs_split[j]) != EXIT_SUCCESS)
-                    return (free_ifs_list(ifs_list), free_argv(ifs_split), NULL);
-                j++;
-            }
-            free_argv(ifs_split);
         }
         else
         {
-            if (add_ifs_back(&ifs_list, argv[i]) != EXIT_SUCCESS)
-                return (free_ifs_list(ifs_list), NULL);
+            if (add_ifs_back(&ifs.ifs_list, argv[ifs.i]) != EXIT_SUCCESS)
+                return (free_ifs_list(ifs.ifs_list), NULL);
         }
-       i++;
+       ifs.i++;
     }
-    new_argv = ifs_list_to_argv(ifs_list);
-    if (!new_argv)
-        return (free_ifs_list(ifs_list), NULL);
-    free_ifs_list(ifs_list);
-    return (new_argv);
+    ifs.new_argv = ifs_list_to_argv(ifs.ifs_list);
+    if (!ifs.new_argv)
+        return (free_ifs_list(ifs.ifs_list), NULL);
+    return (free_ifs_list(ifs.ifs_list), ifs.new_argv);
 }

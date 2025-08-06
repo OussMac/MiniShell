@@ -21,7 +21,7 @@ static bool has_ifs(char *str)
     i = 0;
     while (str[i])
     {
-        if (str[i] == (char)127)
+        if (str[i] == (char)27)
             return (true);
         i++;
     }
@@ -89,7 +89,7 @@ int handle_red(t_tree *node, t_data *data)
         }
         free(curr_red->value);
         curr_red->value = expanded;
-        if (has_ifs(curr_red->value) && ambig)
+        if ((has_ifs(curr_red->value) && ambig) || (curr_red->value[0] == (char)127 && curr_red->value[1] == '\0'))
         {
             redirection_success = 0;
             dprintf(2 , RED"Master@Mind: %s: ambiguous redirect"RST"\n", curr_red->value);

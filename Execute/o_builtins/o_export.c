@@ -135,8 +135,7 @@ int o_export(t_tree *node, t_data *data)
 
     argc = arg_count(node->argv);
     export_lst = NULL;
-    // copy and sort list; sorted version.
-    if (sort_list(&export_lst, data->env) != EXIT_SUCCESS)
+    if (sort_list(&export_lst, data->env) != EXIT_SUCCESS) // copy and sort list; sorted version.
             return (EXIT_FAILURE);
     i = 1;
     if (argc == 1) // only export case.

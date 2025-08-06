@@ -45,14 +45,18 @@ static char    *find_in_env(t_envlist *envlist, char *key)
         return (free(key), NULL);
     free(key); 
     key = trimmed_key;
+    anon[0] = (char)127;
+    anon[1] = '\0';
     while (cur) 
     {
         if (ft_strcmp(key, cur->variable) == 0)
+        {
+            if (cur->value[0] == '\0')
+                return (free(key), ft_strdup(anon));
             return (free(key), ft_strdup(cur->value)); // return value
+        }
         cur = cur->next;
     }
-    anon[0] = (char)127;
-    anon[1] = '\0';
     return (free(key), ft_strdup(anon)); // non printable to detect not passing it to execve.
 }
 
