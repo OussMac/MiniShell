@@ -67,6 +67,24 @@ static int  red_append(t_red *red, t_data *data)
     return (EXIT_SUCCESS);
 }
 
+static bool check_expanded_malloc(char **expanded, int *rs, t_data *data, char *curr_red_value)
+{
+    *expanded = expand_var(curr_red_value, data);
+     if (!*expanded)
+    {
+            *rs = 0;
+            return(EXIT_FAILURE);
+    }
+    return (EXIT_SUCCESS);
+}
+
+static void init_red(t_data *data, int *rs)
+{
+    data->saved_in = dup(STDIN_FILENO);
+    data->saved_out = dup(STDOUT_FILENO);
+    *rs = 1;
+}
+
 int handle_red(t_tree *node, t_data *data)
 {
     t_red   *curr_red = node->red;
@@ -74,19 +92,12 @@ int handle_red(t_tree *node, t_data *data)
     bool    ambig;
     int redirection_success;
 
-    data->saved_in = dup(STDIN_FILENO);
-    data->saved_out = dup(STDOUT_FILENO);
-    redirection_success = 1;
-
+    init_red(data, &redirection_success);
     while (curr_red)
     {
         ambig = expandable_check(curr_red->value);
-        expanded = expand_var(curr_red->value, data);
-        if (!expanded)
-        {
-            redirection_success = 0;
+        if (check_expanded_malloc(&expanded, &redirection_success, data, curr_red->value) != EXIT_SUCCESS)
             break ;
-        }
         free(curr_red->value);
         curr_red->value = expanded;
         if ((has_ifs(curr_red->value) && ambig) || (curr_red->value[0] == (char)127 && curr_red->value[1] == '\0'))
