@@ -13,7 +13,7 @@ static size_t ifs_list_size(t_ifs *curr)
     return (size);
 }
 
-static void free_ifs_list(t_ifs *ifs)
+void free_ifs_list(t_ifs *ifs)
 {
     t_ifs   *tmp;
 
@@ -27,8 +27,8 @@ static void free_ifs_list(t_ifs *ifs)
         ifs = tmp;
     }
 }
-
-static int  add_ifs_back(t_ifs **head, char *str)
+// gets used in terminate anons.
+int  add_ifs_back(t_ifs **head, char *str)
 {
     t_ifs   *new;
     t_ifs   *curr;
@@ -52,7 +52,7 @@ static int  add_ifs_back(t_ifs **head, char *str)
     return (EXIT_SUCCESS);
 }
 
-static char **ifs_list_to_argv(t_ifs *head)
+char **ifs_list_to_argv(t_ifs *head)
 {
     size_t  size;
     t_ifs   *curr;

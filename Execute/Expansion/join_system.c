@@ -77,7 +77,7 @@ char *join_system(t_arg **p_arg)
 			return (free(res), NULL);
         free(res);
         res = tmp;
-        if (curr->space_next)  // if the parser marked a space after this piece, consume it and stop
+        if (curr->space_next || ft_strchr(curr->value, (char)127))  // if the parser marked a space after this piece, consume it and stop
         {
             curr = curr->next;
             break;

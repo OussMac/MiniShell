@@ -420,7 +420,38 @@ int                 printer_red(t_red *curr, char *name);
 
 // ouss functions  -----------------------------------------------------------------
 
-#include <dirent.h> // for wildcard reading directory entries.
+#include <dirent.h>
+
+typedef struct s_plist
+{
+    t_tree *cmd_node;
+    struct s_plist *next;
+}   t_plist;
+
+typedef struct s_ifs
+{
+    char        *string;
+    struct s_ifs *next;
+}   t_ifs;
+
+typedef struct s_ifs_vars
+{
+    char    **ifs_split;
+    char    **new_argv;
+    t_ifs   *ifs_list;
+    int     i;
+    int     j;
+}   t_ifs_vars;
+
+typedef struct s_convert
+{
+    char        **argv;
+    char        **new_argv;
+    size_t      argc;
+    int         i;
+    t_arg       *free_head;
+}   t_convert;
+
 
 // Main Exec Functionality.
 int                 exec_node(t_tree *node, t_data *data);
@@ -468,6 +499,9 @@ char                **IFS_pass(char **argv);
 void                fail_procedure(char **pockets, t_data *data);
 bool                ft_isalnum(int c);
 char                *expand_special_cases(char *str, t_data *data, int *i);
+int                 add_ifs_back(t_ifs **head, char *str);
+void                free_ifs_list(t_ifs *ifs);
+char                **ifs_list_to_argv(t_ifs *head);
 
 // Wildcard
 bool                has_star(char *str);
@@ -496,37 +530,6 @@ void                free_envlist(t_envlist *env);
 
 
 void print_argv(char **argv);
-
-typedef struct s_plist
-{
-    t_tree *cmd_node;
-    struct s_plist *next;
-}   t_plist;
-
-typedef struct s_ifs
-{
-    char        *string;
-    struct s_ifs *next;
-}   t_ifs;
-
-typedef struct s_ifs_vars
-{
-    char    **ifs_split;
-    char    **new_argv;
-    t_ifs   *ifs_list;
-    int     i;
-    int     j;
-}   t_ifs_vars;
-
-typedef struct s_convert
-{
-    char        **argv;
-    char        **new_argv;
-    size_t      argc;
-    int         i;
-    t_arg       *free_head;
-}   t_convert;
-
 
 // ----------------------------------------------------------------------------
 

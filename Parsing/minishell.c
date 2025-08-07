@@ -60,7 +60,8 @@ int main(int argc, char **argv, char **env)
         execute_tree(tree, &data, env, re_built);
     }
     free_argv(data.env_vec);
-    return (free_envlist(data.env), free(input), EXIT_SUCCESS);
+    free_envlist(data.env)
+    return (free(input), EXIT_SUCCESS);
 }
 
 // ls || cat | (cat) && clear | (cat & pwd) case to check in tree

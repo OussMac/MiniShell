@@ -8,7 +8,7 @@ static char **cut_vector(char **argv, int start, int end)
 
     new_vector = malloc(sizeof(char *) * (end - start + 2));
     if (!new_vector)
-        return (NULL);
+        return (free_argv(argv), NULL);
     i = 0;
     while (start <= end)
     {
@@ -17,7 +17,7 @@ static char **cut_vector(char **argv, int start, int end)
         {
             while (--i >= 0)
                 free(new_vector[i]);
-            return (free(new_vector), NULL);
+            return (free(new_vector), free_argv(argv), NULL);
         }
         start++;
         i++;
@@ -25,6 +25,51 @@ static char **cut_vector(char **argv, int start, int end)
     new_vector[i] = NULL;
     free_argv(argv);
     return (new_vector);
+}
+
+static bool has_anon(char *str)
+{
+    int i;
+
+    i = 0;
+    while (str[i])
+    {
+        if (str[i] == (char)127)
+            return (true);
+        i++;
+    }
+    return (false);
+}
+
+static char **terminate_inside_anons(char **argv)
+{
+    t_ifs   *args;
+    char    **new_argv;
+    int     i;
+
+    args = NULL;
+    i = 0;
+    while (argv[i])
+    {
+        if (!has_anon(argv[i]))
+        {
+            if (add_ifs_back(&args, argv[i]) != EXIT_SUCCESS)
+                return (free_ifs_list(args), free_argv(argv), NULL);
+        }
+        i++;
+    }
+    new_argv = ifs_list_to_argv(args);
+    if (!new_argv)
+        return (free_ifs_list(args),  free_argv(argv), NULL);
+    return(free_ifs_list(args), free_argv(argv), new_argv);
+}
+
+static bool has_anons_inside(int from, int till, char **argv)
+{
+    while (from <= till)
+        if (has_anon(argv[from++]))
+            return (true);
+    return (false);
 }
 
 
@@ -44,12 +89,12 @@ static bool anon(t_tree *node, size_t argc)
     while (end >= start && node->argv[end][0] == (char)127)
         end--;
 
-    if (start == 0 && (size_t)(end + 1) == argc)
+    if (start == 0 && (size_t)(end + 1) == argc && !has_anons_inside(start, end, node->argv))
         return (false);
-
     node->argv = cut_vector(node->argv, start, end);
-    printf ("==> %s\n", node->argv[0]);
-    print_argv(node->argv);
+    if (!node->argv)
+        return (true);
+    node->argv = terminate_inside_anons(node->argv);
     if (!node->argv)
         return (true);
     return (false);
@@ -98,11 +143,7 @@ int     exec_node(t_tree *node, t_data *data)
             free_envlist(data->env);
             exit(EXECVE_FAILURE); // exit child process if execve fails
     }
-    
-
-    // Parent:
-    waitpid(id, &ex_status, 0);
-
+    waitpid(id, &ex_status, 0); // Parent:
     // ───── decode status ─────
     if (WIFEXITED(ex_status))
         return (WEXITSTATUS(ex_status));
@@ -117,10 +158,8 @@ int recursive_execution(t_tree *node, t_data *data) // not static cuz used in pi
     {
         // expand_wild_cards(node);
         if (node->red)
-        {
             if (handle_red(node, data) != EXIT_SUCCESS)
                 return (EXIT_FAILURE);
-        }
         if (add_last_executed(node, data) != EXIT_SUCCESS)
             return (EXIT_FAILURE);
         if (!anon(node, arg_count(node->argv)) && node->argv[0])
