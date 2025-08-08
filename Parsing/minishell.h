@@ -475,13 +475,15 @@ size_t              arg_count(char **argv);
 
 // Export
 int                 add_last_executed(t_tree *node, t_data *data);
+char                *get_key(char *str);
+char                *get_value(char *str);
 
 // Expanding enrty functions.
 int                 expand_wild_cards(t_tree *node);
 int                 expand_list(t_arg *arg, t_data *data);
-char                *expand_var(char *str, t_data *data);
+char                *expand_var(char *str, t_data *data, char *first_arg);
 char                **convert_list_to_argv(t_arg *arg, t_data *data);
-int                 pocket_insertion(char **pockets, char *str, t_data *data);
+int                 pocket_insertion(char **pockets, char *str, t_data *data, char *first_arg);
 // Expansion Utils.
 char                *expand_key_wrapper(char *str, t_data *data);
 char                *standalone(int *i);

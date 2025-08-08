@@ -1,6 +1,6 @@
 #include "../execute.h"
 
-static char *get_value(char *str)
+char *get_value(char *str)
 {
     int     equals;
     bool    has_equal;
@@ -28,7 +28,7 @@ static char *get_value(char *str)
     return (value);
 }
 
-static char *get_key(char *str)
+char *get_key(char *str)
 {
     int     equals;
     bool    has_equal;

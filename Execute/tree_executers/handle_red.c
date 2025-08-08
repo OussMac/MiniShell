@@ -67,9 +67,43 @@ static int  red_append(t_red *red, t_data *data)
     return (EXIT_SUCCESS);
 }
 
-static bool check_expanded_malloc(char **expanded, t_data *data, char *curr_red_value)
+static char    *normalize_ifs(char *red_value, t_data *data)
 {
-    *expanded = expand_var(curr_red_value, data);
+    char    *expanded;
+    char    *normalized;
+    char    *trimmed;
+    int     i;
+
+    expanded = expand_var(red_value, data, NULL);
+    if (!expanded)
+        return (NULL);
+    normalized = malloc (o_ft_strlen(expanded) + 1);
+    if (!normalized)
+        return (free(expanded), NULL);
+    i = 0;
+    while (expanded[i])
+    {
+        if (expanded[i] == (char)27)
+            normalized[i] = ' ';
+        else
+            normalized[i] = expanded[i];
+        i++;
+    }
+    normalized[i] = '\0';
+    trimmed = ft_substr(normalized, 0 , o_ft_strlen(normalized) - 1); // trimm last space.
+    if (!trimmed)
+        return (free(expanded), free(normalized), NULL);
+    return (free(expanded), free(normalized), trimmed);
+}
+
+static bool check_expanded_malloc(char **expanded, t_data *data, t_red *curr_red)
+{
+    if (curr_red->was_s_quote)
+        *expanded = ft_strdup(curr_red->value);
+    else if (curr_red->was_d_quote)
+        *expanded = normalize_ifs(curr_red->value, data);
+    else
+        *expanded = expand_var(curr_red->value, data, NULL);
     if (!*expanded)
             return(EXIT_FAILURE);
     return (EXIT_SUCCESS);
@@ -116,7 +150,7 @@ int handle_red(t_tree *node, t_data *data)
     while (curr_red)
     {
         ambig = expandable_check(curr_red->value);
-        if (check_expanded_malloc(&expanded, data, curr_red->value) != EXIT_SUCCESS)
+        if (check_expanded_malloc(&expanded, data, curr_red) != EXIT_SUCCESS)
             return (EXIT_FAILURE);
         free(curr_red->value);
         curr_red->value = expanded;

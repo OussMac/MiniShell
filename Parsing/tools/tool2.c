@@ -13,7 +13,6 @@ int check_doubles(char x, char x2)
 int     ft_strcmp(char *s1, char *s2)
 {
         size_t  i;
-
         if (!s1 || !s2)
             return(-1);
         i = 0;

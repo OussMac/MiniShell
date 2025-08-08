@@ -17,7 +17,21 @@ static int get_keylen(char *str, t_data *data)
 	return (data->pc.keylen);
 }
 
-static int env_key(char *str, t_data *data, char ***pockets)
+static bool comparing_wrapper(char *str, bool argv_0)
+{
+	if (argv_0)
+	{
+		if (!str)
+			return (true);
+		if (ft_strcmp(str, "export"))
+			return (true);
+		else
+			return (false);
+	}
+	return (true);
+}
+
+static int env_key(char *str, t_data *data, char ***pockets, bool argv_0, char *first_arg)
 {
     char    *raw;
 
@@ -27,7 +41,7 @@ static int env_key(char *str, t_data *data, char ***pockets)
 		raw = expand_key_wrapper(str, data);
         if (!raw)
             return ((*pockets)[data->pc.j++] = raw, EXIT_FAILURE); // free backwards.
-        if (has_space(raw))
+        if (has_space(raw) && comparing_wrapper(first_arg, argv_0))
         {
             if (internal_field_seperator(raw, data, pockets) != EXIT_SUCCESS)
 				return (data->pc.j++, EXIT_FAILURE);
@@ -46,7 +60,7 @@ static int env_key(char *str, t_data *data, char ***pockets)
 
 
 // entry function
-int	pocket_insertion(char **pockets, char *str, t_data *data)
+int	pocket_insertion(char **pockets, char *str, t_data *data, char *first_arg)
 {
     init_pocket_struct(&data->pc);
 	while (str[data->pc.i])
@@ -61,7 +75,7 @@ int	pocket_insertion(char **pockets, char *str, t_data *data)
 			}
 			else 
 			{
-                if (env_key(str, data, &pockets) != EXIT_SUCCESS)
+                if (env_key(str, data, &pockets, data->pc.j != 0, first_arg) != EXIT_SUCCESS)
 					return (fail_procedure(pockets, data), EXIT_FAILURE);
 			}
 		}

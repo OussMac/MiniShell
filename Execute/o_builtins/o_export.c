@@ -126,6 +126,51 @@ static int sort_list(t_envlist **export_lst, t_envlist *env)
     return (EXIT_SUCCESS);
 }
 
+static  bool    already_exported(char *new_var, t_data *data)
+{
+    t_envlist   *curr;
+    char        *key;
+
+    key = get_key(new_var);
+    if (!key)
+        return (false);
+    curr = data->env;
+    while (curr)
+    {
+        if (ft_strcmp(key, curr->variable) == 0)
+            return (free(key), true);
+        curr = curr->next;
+    }
+    return (free(key), false);
+}
+
+static int  assign_new_value(char *new_var, t_envlist *env)
+{
+    char    *key;
+    char    *value;
+
+    key = get_key(new_var);
+    if (!key)
+        return (EXIT_FAILURE);
+    value = get_value(new_var);
+    if (!value)
+        return (free(key), EXIT_FAILURE);
+    while (env)
+    {
+        if (ft_strcmp(key, env->variable) == 0)
+        {
+            free(env->value);
+            env->value = value;
+            env->exported = EXPORTED;
+            return (free(key), EXIT_SUCCESS);
+        }
+        env = env->next;
+    }
+    return (EXIT_SUCCESS); // fallback shouldnt happen.
+}
+
+
+
 // function entry.
 int o_export(t_tree *node, t_data *data)
 {
@@ -144,15 +189,25 @@ int o_export(t_tree *node, t_data *data)
     {
         while (node->argv[i])
         {
-            if (has_equal(node->argv[i]))
-                add_to_envlist(&data->env, node->argv[i], EXPORTED);
+            if (not_valid_identifier())
+            {
+
+            }
+            if (already_exported(node->argv[i], data))
+            {
+                assign_new_value(node->argv[i], data->env); // check for fail.
+            }
             else
-                add_to_envlist(&data->env, node->argv[i], NO_VALUE);
+            {
+                if (has_equal(node->argv[i]))
+                    add_to_envlist(&data->env, node->argv[i], EXPORTED); // check for failure.
+                else
+                    add_to_envlist(&data->env, node->argv[i], NO_VALUE); // check for failure.
+            }
             i++;
         }
     }
-    free_exp_list(export_lst);
-    return (EXIT_SUCCESS);
+    return (free_exp_list(export_lst), EXIT_SUCCESS);
 }
 
 // when export is called

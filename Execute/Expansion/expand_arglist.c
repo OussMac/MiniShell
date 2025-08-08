@@ -17,7 +17,7 @@ static int	count_dollars(char *s)
 }
 
 // function entry for expanding a variable can be "$HOME" or "this $USER, is $HOME"
-char	*expand_var(char *str, t_data *data)
+char	*expand_var(char *str, t_data *data, char *first_arg)
 {
 	char	**pockets;
 	char	*expanded;
@@ -31,7 +31,7 @@ char	*expand_var(char *str, t_data *data)
 	if (!pockets)
 		return (NULL);
 	data->pc.cap = (size_t)(dollar_count * 2 + 2);
-	if (pocket_insertion(pockets, str, data) != EXIT_SUCCESS)
+	if (pocket_insertion(pockets, str, data, first_arg) != EXIT_SUCCESS)
 		return (NULL);
 	expanded = pocket_joiner(pockets);
 	if (!expanded)
@@ -45,8 +45,10 @@ int expand_list(t_arg *arg, t_data *data)
 {
     t_arg   *curr;
     char    *expanded;
+	char	*first_arg;
 
     curr = arg;
+	first_arg = ft_strdup(curr->value);
     while (curr)
     {
         if (!curr->was_s_quote) // if not single quoted, expand
@@ -55,7 +57,7 @@ int expand_list(t_arg *arg, t_data *data)
 			// {
 			// 	link_patterns_to_argv(curr); // check for fail
 			// }
-            expanded = expand_var(curr->value, data);
+            expanded = expand_var(curr->value, data, first_arg);
             if (!expanded)
                 return (EXIT_FAILURE);
             free(curr->value);
@@ -64,5 +66,6 @@ int expand_list(t_arg *arg, t_data *data)
         // skips over literal strings s quoted, aymane trims those quotes anyway.
         curr = curr->next;
     }
+	free(first_arg);
     return (EXIT_SUCCESS);
 }

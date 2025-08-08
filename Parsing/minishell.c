@@ -60,7 +60,7 @@ int main(int argc, char **argv, char **env)
         execute_tree(tree, &data, env, re_built);
     }
     free_argv(data.env_vec);
-    free_envlist(data.env)
+    free_envlist(data.env);
     return (free(input), EXIT_SUCCESS);
 }
 
