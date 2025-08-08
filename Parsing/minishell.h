@@ -117,6 +117,7 @@ typedef struct s_arg
     char *value;
     t_grammar tok;
     int was_s_quote;
+    bool was_d_quoted; // zdtha ta tzidha nta
     bool space_next;
     struct s_arg *next;
 }   t_arg;
@@ -481,9 +482,9 @@ char                *get_value(char *str);
 // Expanding enrty functions.
 int                 expand_wild_cards(t_tree *node);
 int                 expand_list(t_arg *arg, t_data *data);
-char                *expand_var(char *str, t_data *data, char *first_arg);
+char                *expand_var(char *str, t_data *data, bool was_d_quoted);
 char                **convert_list_to_argv(t_arg *arg, t_data *data);
-int                 pocket_insertion(char **pockets, char *str, t_data *data, char *first_arg);
+int                 pocket_insertion(char **pockets, char *str, t_data *data, bool was_d_quoted);
 // Expansion Utils.
 char                *expand_key_wrapper(char *str, t_data *data);
 char                *standalone(int *i);

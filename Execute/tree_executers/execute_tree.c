@@ -159,9 +159,9 @@ int recursive_execution(t_tree *node, t_data *data) // not static cuz used in pi
         // expand_wild_cards(node);
         if (node->red)
             if (handle_red(node, data) != EXIT_SUCCESS)
-                return (EXIT_FAILURE);
+                return (EXIT_FAILURE); // restore io
         if (add_last_executed(node, data) != EXIT_SUCCESS)
-            return (EXIT_FAILURE);
+            return (EXIT_FAILURE); // restore io
         if (!anon(node, arg_count(node->argv)) && node->argv[0])
         {
             if (validate_builtin(node->argv[0]))

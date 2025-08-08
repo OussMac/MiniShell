@@ -67,6 +67,20 @@ static int  red_append(t_red *red, t_data *data)
     return (EXIT_SUCCESS);
 }
 
+static int red_here_doc(t_red *red)
+{
+    if (fcntl(red->fd_here_doc, F_GETFD) == -1)
+        perror("fcntl check");
+    puts("passed");
+    if (dup2(red->fd_here_doc, STDIN_FILENO) == -1)
+        return (perror("dup2"), EXIT_FAILURE);
+    puts("passed2");
+    close(red->fd_here_doc);
+    red->fd_here_doc = -1;
+    return (EXIT_SUCCESS);
+}
+
+
 static char    *normalize_ifs(char *red_value, t_data *data)
 {
     char    *expanded;
@@ -74,7 +88,7 @@ static char    *normalize_ifs(char *red_value, t_data *data)
     char    *trimmed;
     int     i;
 
-    expanded = expand_var(red_value, data, NULL);
+    expanded = expand_var(red_value, data, true);
     if (!expanded)
         return (NULL);
     normalized = malloc (o_ft_strlen(expanded) + 1);
@@ -103,7 +117,7 @@ static bool check_expanded_malloc(char **expanded, t_data *data, t_red *curr_red
     else if (curr_red->was_d_quote)
         *expanded = normalize_ifs(curr_red->value, data);
     else
-        *expanded = expand_var(curr_red->value, data, NULL);
+        *expanded = expand_var(curr_red->value, data, false);
     if (!*expanded)
             return(EXIT_FAILURE);
     return (EXIT_SUCCESS);
@@ -135,7 +149,11 @@ static int  redirect_current(t_red *curr_red, t_data *data)
     }
     else if(curr_red->tok == DEL_ID)
     {
-        // HEREDOC
+           dprintf(2, "DEBUG heredoc fd=%d isatty=%d\n",
+            curr_red->fd_here_doc,
+            isatty(curr_red->fd_here_doc));
+        if (red_here_doc(curr_red) != EXIT_SUCCESS)
+            return (EXIT_FAILURE);
     }
     return (EXIT_SUCCESS);
 }

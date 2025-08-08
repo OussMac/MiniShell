@@ -14,6 +14,20 @@ bool    has_equal(char *str)
     return (false);
 }
 
+static bool has_plus(char *str)
+{
+    int i;
+
+    i = 0;
+    while (str[i])
+    {
+        if (str[i] == '+')
+            return (true);
+        i++;
+    }
+    return (false);
+}
+
 static void free_exp_list(t_envlist *exp_list)
 {
     t_envlist   *tmp;
@@ -168,7 +182,148 @@ static int  assign_new_value(char *new_var, t_envlist *env)
     }
     return (EXIT_SUCCESS); // fallback shouldnt happen.
 }
+// invalid identifier
 
+static bool only_equals(char *str)
+{
+    int i;
+
+    i = 0;
+    while (str[i])
+    {
+        if (str[i] != '=' )
+            return (false);
+        i++;
+    }
+    return (true);
+}
+
+static bool valid_first_char(char c)
+{
+    if (c >= 'a' && c <= 'z')
+        return (true);
+    if (c >= 'A' && c <= 'Z')
+        return (true);
+    if (c == '_')
+        return (true);
+    return (false);
+}
+
+static bool valid_char(char c)
+{
+    if (c >= 'a' && c <= 'z')
+        return (true);
+    if (c >= 'A' && c <= 'Z')
+        return (true);
+    if (c >= '0' && c <= '9')
+        return (true);
+    if (c == '_' || c == '=' || c == '+')
+        return (true);
+    return (false);
+}
+
+static bool is_printable(char c)
+{
+    if (c == '=')
+        return (false);
+	if (c >= 32 && c <= 126 || c == '\0')
+	{
+		return (true);
+	}
+	return (false);
+}
+
+static bool valid_identifier(char *str)
+{
+    int     i;
+    bool    standalone;
+
+    i = 0;
+    standalone = true;
+    if (!valid_first_char(str[i]))
+        return (false);
+    i++;
+    while (str[i])
+    {
+        if (!valid_char(str[i]))
+            return (false);
+        else
+        {
+            if (str[i] == '=' || str[i] == '+')
+            {
+                standalone = false;
+                break ;
+            }
+        }
+        i++;
+    }
+    if (standalone)
+        return (true);
+    else
+    {
+        if (str[i] == '+' && str[i + 1] != '=')
+            return (false);
+        if (str[i] == '=' && !is_printable(str[i + 1]))
+            return(false);
+    }
+    return (true);
+}
+// --------------------
+
+
+static char *get_append_key(char *str)
+{
+    int     equals;
+    bool    has_equal;
+    char    *key;
+
+    if (!str)
+        return (perror("NULL Key in envp."), NULL); // cant ever happen unless i pass it.
+    equals = 0;
+    has_equal = false;
+    while (str[equals])
+    {
+        if (str[equals++] == '+')
+        {
+            has_equal = true;
+            break ;
+        }
+    }
+    if (has_equal)
+        key = ft_substr(str, 0, equals - 1); // if this fails it will return a NULL.
+    else
+        key = ft_strdup(str);
+    return (key);
+}
+
+// kayjib key 7ed = so b+ is the key and doenst find it using strcmp
+static int  append_value(char *new_var, t_envlist *env)
+{
+    char    *key;
+    char    *value;
+    char    *old_value;
+
+    key = get_append_key(new_var);
+    if (!key)
+        return (EXIT_FAILURE);
+    value = get_value(new_var);
+    if (!value)
+        return (free(key), EXIT_FAILURE);
+    while (env)
+    {
+        if (ft_strcmp(key, env->variable) == 0)
+        {
+            old_value = env->value;
+            env->value = ft_strjoin(old_value, value);
+            free(value);
+            free(old_value);
+            env->exported = EXPORTED;
+            return (free(key), EXIT_SUCCESS);
+        }
+        env = env->next;
+    }
+    return (EXIT_SUCCESS); // fallback shouldnt happen.
+}
 
 
 // function entry.
@@ -189,18 +344,28 @@ int o_export(t_tree *node, t_data *data)
     {
         while (node->argv[i])
         {
-            if (not_valid_identifier())
+            if (!valid_identifier(node->argv[i]))
             {
-
+                dprintf(2, "Master@Mind: export: `%s': not a valid identifier\n", node->argv[i]);
+                i++;
+                continue ;
             }
             if (already_exported(node->argv[i], data))
             {
-                assign_new_value(node->argv[i], data->env); // check for fail.
+                if(has_plus(node->argv[i]))
+                    append_value(node->argv[i], data->env); // check for fail
+                else if (has_equal(node->argv[i]))
+                    assign_new_value(node->argv[i], data->env); // check for fail.
             }
             else
             {
                 if (has_equal(node->argv[i]))
-                    add_to_envlist(&data->env, node->argv[i], EXPORTED); // check for failure.
+                {
+                    if(has_plus(node->argv[i]))
+                        append_value(node->argv[i], data->env); // check for fail
+                    else
+                        add_to_envlist(&data->env, node->argv[i], EXPORTED); // check for failure.
+                }
                 else
                     add_to_envlist(&data->env, node->argv[i], NO_VALUE); // check for failure.
             }

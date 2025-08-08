@@ -17,7 +17,7 @@ static int	count_dollars(char *s)
 }
 
 // function entry for expanding a variable can be "$HOME" or "this $USER, is $HOME"
-char	*expand_var(char *str, t_data *data, char *first_arg)
+char	*expand_var(char *str, t_data *data, bool was_d_quoted)
 {
 	char	**pockets;
 	char	*expanded;
@@ -31,7 +31,7 @@ char	*expand_var(char *str, t_data *data, char *first_arg)
 	if (!pockets)
 		return (NULL);
 	data->pc.cap = (size_t)(dollar_count * 2 + 2);
-	if (pocket_insertion(pockets, str, data, first_arg) != EXIT_SUCCESS)
+	if (pocket_insertion(pockets, str, data, was_d_quoted) != EXIT_SUCCESS)
 		return (NULL);
 	expanded = pocket_joiner(pockets);
 	if (!expanded)
@@ -57,7 +57,7 @@ int expand_list(t_arg *arg, t_data *data)
 			// {
 			// 	link_patterns_to_argv(curr); // check for fail
 			// }
-            expanded = expand_var(curr->value, data, first_arg);
+            expanded = expand_var(curr->value, data, curr->was_d_quoted);
             if (!expanded)
                 return (EXIT_FAILURE);
             free(curr->value);
