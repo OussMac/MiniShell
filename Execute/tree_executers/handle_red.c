@@ -69,14 +69,10 @@ static int  red_append(t_red *red, t_data *data)
 
 static int red_here_doc(t_red *red)
 {
-    if (fcntl(red->fd_here_doc, F_GETFD) == -1)
-        perror("fcntl check");
-    puts("passed");
     if (dup2(red->fd_here_doc, STDIN_FILENO) == -1)
         return (perror("dup2"), EXIT_FAILURE);
-    puts("passed2");
-    close(red->fd_here_doc);
-    red->fd_here_doc = -1;
+    // close(red->fd_here_doc);
+    // red->fd_here_doc = -1;
     return (EXIT_SUCCESS);
 }
 
@@ -149,9 +145,6 @@ static int  redirect_current(t_red *curr_red, t_data *data)
     }
     else if(curr_red->tok == DEL_ID)
     {
-           dprintf(2, "DEBUG heredoc fd=%d isatty=%d\n",
-            curr_red->fd_here_doc,
-            isatty(curr_red->fd_here_doc));
         if (red_here_doc(curr_red) != EXIT_SUCCESS)
             return (EXIT_FAILURE);
     }
@@ -174,7 +167,8 @@ int handle_red(t_tree *node, t_data *data)
         curr_red->value = expanded;
         if ((has_ifs(curr_red->value) && ambig) || (curr_red->value[0] == (char)127 && curr_red->value[1] == '\0'))
             return (dprintf(2 , RED"Master@Mind: %s: ambiguous redirect"RST"\n", curr_red->value), EXIT_FAILURE);
-        redirect_current(curr_red, data);
+        if (redirect_current(curr_red, data) != EXIT_SUCCESS)
+            return (EXIT_FAILURE);
         curr_red = curr_red->next;
     }
     return (EXIT_SUCCESS);

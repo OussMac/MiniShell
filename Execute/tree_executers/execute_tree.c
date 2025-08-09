@@ -1,104 +1,97 @@
 #include "../execute.h"
 
-static char **cut_vector(char **argv, int start, int end)
-{
-    char    **new_vector;
-    int     i;
-    int     j;
+// static bool single_anon(char *str)
+// {
+//     if (str[0] == (char)127 && str[1] == '\0')
+//         return (true);
+//     return (false);
+// }
 
-    new_vector = malloc(sizeof(char *) * (end - start + 2));
-    if (!new_vector)
-        return (free_argv(argv), NULL);
-    i = 0;
-    while (start <= end)
-    {
-        new_vector[i] = ft_strdup(argv[start]);
-        if (!new_vector[i])
-        {
-            while (--i >= 0)
-                free(new_vector[i]);
-            return (free(new_vector), free_argv(argv), NULL);
-        }
-        start++;
-        i++;
-    }
-    new_vector[i] = NULL;
-    free_argv(argv);
-    return (new_vector);
-}
+// static bool still_has_anon(char *str)
+// {
+//     int i;
 
-static bool has_anon(char *str)
-{
-    int i;
+//     i = 0;
+//     while (str[i])
+//     {
+//         if (str[i] == (char)127)
+//             return (true);
+//         i++;
+//     }
+//     return (false);
+// }
 
-    i = 0;
-    while (str[i])
-    {
-        if (str[i] == (char)127)
-            return (true);
-        i++;
-    }
-    return (false);
-}
+// static int anon_index(char *str)
+// {
+//     int i;
 
-static char **terminate_inside_anons(char **argv)
-{
-    t_ifs   *args;
-    char    **new_argv;
-    int     i;
+//     i = 0;
+//     while (str[i])
+//     {
+//         if (str[i] == (char)127)
+//             return (i);
+//         i++;
+//     }
+//     return (i); // fall back shouldnt happen.
+// }
 
-    args = NULL;
-    i = 0;
-    while (argv[i])
-    {
-        if (!has_anon(argv[i]))
-        {
-            if (add_ifs_back(&args, argv[i]) != EXIT_SUCCESS)
-                return (free_ifs_list(args), free_argv(argv), NULL);
-        }
-        i++;
-    }
-    new_argv = ifs_list_to_argv(args);
-    if (!new_argv)
-        return (free_ifs_list(args),  free_argv(argv), NULL);
-    return(free_ifs_list(args), free_argv(argv), new_argv);
-}
+// static void init_terminator(t_ifs **args, int *i)
+// {
+//     *args = NULL;
+//     *i = 0;
+// }
 
-static bool has_anons_inside(int from, int till, char **argv)
-{
-    while (from <= till)
-        if (has_anon(argv[from++]))
-            return (true);
-    return (false);
-}
+// static char **terminate_inside_anons(char **argv)
+// {
+//     t_ifs   *args;
+//     char    **new_argv;
+//     char    *cut;
+//     int     i;
+
+//     init_terminator(&args, &i);
+//     while (argv[i])
+//     {
+//         if (!single_anon(argv[i]))
+//         {
+//             if (still_has_anon(argv[i]))
+//             {
+//                 cut = ft_substr(argv[i], anon_index(argv[i]) + 1, o_ft_strlen(argv[i]));
+//                 if (!cut)
+//                     return (free_ifs_list(args), free_argv(argv), NULL);
+//                 free(argv[i]);
+//                 argv[i] = cut;
+//             }
+//             if (add_ifs_back(&args, argv[i]) != EXIT_SUCCESS)
+//                 return (free_ifs_list(args), free_argv(argv), NULL);
+//         }
+//         i++;
+//     }
+//     new_argv = ifs_list_to_argv(args);
+//     if (!new_argv)
+//         return (free_ifs_list(args),  free_argv(argv), NULL);
+//     return(free_ifs_list(args), free_argv(argv), new_argv);
+// }
+
+// static bool has_anons_inside(int from, int till, char **argv)
+// {
+//     while (from <= till)
+//         if (still_has_anon(argv[from++]))
+//             return (true);
+//     return (false);
+// }
 
 
-static bool anon(t_tree *node, size_t argc)
-{
-    int start;
-    int end;
-
-    if (argc == 1 && node->argv[0][0] == (char)127)
-        return (true);
-
-    start = 0;
-    while (node->argv[start] && node->argv[start][0] == (char)127)
-        start++;
-
-    end = (int)argc - 1;
-    while (end >= start && node->argv[end][0] == (char)127)
-        end--;
-
-    if (start == 0 && (size_t)(end + 1) == argc && !has_anons_inside(start, end, node->argv))
-        return (false);
-    node->argv = cut_vector(node->argv, start, end);
-    if (!node->argv)
-        return (true);
-    node->argv = terminate_inside_anons(node->argv);
-    if (!node->argv)
-        return (true);
-    return (false);
-}
+// static bool anon(t_tree *node, size_t argc)
+// {
+//     if (argc == 1 && node->argv[0][0] == (char)127 && node->argv[0][1] == '\0')
+//         return (true);
+//     if (!has_anons_inside(0 , argc - 1, node->argv))
+//         return (false);
+//     node->argv = terminate_inside_anons(node->argv);
+//     if (!node->argv)
+//         return (true);
+//     return (false);
+// }
 
 
 // help function with forbidden functions

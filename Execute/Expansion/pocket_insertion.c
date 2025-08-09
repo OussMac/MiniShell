@@ -11,25 +11,13 @@ static void init_pocket_struct(t_pocket *pc)
 static int get_keylen(char *str, t_data *data)
 {
 	data->pc.keylen = 0;
+	if (str[data->pc.i + 1] >= '0' && str[data->pc.i + 1] <= '9')
+		return (data->pc.keylen + 1);
 	while (ft_isalnum(str[data->pc.i + 1 + data->pc.keylen])
 		|| str[data->pc.i + 1 + data->pc.keylen] == '_')
 		data->pc.keylen++;
 	return (data->pc.keylen);
 }
-
-// static bool comparing_wrapper(char *str, bool argv_0)
-// {
-// 	if (argv_0)
-// 	{
-// 		if (!str)
-// 			return (true);
-// 		if (ft_strcmp(str, "export"))
-// 			return (true);
-// 		else
-// 			return (false);
-// 	}
-// 	return (true);
-// }
 
 static int env_key(char *str, t_data *data, char ***pockets, bool was_d_quoted)
 {

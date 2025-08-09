@@ -505,6 +505,10 @@ char                *expand_special_cases(char *str, t_data *data, int *i);
 int                 add_ifs_back(t_ifs **head, char *str);
 void                free_ifs_list(t_ifs *ifs);
 char                **ifs_list_to_argv(t_ifs *head);
+// Anon system.
+bool                anon(t_tree *node, size_t argc);
+bool                still_has_anon(char *str);
+char                **terminate_inside_anons(char **argv);
 
 // Wildcard
 bool                has_star(char *str);

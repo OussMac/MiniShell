@@ -36,7 +36,7 @@ t_tree *masterpasrse(char *input, t_data *data, t_token **prompts)
 
 int main(int argc, char **argv, char **env)
 {
-    // atexit(f);
+    atexit(f);
     // atexit(check_fd_leaks);
     char *input;
     t_data data;
